@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_diabetify</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_small_diabetify</item>
         <item name="postSplashScreenTheme">@style/Theme.Diabetify</item>
     </style>
     

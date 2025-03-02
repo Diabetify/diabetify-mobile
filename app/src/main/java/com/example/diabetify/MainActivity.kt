@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import com.example.diabetify.domain.usecases.AppEntryUseCases
 import com.example.diabetify.presentation.onboarding.OnBoardingScreen
+import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.example.diabetify.ui.theme.DiabetifyTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -16,20 +18,24 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var appEntryUseCases: AppEntryUseCases
+    lateinit var useCases: AppEntryUseCases
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
+
         lifecycleScope.launch {
-            appEntryUseCases.readAppEntry().collect{
+            useCases.readAppEntry().collect{
                 Log.d("MainActivity", "App entry: ${it.toString()}")
             }
-
         }
+
         setContent {
             DiabetifyTheme {
-                OnBoardingScreen()
+                val viewModel: OnBoardingViewModel = hiltViewModel()
+                OnBoardingScreen(
+                    event = viewModel::onEvent
+                )
             }
         }
     }

@@ -40,7 +40,9 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun OnBoardingScreen() {
+fun OnBoardingScreen(
+    event: (OnBoardingEvent) -> Unit
+) {
     val (showGetStarted, setShowGetStarted) = remember { mutableStateOf(true) }
 
     val pagerState = rememberPagerState(initialPage = 0) {
@@ -109,7 +111,7 @@ fun OnBoardingScreen() {
                             if (showGetStarted) {
                                 setShowGetStarted(false)
                             } else if (pagerState.currentPage == pages.size - 1) {
-                                // TODO: Add navigation to main screen
+                                event(OnBoardingEvent.SaveAppEntry)
                             } else {
                                 pagerState.animateScrollToPage(
                                     page = pagerState.currentPage + 1

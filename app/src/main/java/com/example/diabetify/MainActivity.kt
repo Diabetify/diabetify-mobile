@@ -1,41 +1,29 @@
 package com.example.diabetify
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
-import com.example.diabetify.domain.usecases.AppEntryUseCases
-import com.example.diabetify.presentation.onboarding.OnBoardingScreen
-import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
+import com.example.diabetify.presentation.navgraph.NavGraph
 import com.example.diabetify.ui.theme.DiabetifyTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var useCases: AppEntryUseCases
-
+    val viewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
-
-        lifecycleScope.launch {
-            useCases.readAppEntry().collect{
-                Log.d("MainActivity", "App entry: ${it.toString()}")
+        installSplashScreen().apply {
+            setKeepOnScreenCondition{
+                viewModel.splashCondition
             }
         }
 
         setContent {
             DiabetifyTheme {
-                val viewModel: OnBoardingViewModel = hiltViewModel()
-                OnBoardingScreen(
-                    event = viewModel::onEvent
-                )
+                val startDestination = viewModel.startDestination
+                NavGraph(startDestination)
             }
         }
     }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.example.diabetify.R
 import com.example.diabetify.ui.theme.poppinsFontFamily
 import com.example.diabetify.presentation.common.Divider
+import com.example.diabetify.presentation.common.PrimaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -276,25 +277,12 @@ fun RegisterScreen() {
                     )
                 }
 
-                // Register button
-                Button(
+                PrimaryButton(
+                    text = "Daftar",
                     onClick = { /* Handle registration */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary)),
-                    shape = RoundedCornerShape(28.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     enabled = isChecked
-                ) {
-                    Text(
-                        text = "Daftar",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                )
 
                 Divider(
                     text = "Atau",

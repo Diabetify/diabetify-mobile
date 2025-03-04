@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.diabetify.R
+import com.example.diabetify.presentation.common.PrimaryButton
 import com.example.diabetify.presentation.onboarding.components.GetStartedPage
 import com.example.diabetify.presentation.onboarding.components.OnBoardingPage
 import com.example.diabetify.presentation.onboarding.components.PagerIndicator
@@ -105,55 +106,49 @@ fun OnBoardingScreen(
             ) {
                 val scope = rememberCoroutineScope()
 
-                Button(
-                    onClick = {
-                        scope.launch {
-                            if (showGetStarted) {
+                if (showGetStarted) {
+                    PrimaryButton(
+                        text = buttonText.value,
+                        onClick = {
+                            scope.launch {
                                 setShowGetStarted(false)
-                            } else if (pagerState.currentPage == pages.size - 1) {
-                                event(OnBoardingEvent.SaveAppEntry)
-                            } else {
-                                pagerState.animateScrollToPage(
-                                    page = pagerState.currentPage + 1
-                                )
                             }
-                        }
-                    },
-                    modifier = if (showGetStarted) {
-                        Modifier
-                            .height(56.dp)
-                            .fillMaxWidth()
-                    } else {
-                        Modifier
-                            .height(56.dp)
-                            .width(56.dp)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (showGetStarted) {
-                            colorResource(id = R.color.secondary)
-                        } else {
-                            colorResource(id = R.color.primary)
-                        }
-                    ),
-                    shape = if (showGetStarted) {
-                        androidx.compose.foundation.shape.RoundedCornerShape(28.dp)
-                    } else {
-                        androidx.compose.foundation.shape.CircleShape
-                    },
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        },
+                        enabled = true,
+                    )
+                } else {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                if (pagerState.currentPage == pages.size - 1) {
+                                    event(OnBoardingEvent.SaveAppEntry)
+                                } else {
+                                    pagerState.animateScrollToPage(
+                                        page = pagerState.currentPage + 1
+                                    )
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                                .height(56.dp)
+                                .width(56.dp),
+                        colors = ButtonDefaults.buttonColors(colorResource(id = R.color.primary)),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(
-                            text = buttonText.value,
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = if (showGetStarted) 18.sp else 25.sp,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = buttonText.value,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 25.sp,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             }

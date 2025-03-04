@@ -28,14 +28,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.diabetify.R
 import com.example.diabetify.ui.theme.poppinsFontFamily
 import com.example.diabetify.presentation.common.Divider
 import com.example.diabetify.presentation.common.PrimaryButton
+import com.example.diabetify.presentation.navgraph.Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -279,7 +281,9 @@ fun RegisterScreen() {
 
                 PrimaryButton(
                     text = "Daftar",
-                    onClick = { /* Handle registration */ },
+                    onClick = {
+                        navController.navigate(Route.BiodataScreen.route)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = isChecked
                 )

@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.diabetify.presentation.login.LoginScreen
 import com.example.diabetify.presentation.onboarding.OnBoardingScreen
 import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
+import com.example.diabetify.presentation.register.BiodataScreen
 import com.example.diabetify.presentation.register.RegisterScreen
 
 @Composable
@@ -36,10 +37,32 @@ fun NavGraph(
             route = Route.RegisterNavigation.route,
             startDestination = Route.RegisterScreen.route
         ) {
+            // Create a ViewModel scoped to this navigation graph
+//            val sharedViewModel: RegisterSharedViewModel = hiltViewModel(
+//                navController.getBackStackEntry(Route.RegisterNavigation.route)
+//            )
+
             composable(
                 route = Route.RegisterScreen.route
             ) {
-                 RegisterScreen()
+                RegisterScreen(
+                    navController = navController,
+//                    viewModel = sharedViewModel,
+//                    onNavigateToBiodata = {
+//                        navController.navigate(Route.BiodataScreen.route)
+//                    }
+                )
+            }
+
+            composable(
+                route = Route.BiodataScreen.route
+            ) {
+                BiodataScreen(
+//                    viewModel = sharedViewModel,
+//                    onSubmitRegistration = {
+//                        // Handle submission and navigation to next screen
+//                    }
+                )
             }
         }
 

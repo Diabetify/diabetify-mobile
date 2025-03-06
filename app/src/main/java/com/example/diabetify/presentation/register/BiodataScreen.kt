@@ -41,10 +41,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.diabetify.R
 import com.example.diabetify.presentation.common.DropdownField
 import com.example.diabetify.presentation.common.InputField
 import com.example.diabetify.presentation.common.PrimaryButton
+import com.example.diabetify.presentation.navgraph.Route
 import com.example.diabetify.presentation.register.components.DatePickerModal
 import com.example.diabetify.ui.theme.poppinsFontFamily
 import java.text.SimpleDateFormat
@@ -53,7 +55,7 @@ import java.util.Locale
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun BiodataScreen() {
+fun BiodataScreen(navController: NavController) {
     var gender by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
@@ -113,7 +115,7 @@ fun BiodataScreen() {
                 fontSize = 12.sp,
                 lineHeight = 15.sp,
                 textAlign = TextAlign.Center,
-                color = colorResource(id = R.color.primary)
+                color = colorResource(id = R.color.gray)
             )
 
             Column(
@@ -266,7 +268,7 @@ fun BiodataScreen() {
         PrimaryButton(
             text = "Lanjut",
             onClick = {
-//                        navController.navigate(Route.BiodataScreen.route)
+                navController.navigate(Route.OtpScreen.route)
             },
             modifier = Modifier
                 .fillMaxWidth()

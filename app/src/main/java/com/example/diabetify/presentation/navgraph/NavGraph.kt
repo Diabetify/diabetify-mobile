@@ -10,6 +10,7 @@ import com.example.diabetify.presentation.login.LoginScreen
 import com.example.diabetify.presentation.onboarding.OnBoardingScreen
 import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.example.diabetify.presentation.register.BiodataScreen
+import com.example.diabetify.presentation.register.OtpScreen
 import com.example.diabetify.presentation.register.RegisterScreen
 
 @Composable
@@ -57,11 +58,18 @@ fun NavGraph(
                 route = Route.BiodataScreen.route
             ) {
                 BiodataScreen(
+                    navController = navController,
 //                    viewModel = sharedViewModel,
 //                    onSubmitRegistration = {
 //                        // Handle submission and navigation to next screen
 //                    }
                 )
+            }
+
+            composable(
+                route = Route.OtpScreen.route
+            ) {
+                OtpScreen()
             }
         }
 

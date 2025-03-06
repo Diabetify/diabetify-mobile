@@ -6,6 +6,7 @@ sealed class Route(
     object OnBoardingScreen : Route(route = "onBoardingScreen")
     object RegisterScreen : Route(route = "registerScreen")
     object BiodataScreen : Route(route = "biodataScreen")
+    object OtpScreen : Route(route = "otpScreen")
     object LoginScreen : Route(route = "loginScreen")
     object AppStartNavigation : Route(route = "appStartNavigation")
     object RegisterNavigation : Route(route = "registerNavigation")

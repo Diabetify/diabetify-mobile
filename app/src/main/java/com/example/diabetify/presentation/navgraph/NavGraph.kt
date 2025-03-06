@@ -37,7 +37,6 @@ fun NavGraph(
             route = Route.RegisterNavigation.route,
             startDestination = Route.RegisterScreen.route
         ) {
-            // Create a ViewModel scoped to this navigation graph
 //            val sharedViewModel: RegisterSharedViewModel = hiltViewModel(
 //                navController.getBackStackEntry(Route.RegisterNavigation.route)
 //            )

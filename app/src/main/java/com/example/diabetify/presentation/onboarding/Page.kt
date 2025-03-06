@@ -2,7 +2,6 @@ package com.example.diabetify.presentation.onboarding
 
 import com.example.diabetify.R
 
-
 data class Page(
     val isGetStartedPage: Boolean = false,
     val imageResId: Int = 0,

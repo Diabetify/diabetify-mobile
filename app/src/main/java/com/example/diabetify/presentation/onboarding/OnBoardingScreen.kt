@@ -114,7 +114,6 @@ fun OnBoardingScreen(
                                 setShowGetStarted(false)
                             }
                         },
-                        enabled = true,
                     )
                 } else {
                     Button(

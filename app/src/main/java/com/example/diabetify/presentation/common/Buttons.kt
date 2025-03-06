@@ -1,7 +1,10 @@
 package com.example.diabetify.presentation.common
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,14 +27,16 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean? = true,
+    leftImageResId: Int? = null,
+    rightImageResId: Int? = null
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp).
-            shadow(
+            .height(56.dp)
+            .shadow(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(28.dp)
             ),
@@ -39,8 +45,18 @@ fun PrimaryButton(
             disabledContainerColor = colorResource(id = R.color.primary).copy(alpha = 0.5f)
         ),
         shape = RoundedCornerShape(28.dp),
-        enabled = enabled
+        enabled = enabled ?: true
     ) {
+        if (leftImageResId != null) {
+            Image(
+                painter = painterResource(id = leftImageResId),
+                contentDescription = "Left Image",
+                modifier = Modifier.size(15.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.size(5.dp))
+
         Text(
             text = text,
             fontFamily = poppinsFontFamily,
@@ -49,5 +65,15 @@ fun PrimaryButton(
             color = Color.White,
             textAlign = TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.size(5.dp))
+
+        if (rightImageResId != null) {
+            Image(
+                painter = painterResource(id = rightImageResId),
+                contentDescription = "Right Image",
+                modifier = Modifier.size(15.dp)
+            )
+        }
     }
 }

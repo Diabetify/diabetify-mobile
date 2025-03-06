@@ -166,87 +166,93 @@ fun RegisterScreen(navController: NavController) {
                         modifier = Modifier.clickable { /* Open privacy policy link */ }
                     )
                 }
+            }
+        }
 
-                PrimaryButton(
-                    text = "Daftar",
-                    onClick = {
-                        navController.navigate(Route.BiodataScreen.route)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = isChecked
-                )
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(start = 30.dp, end = 30.dp)
+        ) {
+            PrimaryButton(
+                text = "Daftar",
+                onClick = {
+                    navController.navigate(Route.BiodataScreen.route)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isChecked
+            )
 
-                Divider(
-                    text = "Atau",
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
+            Divider(
+                text = "Atau",
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
 
-                // Login with google and facebook
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+            // Login with google and facebook
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Surface(
+                    onClick = { /* Handle Google login */ },
+                    modifier = Modifier.size(50.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
                 ) {
-                    Surface(
-                        onClick = { /* Handle Google login */ },
-                        modifier = Modifier.size(50.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_google),
-                                contentDescription = "Google icon",
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(25.dp))
-
-                    Surface(
-                        onClick = { /* Handle Google login */ },
-                        modifier = Modifier.size(50.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_facebook),
-                                contentDescription = "Facebook icon",
-                                modifier = Modifier.size(25.dp)
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_google),
+                            contentDescription = "Google icon",
+                            modifier = Modifier.size(30.dp)
+                        )
                     }
                 }
 
-                Text(
-                    text = buildAnnotatedString {
-                        append("Sudah memiliki akun? ")
-                        withStyle(
-                            style = SpanStyle(
-                                color = Color(0xFF648C9C),
-                            )
-                        ) {
-                            append("Masuk")
-                        }
-                    },
-                    fontSize = 14.sp,
-                    fontFamily = poppinsFontFamily,
-                    color = colorResource(id = R.color.black),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth().padding(vertical = 20.dp)
-                        .clickable { /* Open Login */ }
-                )
+                Spacer(modifier = Modifier.width(25.dp))
+
+                Surface(
+                    onClick = { /* Handle Google login */ },
+                    modifier = Modifier.size(50.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_facebook),
+                            contentDescription = "Facebook icon",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                }
             }
+
+            Text(
+                text = buildAnnotatedString {
+                    append("Sudah memiliki akun? ")
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color(0xFF648C9C),
+                        )
+                    ) {
+                        append("Masuk")
+                    }
+                },
+                fontSize = 14.sp,
+                fontFamily = poppinsFontFamily,
+                color = colorResource(id = R.color.black),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth().padding(vertical = 20.dp)
+                    .clickable { /* Open Login */ }
+            )
         }
 
         Image(

@@ -1,6 +1,7 @@
 package com.example.diabetify.presentation.register
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import com.example.diabetify.R
 import com.example.diabetify.presentation.common.Lottie
 import com.example.diabetify.presentation.common.PrimaryButton
-import com.example.diabetify.presentation.navgraph.Route
 import com.example.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -31,8 +31,8 @@ fun SuccessScreen() {
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Lottie(
                 rawResId = R.raw.success,

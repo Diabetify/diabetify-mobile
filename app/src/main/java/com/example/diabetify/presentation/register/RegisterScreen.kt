@@ -133,7 +133,7 @@ fun RegisterScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 16.dp, top = 5.dp)
                 ) {
                     Checkbox(
                         checked = isChecked,
@@ -251,7 +251,9 @@ fun RegisterScreen(navController: NavController) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth().padding(vertical = 20.dp)
-                    .clickable { /* Open Login */ }
+                    .clickable {
+                        navController.navigate(Route.LoginScreen.route)
+                    }
             )
         }
 

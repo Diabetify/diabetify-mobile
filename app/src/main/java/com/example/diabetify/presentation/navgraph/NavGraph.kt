@@ -56,6 +56,14 @@ fun NavGraph(
             }
 
             composable(
+                route = Route.LoginScreen.route
+            ) {
+                LoginScreen(
+                    navController = navController
+                )
+            }
+
+            composable(
                 route = Route.BiodataScreen.route
             ) {
                 BiodataScreen(
@@ -85,9 +93,11 @@ fun NavGraph(
             startDestination = Route.LoginScreen.route
         ) {
             composable(
-                route = Route.LoginScreen.route
+                route = Route.RegisterScreen.route
             ) {
-                LoginScreen()
+                RegisterScreen(
+                    navController = navController,
+                )
             }
         }
     }

@@ -45,12 +45,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.diabetify.R
 import com.example.diabetify.presentation.common.PrimaryButton
+import com.example.diabetify.presentation.navgraph.Route
 import com.example.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun OtpScreen(
+    navController: NavController,
     onVerifyClick: (String) -> Unit = {}
 ) {
     var otpValue by remember { mutableStateOf(TextFieldValue("")) }
@@ -197,7 +200,7 @@ fun OtpScreen(
         // Verify button
         PrimaryButton(
             text = "Verifikasi",
-            onClick = { onVerifyClick(otpValue.text) },
+            onClick = { navController.navigate(Route.SuccessScreen.route) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp)

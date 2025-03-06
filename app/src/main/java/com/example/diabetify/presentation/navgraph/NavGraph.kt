@@ -12,6 +12,7 @@ import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.example.diabetify.presentation.register.BiodataScreen
 import com.example.diabetify.presentation.register.OtpScreen
 import com.example.diabetify.presentation.register.RegisterScreen
+import com.example.diabetify.presentation.register.SuccessScreen
 
 @Composable
 fun NavGraph(
@@ -69,7 +70,13 @@ fun NavGraph(
             composable(
                 route = Route.OtpScreen.route
             ) {
-                OtpScreen()
+                OtpScreen(navController = navController)
+            }
+
+            composable(
+                route = Route.SuccessScreen.route
+            ) {
+                SuccessScreen()
             }
         }
 

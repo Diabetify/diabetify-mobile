@@ -10,6 +10,7 @@ import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
+import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -63,5 +64,13 @@ object AppModule {
         repository: AuthRepository
     ): CreateAccountUseCase {
         return CreateAccountUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesSendVerificationUseCase(
+        repository: AuthRepository
+    ): SendVerificationUseCase {
+        return SendVerificationUseCase(repository)
     }
 }

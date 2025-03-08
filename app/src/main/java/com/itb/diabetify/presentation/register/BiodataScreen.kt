@@ -2,6 +2,7 @@ package com.itb.diabetify.presentation.register
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -77,7 +79,16 @@ fun BiodataScreen(
         }
     }
 
-    val isLoading = viewModel.createAccountState.value.isLoading
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    val isLoading = viewModel.createAccountState.value.isLoading || viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier

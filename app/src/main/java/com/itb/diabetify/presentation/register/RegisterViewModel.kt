@@ -2,12 +2,14 @@ package com.itb.diabetify.presentation.register
 
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import com.itb.diabetify.presentation.common.FieldState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
+import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,13 +17,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val createAccountUseCase: CreateAccountUseCase
+    private val createAccountUseCase: CreateAccountUseCase,
+    private val sendVerificationUseCase: SendVerificationUseCase
 ): ViewModel() {
     private var _createAccountState = mutableStateOf(RegisterState())
     val createAccountState: State<RegisterState> = _createAccountState
 
+    private var _sendVerificationState = mutableStateOf(RegisterState())
+    val sendVerificationState: State<RegisterState> = _sendVerificationState
+
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
 
 
     private val _nameState = mutableStateOf(FieldState())
@@ -210,9 +219,10 @@ class RegisterViewModel @Inject constructor(
 
             when (createAccountResult.result) {
                 is Resource.Success -> {
-                    _navigationEvent.value = "OTP_SCREEN"
+                    sendVerification()
                 }
                 is Resource.Error -> {
+                    _errorMessage.value = createAccountResult.result.message ?: "Unknown error occurred"
                     createAccountResult.result.message?.let { Log.d("RegisterViewModel", it) }
                 }
                 is Resource.Loading -> {
@@ -221,14 +231,53 @@ class RegisterViewModel @Inject constructor(
 
                 else -> {
                     // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
                     Log.d("RegisterViewModel", "Unexpected error")
                 }
             }
         }
+    }
 
+    private fun sendVerification() {
+        viewModelScope.launch {
+            _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
+
+            val sendVerificationResult = sendVerificationUseCase(
+                email = emailState.value.text
+            )
+
+            _sendVerificationState.value = sendVerificationState.value.copy(isLoading = false)
+
+            if (sendVerificationResult.emailError != null) {
+                _emailState.value = emailState.value.copy(error = sendVerificationResult.emailError)
+            }
+
+            when (sendVerificationResult.result) {
+                is Resource.Success -> {
+                    _navigationEvent.value = "OTP_SCREEN"
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
+                    sendVerificationResult.result.message?.let { Log.d("RegisterViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("RegisterViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("RegisterViewModel", "Unexpected error")
+                }
+            }
+        }
     }
 
     fun onNavigationHandled() {
         _navigationEvent.value = null
+    }
+
+    fun onErrorShown() {
+        _errorMessage.value = null
     }
 }

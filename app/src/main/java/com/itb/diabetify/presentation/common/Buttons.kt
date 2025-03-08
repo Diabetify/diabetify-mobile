@@ -51,44 +51,40 @@ fun PrimaryButton(
         shape = RoundedCornerShape(28.dp),
         enabled = (enabled ?: true) && !isLoading
     ) {
-        Box(
-            contentAlignment = Alignment.Center
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = Color.White,
-                    strokeWidth = 2.dp
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = Color.White,
+                strokeWidth = 2.dp
+            )
+        } else {
+            if (leftImageResId != null) {
+                Image(
+                    painter = painterResource(id = leftImageResId),
+                    contentDescription = "Left Image",
+                    modifier = Modifier.size(15.dp)
                 )
-            } else {
-                if (leftImageResId != null) {
-                    Image(
-                        painter = painterResource(id = leftImageResId),
-                        contentDescription = "Left Image",
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
+            }
 
-                Spacer(modifier = Modifier.size(5.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                Text(
-                    text = text,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
+            Text(
+                text = text,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.size(10.dp))
+
+            if (rightImageResId != null) {
+                Image(
+                    painter = painterResource(id = rightImageResId),
+                    contentDescription = "Right Image",
+                    modifier = Modifier.size(15.dp)
                 )
-
-                Spacer(modifier = Modifier.size(5.dp))
-
-                if (rightImageResId != null) {
-                    Image(
-                        painter = painterResource(id = rightImageResId),
-                        contentDescription = "Right Image",
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
             }
         }
     }

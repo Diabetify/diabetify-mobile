@@ -79,7 +79,14 @@ fun NavGraph(
             composable(
                 route = Route.OtpScreen.route
             ) {
-                OtpScreen(navController = navController)
+                val registerViewModel: RegisterViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                )
+
+                OtpScreen(
+                    navController = navController,
+                    viewModel = registerViewModel,
+                )
             }
 
             composable(

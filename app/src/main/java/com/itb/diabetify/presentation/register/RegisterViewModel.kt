@@ -2,7 +2,6 @@ package com.itb.diabetify.presentation.register
 
 import android.util.Log
 import android.util.Patterns
-import android.widget.Toast
 import com.itb.diabetify.presentation.common.FieldState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
@@ -10,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
+import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,13 +18,17 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val createAccountUseCase: CreateAccountUseCase,
-    private val sendVerificationUseCase: SendVerificationUseCase
+    private val sendVerificationUseCase: SendVerificationUseCase,
+    private val verifyOtpUseCase: VerifyOtpUseCase
 ): ViewModel() {
     private var _createAccountState = mutableStateOf(RegisterState())
     val createAccountState: State<RegisterState> = _createAccountState
 
     private var _sendVerificationState = mutableStateOf(RegisterState())
     val sendVerificationState: State<RegisterState> = _sendVerificationState
+
+    private var _verifyOtpState = mutableStateOf(RegisterState())
+    val verifyOtpState: State<RegisterState> = _verifyOtpState
 
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
@@ -120,6 +124,9 @@ class RegisterViewModel @Inject constructor(
         _heightState.value = heightState.value.copy(error = null)
         _heightState.value = heightState.value.copy(text = value)
     }
+
+    private val _otpState = mutableStateOf(FieldState())
+    val otpState: State<FieldState> = _otpState
 
     fun validateBiodataFields(): Boolean {
         val gender = genderState.value.text
@@ -259,6 +266,71 @@ class RegisterViewModel @Inject constructor(
                 is Resource.Error -> {
                     _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
                     sendVerificationResult.result.message?.let { Log.d("RegisterViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("RegisterViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("RegisterViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
+    fun setOtp(value: String) {
+        if (value.length <= 6 && value.all { it.isDigit() }) {
+            _otpState.value = otpState.value.copy(error = null)
+            _otpState.value = otpState.value.copy(text = value)
+        }
+    }
+
+    fun validateOtpFields(): Boolean {
+        val code = otpState.value.text
+
+        var isValid = true
+
+        if (code.isEmpty()) {
+            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
+            isValid = false
+        }
+
+        if (code.length != 6) {
+            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    fun verifyOtp() {
+        viewModelScope.launch {
+            _verifyOtpState.value = verifyOtpState.value.copy(isLoading = true)
+
+            val verifyOtpResult = verifyOtpUseCase(
+                email = emailState.value.text,
+                code = otpState.value.text
+            )
+
+            _verifyOtpState.value = verifyOtpState.value.copy(isLoading = false)
+
+            if (verifyOtpResult.emailError != null) {
+                _emailState.value = emailState.value.copy(error = verifyOtpResult.emailError)
+            }
+
+            if (verifyOtpResult.codeError != null) {
+                _otpState.value = otpState.value.copy(error = verifyOtpResult.codeError)
+            }
+
+            when (verifyOtpResult.result) {
+                is Resource.Success -> {
+                    _navigationEvent.value = "SUCCESS_SCREEN"
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = verifyOtpResult.result.message ?: "Unknown error occurred"
+                    verifyOtpResult.result.message?.let { Log.d("RegisterViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("RegisterViewModel", "Loading")

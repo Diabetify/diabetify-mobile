@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.register
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -54,15 +56,38 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 @Composable
 fun OtpScreen(
     navController: NavController,
-    onVerifyClick: (String) -> Unit = {}
+    viewModel: RegisterViewModel
 ) {
-    var otpValue by remember { mutableStateOf(TextFieldValue("")) }
+    val otpState = viewModel.otpState.value
     val focusRequester = remember { FocusRequester() }
     val maxLength = 6
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "SUCCESS_SCREEN" -> {
+                    navController.navigate(Route.SuccessScreen.route)
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    val isLoading = viewModel.verifyOtpState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -110,13 +135,12 @@ fun OtpScreen(
 
             // OTP Input Fields
             BasicTextField(
-                value = otpValue,
+                value = TextFieldValue(
+                    text = otpState.text,
+                    selection = TextRange(otpState.text.length)
+                ),
                 onValueChange = { newValue ->
-                    if (newValue.text.length <= maxLength && newValue.text.all { it.isDigit() }) {
-                        otpValue = newValue.copy(
-                            selection = TextRange(newValue.text.length)
-                        )
-                    }
+                    viewModel.setOtp(newValue.text)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 modifier = Modifier
@@ -133,7 +157,7 @@ fun OtpScreen(
                     ) {
                         for (i in 0 until maxLength) {
                             val char = when {
-                                i < otpValue.text.length -> otpValue.text[i].toString()
+                                i < otpState.text.length -> otpState.text[i].toString()
                                 else -> ""
                             }
 
@@ -147,7 +171,7 @@ fun OtpScreen(
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (i == otpValue.text.length && otpValue.text.length < maxLength)
+                                        color = if (i == otpState.text.length && otpState.text.length < maxLength)
                                             colorResource(id = R.color.primary)
                                         else
                                             Color.Transparent,
@@ -200,13 +224,19 @@ fun OtpScreen(
         // Verify button
         PrimaryButton(
             text = "Verifikasi",
-            onClick = { navController.navigate(Route.SuccessScreen.route) },
+            onClick = {
+                val isValid = viewModel.validateOtpFields()
+                if (isValid) {
+                    viewModel.verifyOtp()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = otpValue.text.length == maxLength
+            enabled = otpState.text.length == maxLength && !isLoading,
+            isLoading = isLoading
         )
     }
 }

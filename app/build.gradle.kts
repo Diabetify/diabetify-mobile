@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.diabetify"
+    namespace = "com.itb.diabetify"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.diabetify"
+        applicationId = "com.itb.diabetify"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

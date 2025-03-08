@@ -1,4 +1,4 @@
-package com.example.diabetify.domain.usecases
+package com.example.diabetify.domain.usecases.app_entry
 
 import com.example.diabetify.domain.manager.LocalUserManager
 

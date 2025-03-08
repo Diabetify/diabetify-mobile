@@ -1,5 +1,6 @@
 package com.example.diabetify.presentation.navgraph
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
@@ -12,8 +13,10 @@ import com.example.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.example.diabetify.presentation.register.BiodataScreen
 import com.example.diabetify.presentation.register.OtpScreen
 import com.example.diabetify.presentation.register.RegisterScreen
+import com.example.diabetify.presentation.register.RegisterViewModel
 import com.example.diabetify.presentation.register.SuccessScreen
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun NavGraph(
     startDestination: String
@@ -39,19 +42,16 @@ fun NavGraph(
             route = Route.RegisterNavigation.route,
             startDestination = Route.RegisterScreen.route
         ) {
-//            val sharedViewModel: RegisterSharedViewModel = hiltViewModel(
-//                navController.getBackStackEntry(Route.RegisterNavigation.route)
-//            )
-
             composable(
                 route = Route.RegisterScreen.route
             ) {
+                val registerViewModel: RegisterViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                )
+
                 RegisterScreen(
                     navController = navController,
-//                    viewModel = sharedViewModel,
-//                    onNavigateToBiodata = {
-//                        navController.navigate(Route.BiodataScreen.route)
-//                    }
+                    viewModel = registerViewModel,
                 )
             }
 
@@ -66,12 +66,13 @@ fun NavGraph(
             composable(
                 route = Route.BiodataScreen.route
             ) {
+                val registerViewModel: RegisterViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                )
+
                 BiodataScreen(
                     navController = navController,
-//                    viewModel = sharedViewModel,
-//                    onSubmitRegistration = {
-//                        // Handle submission and navigation to next screen
-//                    }
+                    viewModel = registerViewModel,
                 )
             }
 
@@ -95,8 +96,13 @@ fun NavGraph(
             composable(
                 route = Route.RegisterScreen.route
             ) {
+                val registerViewModel: RegisterViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.LoginNavigation.route)
+                )
+
                 RegisterScreen(
                     navController = navController,
+                    viewModel = registerViewModel,
                 )
             }
         }

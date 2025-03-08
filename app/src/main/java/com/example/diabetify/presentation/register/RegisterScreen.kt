@@ -34,7 +34,10 @@ import com.example.diabetify.presentation.common.PrimaryButton
 import com.example.diabetify.presentation.navgraph.Route
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel
+) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -251,7 +254,7 @@ fun RegisterScreen(navController: NavController) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth().padding(vertical = 20.dp)
-                    .clickable {
+                        .clickable {
                         navController.navigate(Route.LoginScreen.route)
                     }
             )

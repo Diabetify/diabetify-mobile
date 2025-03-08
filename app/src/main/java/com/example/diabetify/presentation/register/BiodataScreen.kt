@@ -55,7 +55,10 @@ import java.util.Locale
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun BiodataScreen(navController: NavController) {
+fun BiodataScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel
+) {
     var gender by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
@@ -268,7 +271,8 @@ fun BiodataScreen(navController: NavController) {
         PrimaryButton(
             text = "Lanjut",
             onClick = {
-                navController.navigate(Route.OtpScreen.route)
+                viewModel.createAccount()
+//                navController.navigate(Route.OtpScreen.route)
             },
             modifier = Modifier
                 .fillMaxWidth()

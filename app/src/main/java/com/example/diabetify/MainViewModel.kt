@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.diabetify.domain.usecases.AppEntryUseCases
+import com.example.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.example.diabetify.presentation.navgraph.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val appEntryUseCases: AppEntryUseCases
+    private val appEntryUseCase: AppEntryUseCase
 ): ViewModel() {
     var splashCondition by mutableStateOf(true)
         private set
@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
         private set
 
     init {
-        appEntryUseCases.readAppEntry().onEach { shouldStartFromRegisterScreen ->
+        appEntryUseCase.readAppEntry().onEach { shouldStartFromRegisterScreen ->
             startDestination = if (shouldStartFromRegisterScreen) {
                 Route.RegisterNavigation.route
             } else {

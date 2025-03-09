@@ -71,8 +71,8 @@ fun ChangePasswordScreen(
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
             when (it) {
-                "LOGIN_SCREEN" -> {
-                    navController.navigate(Route.LoginScreen.route)
+                "SUCCESS_SCREEN" -> {
+                    navController.navigate(Route.ResetPasswordSuccessScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }

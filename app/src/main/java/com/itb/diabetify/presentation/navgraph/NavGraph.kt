@@ -99,7 +99,7 @@ fun NavGraph(
             }
 
             composable(
-                route = Route.SuccessScreen.route
+                route = Route.RegisterSuccessScreen.route
             ) {
                 SuccessScreen()
             }
@@ -150,6 +150,14 @@ fun NavGraph(
                 ChangePasswordScreen(
                     navController = navController,
                     viewModel = forgotPasswordViewModel
+                )
+            }
+
+            composable(
+                route = Route.ResetPasswordSuccessScreen.route
+            ) {
+                com.itb.diabetify.presentation.forgot_password.SuccessScreen(
+                    navController = navController
                 )
             }
         }

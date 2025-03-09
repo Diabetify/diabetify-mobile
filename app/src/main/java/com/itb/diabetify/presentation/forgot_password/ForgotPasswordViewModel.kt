@@ -158,7 +158,7 @@ class ForgotPasswordViewModel @Inject constructor(
 
             when (changePasswordResult.result) {
                 is Resource.Success -> {
-                    _navigationEvent.value = "LOGIN_SCREEN"
+                    _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
                     _errorMessage.value = changePasswordResult.result.message ?: "Unknown error occurred"

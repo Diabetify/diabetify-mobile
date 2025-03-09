@@ -71,7 +71,7 @@ fun OtpScreen(
         navigationEvent?.let {
             when (it) {
                 "SUCCESS_SCREEN" -> {
-                    navController.navigate(Route.SuccessScreen.route)
+                    navController.navigate(Route.RegisterSuccessScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }

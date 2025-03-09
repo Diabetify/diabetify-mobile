@@ -72,7 +72,9 @@ class ForgotPasswordViewModel @Inject constructor(
         return isValid
     }
 
-    fun sendVerification() {
+    fun sendVerification(
+        isResend: Boolean = false
+    ) {
         viewModelScope.launch {
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
@@ -89,7 +91,11 @@ class ForgotPasswordViewModel @Inject constructor(
 
             when (sendVerificationResult.result) {
                 is Resource.Success -> {
-                    _navigationEvent.value = "CHANGE_PASSWORD_SCREEN"
+                    if (isResend) {
+                        _errorMessage.value = "Kode OTP telah dikirim ulang"
+                    } else {
+                        _navigationEvent.value = "CHANGE_PASSWORD_SCREEN"
+                    }
                 }
                 is Resource.Error -> {
                     _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"

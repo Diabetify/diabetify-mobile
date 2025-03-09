@@ -253,7 +253,9 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun sendVerification() {
+    fun sendVerification(
+        isResend: Boolean = false
+    ) {
         viewModelScope.launch {
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
@@ -270,7 +272,11 @@ class RegisterViewModel @Inject constructor(
 
             when (sendVerificationResult.result) {
                 is Resource.Success -> {
-                    _navigationEvent.value = "OTP_SCREEN"
+                    if (isResend) {
+                        _errorMessage.value = "Kode OTP berhasil dikirim ulang"
+                    } else {
+                        _navigationEvent.value = "OTP_SCREEN"
+                    }
                 }
                 is Resource.Error -> {
                     _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
@@ -279,7 +285,6 @@ class RegisterViewModel @Inject constructor(
                 is Resource.Loading -> {
                     Log.d("RegisterViewModel", "Loading")
                 }
-
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"

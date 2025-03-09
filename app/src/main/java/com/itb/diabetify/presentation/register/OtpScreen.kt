@@ -52,6 +52,7 @@ import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.delay
 
 @Composable
 fun OtpScreen(
@@ -61,6 +62,20 @@ fun OtpScreen(
     val otpState = viewModel.otpState.value
     val focusRequester = remember { FocusRequester() }
     val maxLength = 6
+
+    var resendTimerActive by remember { mutableStateOf(false) }
+    var timeLeft by remember { mutableStateOf(60) }
+
+    LaunchedEffect(resendTimerActive) {
+        if (resendTimerActive) {
+            while (timeLeft > 0) {
+                delay(1000)
+                timeLeft--
+            }
+            resendTimerActive = false
+            timeLeft = 60
+        }
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -88,6 +103,7 @@ fun OtpScreen(
     }
 
     val isLoading = viewModel.verifyOtpState.value.isLoading
+    val isResendLoading = viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -199,26 +215,52 @@ fun OtpScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
+            // Resend code with timer
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 30.dp)
-                    .clickable { /* Resend */ },
-                text = buildAnnotatedString {
-                    append("Belum menerima kode? ")
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color(0xFF648C9C),
-                        )
-                    ) {
-                        append("Kirim ulang")
-                    }
-                },
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                color = colorResource(id = R.color.primary)
-            )
+                    .padding(horizontal = 30.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .clickable(enabled = !resendTimerActive && !isResendLoading) {
+                            if (!resendTimerActive) {
+                                viewModel.sendVerification(isResend = true)
+                                resendTimerActive = true
+                                timeLeft = 60
+                            }
+                        },
+                    text = buildAnnotatedString {
+                        append("Belum menerima kode? ")
+                        withStyle(
+                            style = SpanStyle(
+                                color = if (resendTimerActive || isResendLoading)
+                                    Color.Gray
+                                else
+                                    Color(0xFF648C9C),
+                            )
+                        ) {
+                            append("Kirim ulang")
+                        }
+                    },
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    color = colorResource(id = R.color.primary)
+                )
+
+                if (resendTimerActive) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "(${timeLeft}d)",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
         }
 
         // Verify button

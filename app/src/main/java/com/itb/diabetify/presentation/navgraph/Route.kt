@@ -14,4 +14,5 @@ sealed class Route(
     object AppStartNavigation : Route(route = "appStartNavigation")
     object RegisterNavigation : Route(route = "registerNavigation")
     object LoginNavigation : Route(route = "loginNavigation")
+    object ForgotPasswordNavigation : Route(route = "forgotPasswordNavigation")
 }

@@ -1,5 +1,6 @@
-package com.itb.diabetify.presentation.login
+package com.itb.diabetify.presentation.forgot_password
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -50,17 +53,42 @@ import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.navgraph.Route
+import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun ChangePasswordScreen(
     navController: NavController,
-//    viewModel: RegisterViewModel
+    viewModel: ForgotPasswordViewModel
 ) {
-    val passwordState = TextFieldValue("")
-    val otpState = TextFieldValue("")
+    val passwordState = viewModel.passwordState.value
+    val otpState = viewModel.otpState.value
     var passwordVisible by remember { mutableStateOf(false) }
     val maxLength = 6
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "LOGIN_SCREEN" -> {
+                    navController.navigate(Route.LoginScreen.route)
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    val isLoading = viewModel.changePasswordState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -108,7 +136,7 @@ fun ChangePasswordScreen(
             InputField(
                 value = passwordState.text,
                 onValueChange = {
-//                        viewModel.setPassword(it)
+                    viewModel.setPassword(it)
                 },
                 placeholderText = "Kata Sandi Baru",
                 iconResId = R.drawable.ic_lock,
@@ -132,8 +160,8 @@ fun ChangePasswordScreen(
                         )
                     }
                 },
-//                    isError = passwordState.error != null,
-//                    errorMessage = passwordState.error ?: ""
+                isError = passwordState.error != null,
+                errorMessage = passwordState.error ?: ""
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -145,7 +173,7 @@ fun ChangePasswordScreen(
                     selection = TextRange(otpState.text.length)
                 ),
                 onValueChange = { newValue ->
-//                    viewModel.setOtp(newValue.text)
+                    viewModel.setOtp(newValue.text)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 modifier = Modifier
@@ -229,18 +257,18 @@ fun ChangePasswordScreen(
         PrimaryButton(
             text = "Ubah Kata Sandi",
             onClick = {
-//                val isValid = viewModel.validateOtpFields()
-//                if (isValid) {
-//                    viewModel.verifyOtp()
-//                }
+                val isValid = viewModel.validateChangePasswordFields()
+                if (isValid) {
+                    viewModel.changePassword()
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-//            enabled = otpState.text.length == maxLength && !isLoading,
-//            isLoading = isLoading
+            enabled = otpState.error == null && otpState.text.length == maxLength && passwordState.error == null && !isLoading,
+            isLoading = isLoading
         )
     }
 }

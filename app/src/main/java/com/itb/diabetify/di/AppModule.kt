@@ -9,6 +9,7 @@ import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
+import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
@@ -90,5 +91,13 @@ object AppModule {
         repository: AuthRepository
     ): LoginUseCase {
         return LoginUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesChangePasswordUseCase(
+        repository: AuthRepository
+    ): ChangePasswordUseCase {
+        return ChangePasswordUseCase(repository)
     }
 }

@@ -1,5 +1,6 @@
 package com.itb.diabetify.data.remote.auth
 
+import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
 import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
@@ -32,5 +33,10 @@ interface ApiService {
     @POST("users/reset-password")
     suspend fun sendResetPasswordVerification(
         @Body sendVerificationRequest: SendVerificationRequest
+    ) : AuthResponse
+
+    @POST("users/change-password")
+    suspend fun changePassword(
+        @Body changePasswordRequest: ChangePasswordRequest
     ) : AuthResponse
 }

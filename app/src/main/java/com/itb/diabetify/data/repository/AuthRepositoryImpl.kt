@@ -1,6 +1,7 @@
 package com.itb.diabetify.data.repository
 
 import com.itb.diabetify.data.remote.auth.ApiService
+import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
 import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
@@ -68,6 +69,19 @@ class AuthRepositoryImpl(
     ): Resource<Unit> {
         return try {
             val response = apiService.login(loginRequest)
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun changePassword(
+        changePasswordRequest: ChangePasswordRequest
+    ): Resource<Unit> {
+        return try {
+            val response = apiService.changePassword(changePasswordRequest)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

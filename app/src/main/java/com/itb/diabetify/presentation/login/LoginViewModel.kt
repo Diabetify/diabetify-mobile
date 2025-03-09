@@ -17,14 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val sendVerificationUseCase: SendVerificationUseCase
+    private val loginUseCase: LoginUseCase
 ): ViewModel() {
     private var _loginState = mutableStateOf(DataState())
     val loginState: State<DataState> = _loginState
-
-    private var _sendVerificationState = mutableStateOf(DataState())
-    val sendVerificationState: State<DataState> = _sendVerificationState
 
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
@@ -68,19 +64,6 @@ class LoginViewModel @Inject constructor(
         return isValid
     }
 
-    fun validateForgotPasswordFields(): Boolean {
-        val email = emailState.value.text
-
-        var isValid = true
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailState.value = emailState.value.copy(error = "Email tidak valid")
-            isValid = false
-        }
-
-        return isValid
-    }
-
     fun login() {
         viewModelScope.launch {
             _loginState.value = loginState.value.copy(isLoading = true)
@@ -107,42 +90,6 @@ class LoginViewModel @Inject constructor(
                 is Resource.Error -> {
                     _errorMessage.value = loginResult.result.message ?: "Unknown error occurred"
                     loginResult.result.message?.let { Log.d("LoginViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("LoginViewModel", "Loading")
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("LoginViewModel", "Unexpected error")
-                }
-            }
-        }
-    }
-
-    fun sendVerification() {
-        viewModelScope.launch {
-            _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
-
-            val sendVerificationResult = sendVerificationUseCase(
-                email = emailState.value.text,
-                type = "reset-password"
-            )
-
-            _sendVerificationState.value = sendVerificationState.value.copy(isLoading = false)
-
-            if (sendVerificationResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = sendVerificationResult.emailError)
-            }
-
-            when (sendVerificationResult.result) {
-                is Resource.Success -> {
-                    _navigationEvent.value = "CHANGE_PASSWORD_SCREEN"
-                }
-                is Resource.Error -> {
-                    _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
-                    sendVerificationResult.result.message?.let { Log.d("LoginViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("LoginViewModel", "Loading")

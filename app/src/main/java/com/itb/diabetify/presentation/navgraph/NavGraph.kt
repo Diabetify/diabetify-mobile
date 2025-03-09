@@ -7,8 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.itb.diabetify.presentation.login.ChangePasswordScreen
-import com.itb.diabetify.presentation.login.ForgotPasswordScreen
+import com.itb.diabetify.presentation.forgot_password.ChangePasswordScreen
+import com.itb.diabetify.presentation.forgot_password.ForgotPasswordScreen
+import com.itb.diabetify.presentation.forgot_password.ForgotPasswordViewModel
 import com.itb.diabetify.presentation.login.LoginScreen
 import com.itb.diabetify.presentation.login.LoginViewModel
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
@@ -120,23 +121,35 @@ fun NavGraph(
                     viewModel = registerViewModel,
                 )
             }
+        }
 
-            composable (
+        navigation(
+            route = Route.ForgotPasswordNavigation.route,
+            startDestination = Route.ForgotPasswordScreen.route
+        ) {
+            composable(
                 route = Route.ForgotPasswordScreen.route
             ) {
-                val loginViewModel: LoginViewModel = hiltViewModel()
+                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.ForgotPasswordNavigation.route)
+                )
 
                 ForgotPasswordScreen(
                     navController = navController,
-                    viewModel = loginViewModel
+                    viewModel = forgotPasswordViewModel
                 )
             }
 
-            composable (
+            composable(
                 route = Route.ChangePasswordScreen.route
             ) {
+                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.ForgotPasswordNavigation.route)
+                )
+
                 ChangePasswordScreen(
-                    navController = navController
+                    navController = navController,
+                    viewModel = forgotPasswordViewModel
                 )
             }
         }

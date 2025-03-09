@@ -129,6 +129,13 @@ class RegisterViewModel @Inject constructor(
     private val _otpState = mutableStateOf(FieldState())
     val otpState: State<FieldState> = _otpState
 
+    fun setOtp(value: String) {
+        if (value.length <= 6 && value.all { it.isDigit() }) {
+            _otpState.value = otpState.value.copy(error = null)
+            _otpState.value = otpState.value.copy(text = value)
+        }
+    }
+
     fun validateBiodataFields(): Boolean {
         val gender = genderState.value.text
         val birthDate = dobState.value.text
@@ -279,13 +286,6 @@ class RegisterViewModel @Inject constructor(
                     Log.d("RegisterViewModel", "Unexpected error")
                 }
             }
-        }
-    }
-
-    fun setOtp(value: String) {
-        if (value.length <= 6 && value.all { it.isDigit() }) {
-            _otpState.value = otpState.value.copy(error = null)
-            _otpState.value = otpState.value.copy(text = value)
         }
     }
 

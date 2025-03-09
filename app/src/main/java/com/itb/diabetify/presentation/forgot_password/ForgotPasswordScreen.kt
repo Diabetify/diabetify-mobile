@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.login
+package com.itb.diabetify.presentation.forgot_password
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -35,7 +35,7 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 @Composable
 fun ForgotPasswordScreen(
     navController: NavController,
-    viewModel: LoginViewModel
+    viewModel: ForgotPasswordViewModel
 ) {
     val emailState = viewModel.emailState.value
 

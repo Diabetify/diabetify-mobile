@@ -235,7 +235,7 @@ fun OtpScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = otpState.text.length == maxLength && !isLoading,
+            enabled = otpState.error == null && otpState.text.length == maxLength && !isLoading,
             isLoading = isLoading
         )
     }

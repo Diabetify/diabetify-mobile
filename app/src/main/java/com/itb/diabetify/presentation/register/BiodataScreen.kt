@@ -314,7 +314,7 @@ fun BiodataScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = !isLoading,
+            enabled = genderState.error == null && birthDateState.error == null && weightState.error == null && heightState.error == null && !isLoading,
             rightImageResId = R.drawable.ic_chevron_right,
             isLoading = isLoading
         )

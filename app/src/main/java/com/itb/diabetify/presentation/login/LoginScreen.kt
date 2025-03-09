@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.login
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -59,6 +62,29 @@ fun LoginScreen(
     val emailState = viewModel.emailState.value
     val passwordState = viewModel.passwordState.value
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "HOME_SCREEN" -> {
+//                    navController.navigate(Route.HomeScreen.route)
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    val isLoading = viewModel.loginState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -105,6 +131,8 @@ fun LoginScreen(
                     iconResId = R.drawable.ic_message,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Email,
+                    isError = emailState.error != null,
+                    errorMessage = emailState.error ?: "",
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -132,7 +160,9 @@ fun LoginScreen(
                                 tint = Color.Gray
                             )
                         }
-                    }
+                    },
+                    isError = passwordState.error != null,
+                    errorMessage = passwordState.error ?: "",
                 )
 
                 // Forgot password
@@ -172,8 +202,9 @@ fun LoginScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = true,
-                leftImageResId = R.drawable.ic_enter
+                enabled = emailState.error == null && passwordState.error == null && !isLoading,
+                leftImageResId = R.drawable.ic_enter,
+                isLoading = isLoading
             )
 
             Divider(

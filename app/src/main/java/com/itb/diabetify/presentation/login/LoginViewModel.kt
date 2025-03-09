@@ -102,4 +102,12 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun onNavigationHandled() {
+        _navigationEvent.value = null
+    }
+
+    fun onErrorShown() {
+        _errorMessage.value = null
+    }
 }

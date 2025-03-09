@@ -52,9 +52,12 @@ import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel
+) {
+    val emailState = viewModel.emailState.value
+    val passwordState = viewModel.passwordState.value
     var passwordVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -96,8 +99,8 @@ fun LoginScreen(navController: NavController) {
             ) {
                 // Email field
                 InputField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = emailState.text,
+                    onValueChange = { viewModel.setEmail(it) },
                     placeholderText = "Email",
                     iconResId = R.drawable.ic_message,
                     modifier = Modifier.fillMaxWidth(),
@@ -108,8 +111,8 @@ fun LoginScreen(navController: NavController) {
 
                 // Password field
                 InputField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = passwordState.text,
+                    onValueChange = { viewModel.setPassword(it) },
                     placeholderText = "Kata Sandi",
                     iconResId = R.drawable.ic_lock,
                     modifier = Modifier.fillMaxWidth(),
@@ -163,7 +166,10 @@ fun LoginScreen(navController: NavController) {
             PrimaryButton(
                 text = "Masuk",
                 onClick = {
-//                    navController.navigate(Route.BiodataScreen.route)
+                    val isValid = viewModel.validateLoginFields()
+                    if (isValid) {
+                        viewModel.login()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = true,

@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
+import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,14 +22,14 @@ class RegisterViewModel @Inject constructor(
     private val sendVerificationUseCase: SendVerificationUseCase,
     private val verifyOtpUseCase: VerifyOtpUseCase
 ): ViewModel() {
-    private var _createAccountState = mutableStateOf(RegisterState())
-    val createAccountState: State<RegisterState> = _createAccountState
+    private var _createAccountState = mutableStateOf(DataState())
+    val createAccountState: State<DataState> = _createAccountState
 
-    private var _sendVerificationState = mutableStateOf(RegisterState())
-    val sendVerificationState: State<RegisterState> = _sendVerificationState
+    private var _sendVerificationState = mutableStateOf(DataState())
+    val sendVerificationState: State<DataState> = _sendVerificationState
 
-    private var _verifyOtpState = mutableStateOf(RegisterState())
-    val verifyOtpState: State<RegisterState> = _verifyOtpState
+    private var _verifyOtpState = mutableStateOf(DataState())
+    val verifyOtpState: State<DataState> = _verifyOtpState
 
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent

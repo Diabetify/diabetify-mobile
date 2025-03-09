@@ -42,7 +42,7 @@ fun RegisterScreen(
     val emailState = viewModel.emailState.value
     val passwordState = viewModel.passwordState.value
     var passwordVisible by remember { mutableStateOf(false) }
-    var privacyPolicyState = viewModel.privacyPolicyState.value
+    val privacyPolicyState = viewModel.privacyPolicyState.value
 
     Box(
         modifier = Modifier

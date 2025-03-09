@@ -1,6 +1,7 @@
 package com.itb.diabetify.data.remote.auth
 
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
+import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
 import com.itb.diabetify.data.remote.auth.request.VerifyOtpRequest
 import com.itb.diabetify.data.remote.auth.response.AuthResponse
@@ -21,5 +22,10 @@ interface ApiService {
     @POST("verification/verify")
     suspend fun verifyOtp(
         @Body verifyOtpRequest: VerifyOtpRequest
+    ) : AuthResponse
+
+    @POST("users/login")
+    suspend fun login(
+        @Body loginRequest: LoginRequest
     ) : AuthResponse
 }

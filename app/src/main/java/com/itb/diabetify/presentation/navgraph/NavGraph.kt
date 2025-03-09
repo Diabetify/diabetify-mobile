@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.itb.diabetify.presentation.login.ChangePasswordScreen
 import com.itb.diabetify.presentation.login.ForgotPasswordScreen
 import com.itb.diabetify.presentation.login.LoginScreen
+import com.itb.diabetify.presentation.login.LoginViewModel
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.itb.diabetify.presentation.register.BiodataScreen
@@ -60,8 +61,13 @@ fun NavGraph(
             composable(
                 route = Route.LoginScreen.route
             ) {
+                val loginViewModel: LoginViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                )
+
                 LoginScreen(
-                    navController = navController
+                    navController = navController,
+                    viewModel = loginViewModel,
                 )
             }
 

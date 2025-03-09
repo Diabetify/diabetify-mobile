@@ -27,10 +27,21 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun sendVerification(
-        sendVerificationRequest: SendVerificationRequest
+        sendVerificationRequest: SendVerificationRequest,
+        type: String
     ): Resource<Unit> {
         return try {
-            val response = apiService.sendVerification(sendVerificationRequest)
+            when (type) {
+                "register" -> {
+                    val response = apiService.sendVerification(sendVerificationRequest)
+                }
+                "reset-password" -> {
+                    val response = apiService.sendResetPasswordVerification(sendVerificationRequest)
+                }
+                else -> {
+                    return Resource.Error("Invalid type")
+                }
+            }
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

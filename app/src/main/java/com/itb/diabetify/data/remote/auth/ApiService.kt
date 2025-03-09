@@ -28,4 +28,9 @@ interface ApiService {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ) : AuthResponse
+
+    @POST("users/reset-password")
+    suspend fun sendResetPasswordVerification(
+        @Body sendVerificationRequest: SendVerificationRequest
+    ) : AuthResponse
 }

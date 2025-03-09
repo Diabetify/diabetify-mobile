@@ -251,7 +251,8 @@ class RegisterViewModel @Inject constructor(
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
             val sendVerificationResult = sendVerificationUseCase(
-                email = emailState.value.text
+                email = emailState.value.text,
+                type = "register"
             )
 
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = false)

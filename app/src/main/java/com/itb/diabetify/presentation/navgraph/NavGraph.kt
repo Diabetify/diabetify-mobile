@@ -124,8 +124,11 @@ fun NavGraph(
             composable (
                 route = Route.ForgotPasswordScreen.route
             ) {
+                val loginViewModel: LoginViewModel = hiltViewModel()
+
                 ForgotPasswordScreen(
-                    navController = navController
+                    navController = navController,
+                    viewModel = loginViewModel
                 )
             }
 

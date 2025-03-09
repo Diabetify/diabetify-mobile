@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,13 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,9 +35,32 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 @Composable
 fun ForgotPasswordScreen(
     navController: NavController,
-//    viewModel: RegisterViewModel
+    viewModel: LoginViewModel
 ) {
-    var email by remember { mutableStateOf("") }
+    val emailState = viewModel.emailState.value
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "CHANGE_PASSWORD_SCREEN" -> {
+                    navController.navigate(Route.ChangePasswordScreen.route)
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    val isLoading = viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -89,12 +111,14 @@ fun ForgotPasswordScreen(
             ) {
                 // Email field
                 InputField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = emailState.text,
+                    onValueChange = { viewModel.setEmail(it) },
                     placeholderText = "Email",
                     iconResId = R.drawable.ic_message,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Email,
+                    isError = emailState.error != null,
+                    errorMessage = emailState.error ?: ""
                 )
             }
         }
@@ -103,19 +127,18 @@ fun ForgotPasswordScreen(
         PrimaryButton(
             text = "Kirim Kode",
             onClick = {
-//                val isValid = viewModel.validateOtpFields()
-//                if (isValid) {
-//                    viewModel.verifyOtp()
-//                }
-                navController.navigate(Route.ChangePasswordScreen.route)
+                val isValid = viewModel.validateForgotPasswordFields()
+                if (isValid) {
+                    viewModel.sendVerification()
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-//            enabled = otpState.text.length == maxLength && !isLoading,
-//            isLoading = isLoading
+            enabled = emailState.error == null && !isLoading,
+            isLoading = isLoading
         )
     }
 }

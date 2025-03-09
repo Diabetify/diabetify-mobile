@@ -9,7 +9,8 @@ class SendVerificationUseCase(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(
-        email: String
+        email: String,
+        type: String
     ): SendVerificationResult {
         val emailError: String? = if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) "Email tidak valid" else null
 
@@ -24,7 +25,7 @@ class SendVerificationUseCase(
         )
 
         return SendVerificationResult(
-            result = repository.sendVerification(sendVerificationRequest)
+            result = repository.sendVerification(sendVerificationRequest, type)
         )
     }
 }

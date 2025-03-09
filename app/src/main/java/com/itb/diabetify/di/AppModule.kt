@@ -71,7 +71,7 @@ object AppModule {
     @Provides
     @Singleton
     fun providesSendVerificationUseCase(
-        repository: AuthRepository
+        repository: AuthRepository,
     ): SendVerificationUseCase {
         return SendVerificationUseCase(repository)
     }

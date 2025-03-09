@@ -8,7 +8,7 @@ import com.itb.diabetify.util.Resource
 
 interface AuthRepository {
     suspend fun createAccount(createAccountRequest: CreateAccountRequest): Resource<Unit>
-    suspend fun sendVerification(sendVerificationRequest: SendVerificationRequest): Resource<Unit>
+    suspend fun sendVerification(sendVerificationRequest: SendVerificationRequest, type: String): Resource<Unit>
     suspend fun verifyOtp(verifyOtpRequest: VerifyOtpRequest): Resource<Unit>
     suspend fun login(loginRequest: LoginRequest): Resource<Unit>
 }

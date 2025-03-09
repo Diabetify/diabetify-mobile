@@ -1,10 +1,13 @@
 package com.itb.diabetify.di
 
 import android.app.Application
+import android.content.Context
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
+import com.itb.diabetify.data.manager.TokenManagerImpl
 import com.itb.diabetify.data.remote.auth.ApiService
 import com.itb.diabetify.data.repository.AuthRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
+import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
@@ -18,6 +21,7 @@ import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -43,6 +47,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideTokenManager(
+        @ApplicationContext context: Context
+    ): TokenManager {
+        return TokenManagerImpl(context)
+    }
+
+    @Provides
+    @Singleton
     fun providesApiService(): ApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -54,10 +66,12 @@ object AppModule {
     @Provides
     @Singleton
     fun providesAuthRepository(
-        apiService: ApiService
+        apiService: ApiService,
+        tokenManager: TokenManager
     ): AuthRepository {
         return AuthRepositoryImpl(
-            apiService = apiService
+            apiService = apiService,
+            tokenManager = tokenManager
         )
     }
 

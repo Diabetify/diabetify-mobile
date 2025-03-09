@@ -6,13 +6,15 @@ import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
 import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
 import com.itb.diabetify.data.remote.auth.request.VerifyOtpRequest
+import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.util.Resource
 import okio.IOException
 import retrofit2.HttpException
 
 class AuthRepositoryImpl(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val tokenManager: TokenManager
 ): AuthRepository {
     override suspend fun createAccount(
         createAccountRequest: CreateAccountRequest
@@ -69,6 +71,7 @@ class AuthRepositoryImpl(
     ): Resource<Unit> {
         return try {
             val response = apiService.login(loginRequest)
+            tokenManager.saveToken(response.data.toString())
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

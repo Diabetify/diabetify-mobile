@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.itb.diabetify.presentation.login.ChangePasswordScreen
+import com.itb.diabetify.presentation.login.ForgotPasswordScreen
 import com.itb.diabetify.presentation.login.LoginScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingViewModel
@@ -110,6 +112,22 @@ fun NavGraph(
                 RegisterScreen(
                     navController = navController,
                     viewModel = registerViewModel,
+                )
+            }
+
+            composable (
+                route = Route.ForgotPasswordScreen.route
+            ) {
+                ForgotPasswordScreen(
+                    navController = navController
+                )
+            }
+
+            composable (
+                route = Route.ChangePasswordScreen.route
+            ) {
+                ChangePasswordScreen(
+                    navController = navController
                 )
             }
         }

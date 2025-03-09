@@ -147,7 +147,9 @@ fun LoginScreen(navController: NavController) {
                         color = colorResource(id = R.color.gray_2),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .clickable { /* Open privacy policy link */ }
+                            .clickable {
+                                navController.navigate(Route.ForgotPasswordScreen.route)
+                            }
                     )
                 }
             }

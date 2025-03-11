@@ -1,5 +1,7 @@
 package com.itb.diabetify.presentation.register
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -27,11 +30,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import com.itb.diabetify.presentation.common.Divider
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
+import com.itb.diabetify.util.AuthResultContract
+import com.itb.diabetify.BuildConfig
 
 @Composable
 fun RegisterScreen(
@@ -43,6 +51,17 @@ fun RegisterScreen(
     val passwordState = viewModel.passwordState.value
     var passwordVisible by remember { mutableStateOf(false) }
     val privacyPolicyState = viewModel.privacyPolicyState.value
+
+    val context = LocalContext.current
+    val googleSignInClient = remember {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestProfile()
+            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
+            .build()
+
+        GoogleSignIn.getClient(context, gso)
+    }
 
     Box(
         modifier = Modifier
@@ -205,8 +224,28 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
+                val coroutineScope = rememberCoroutineScope()
+                val signInRequestCode = 1
+
+                val authResultLauncher =
+                    rememberLauncherForActivityResult(contract = AuthResultContract(googleSignInClient)) {
+                        try {
+                            val account = it?.getResult(ApiException::class.java)
+                            if (account == null) {
+                                Log.e("GoogleSignIn", "Account is null")
+                            } else {
+                                Log.d("GoogleSignIn", "Account: ${account.idToken}")
+//                                coroutineScope.launch {
+//                                    Log.d("GoogleSignIn", "Account: ${account}")
+//                                }
+                            }
+                        } catch (e: ApiException) {
+                            Log.d("GoogleSignIn", "signInResult:failed code=" + e.statusCode)
+                        }
+                    }
+
                 Surface(
-                    onClick = { /* Handle Google login */ },
+                    onClick = { authResultLauncher.launch(signInRequestCode) },
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(15.dp),
                     color = Color.White,

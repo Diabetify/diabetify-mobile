@@ -63,19 +63,6 @@ fun NavGraph(
             }
 
             composable(
-                route = Route.LoginScreen.route
-            ) {
-                val loginViewModel: LoginViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.RegisterNavigation.route)
-                )
-
-                LoginScreen(
-                    navController = navController,
-                    viewModel = loginViewModel,
-                )
-            }
-
-            composable(
                 route = Route.BiodataScreen.route
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel(
@@ -106,6 +93,17 @@ fun NavGraph(
             ) {
                 SuccessScreen()
             }
+
+            composable(
+                route = Route.LoginScreen.route
+            ) {
+                val loginViewModel: LoginViewModel = hiltViewModel()
+
+                LoginScreen(
+                    navController = navController,
+                    viewModel = loginViewModel,
+                )
+            }
         }
 
         navigation(
@@ -115,9 +113,7 @@ fun NavGraph(
             composable(
                 route = Route.RegisterScreen.route
             ) {
-                val registerViewModel: RegisterViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.LoginNavigation.route)
-                )
+                val registerViewModel: RegisterViewModel = hiltViewModel()
 
                 RegisterScreen(
                     navController = navController,
@@ -133,9 +129,7 @@ fun NavGraph(
             composable(
                 route = Route.ForgotPasswordScreen.route
             ) {
-                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.ForgotPasswordNavigation.route)
-                )
+                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel()
 
                 ForgotPasswordScreen(
                     navController = navController,

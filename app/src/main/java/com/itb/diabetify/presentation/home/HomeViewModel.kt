@@ -35,7 +35,7 @@ class HomeViewModel @Inject constructor(
 
             when (logoutResult.result) {
                 is Resource.Success -> {
-                    _navigationEvent.value = "LOGIN_SCREEN"
+//                    _navigationEvent.value = "LOGIN_SCREEN"
                 }
                 is Resource.Error -> {
                     _errorMessage.value = logoutResult.result.message ?: "Unknown error occurred"
@@ -46,7 +46,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 else -> {
-                    // Handle unexpected error
+                    // Handle unexpected er ror
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("HomeViewModel", "Unexpected error")
                 }

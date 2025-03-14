@@ -13,4 +13,5 @@ interface AuthRepository {
     suspend fun verifyOtp(verifyOtpRequest: VerifyOtpRequest): Resource<Unit>
     suspend fun login(loginRequest: LoginRequest): Resource<Unit>
     suspend fun changePassword(changePasswordRequest: ChangePasswordRequest): Resource<Unit>
+    suspend fun logout(): Resource<Unit>
 }

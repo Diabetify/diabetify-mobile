@@ -92,4 +92,15 @@ class AuthRepositoryImpl(
             Resource.Error("${e.message}")
         }
     }
+
+    override suspend fun logout(): Resource<Unit> {
+        return try {
+            tokenManager.clearToken()
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
 }

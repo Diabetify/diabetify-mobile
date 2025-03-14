@@ -68,7 +68,7 @@ fun LoginScreen(
         navigationEvent?.let {
             when (it) {
                 "HOME_SCREEN" -> {
-//                    navController.navigate(Route.HomeScreen.route)
+                    navController.navigate(Route.MainNavigation.route)
                     viewModel.onNavigationHandled()
                 }
             }

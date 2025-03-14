@@ -3,6 +3,7 @@ package com.itb.diabetify.presentation.navgraph
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -10,8 +11,10 @@ import androidx.navigation.compose.rememberNavController
 import com.itb.diabetify.presentation.forgot_password.ChangePasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordViewModel
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.login.LoginScreen
 import com.itb.diabetify.presentation.login.LoginViewModel
+import com.itb.diabetify.presentation.main.MainScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.itb.diabetify.presentation.register.BiodataScreen
@@ -158,6 +161,33 @@ fun NavGraph(
             ) {
                 com.itb.diabetify.presentation.forgot_password.SuccessScreen(
                     navController = navController
+                )
+            }
+        }
+
+        navigation(
+            route = Route.MainNavigation.route,
+            startDestination = Route.MainScreen.route
+        ) {
+            composable(
+                route = Route.MainScreen.route
+            ) {
+                val homeViewModel: HomeViewModel = hiltViewModel()
+
+                MainScreen(
+                    homeViewModel = homeViewModel
+                )
+            }
+
+            composable(
+                route = Route.LoginScreen.route
+            ) {
+                val loginViewModel: LoginViewModel = hiltViewModel(
+                )
+
+                LoginScreen(
+                    navController = navController,
+                    viewModel = loginViewModel
                 )
             }
         }

@@ -12,8 +12,11 @@ sealed class Route(
     object ForgotPasswordScreen : Route(route = "forgotPasswordScreen")
     object ChangePasswordScreen : Route(route = "changePasswordScreen")
     object ResetPasswordSuccessScreen : Route(route = "resetPasswordSuccessScreen")
+    object MainScreen : Route(route = "mainScreen")
+    object HomeScreen: Route(route = "homeScreen")
     object AppStartNavigation : Route(route = "appStartNavigation")
     object RegisterNavigation : Route(route = "registerNavigation")
     object LoginNavigation : Route(route = "loginNavigation")
     object ForgotPasswordNavigation : Route(route = "forgotPasswordNavigation")
+    object MainNavigation : Route(route = "mainNavigation")
 }

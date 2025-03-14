@@ -15,6 +15,7 @@ import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
 import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
+import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
@@ -113,5 +114,13 @@ object AppModule {
         repository: AuthRepository
     ): ChangePasswordUseCase {
         return ChangePasswordUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesLogoutUseCase(
+        repository: AuthRepository
+    ): LogoutUseCase {
+        return LogoutUseCase(repository)
     }
 }

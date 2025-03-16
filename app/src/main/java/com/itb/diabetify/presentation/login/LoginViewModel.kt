@@ -85,6 +85,7 @@ class LoginViewModel @Inject constructor(
 
             when (loginResult.result) {
                 is Resource.Success -> {
+                    resetValues()
                     _navigationEvent.value = "HOME_SCREEN"
                 }
                 is Resource.Error -> {
@@ -102,6 +103,11 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun resetValues() {
+        _emailState.value = FieldState()
+        _passwordState.value = FieldState()
     }
 
     fun onNavigationHandled() {

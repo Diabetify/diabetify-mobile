@@ -17,13 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.Lottie
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
-fun SuccessScreen() {
+fun SuccessScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +45,7 @@ fun SuccessScreen() {
 
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 5.dp),
-                text = "Selamat Datang, Bernardus",
+                text = "Selamat Datang, ${viewModel.nameStateCopy.value.text}!",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -63,7 +67,9 @@ fun SuccessScreen() {
         // Go to Home button
         PrimaryButton(
             text = "Pergi ke Beranda",
-            onClick = { },
+            onClick = {
+                viewModel.resetName()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp)

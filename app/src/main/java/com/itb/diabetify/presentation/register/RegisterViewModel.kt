@@ -41,8 +41,12 @@ class RegisterViewModel @Inject constructor(
     private val _nameState = mutableStateOf(FieldState())
     val nameState: State<FieldState> = _nameState
 
+    private val _nameStateCopy = mutableStateOf(FieldState())
+    val nameStateCopy: State<FieldState> = _nameStateCopy
+
     fun setName(value: String) {
         _nameState.value = nameState.value.copy(error = null)
+        _nameStateCopy.value = nameState.value.copy(text = value)
         _nameState.value = nameState.value.copy(text = value)
     }
 
@@ -333,6 +337,7 @@ class RegisterViewModel @Inject constructor(
 
             when (verifyOtpResult.result) {
                 is Resource.Success -> {
+                    resetValues()
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
@@ -350,6 +355,22 @@ class RegisterViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun resetValues() {
+        _nameState.value = FieldState()
+        _emailState.value = FieldState()
+        _passwordState.value = FieldState()
+        _privacyPolicyState.value = false
+        _genderState.value = FieldState()
+        _dobState.value = FieldState()
+        _weightState.value = FieldState()
+        _heightState.value = FieldState()
+        _otpState.value = FieldState()
+    }
+
+    fun resetName() {
+        _nameStateCopy.value = FieldState()
     }
 
     fun onNavigationHandled() {

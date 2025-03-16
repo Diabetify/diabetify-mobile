@@ -164,6 +164,7 @@ class ForgotPasswordViewModel @Inject constructor(
 
             when (changePasswordResult.result) {
                 is Resource.Success -> {
+                    resetValues()
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
@@ -181,6 +182,12 @@ class ForgotPasswordViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun resetValues() {
+        _emailState.value = FieldState()
+        _passwordState.value = FieldState()
+        _otpState.value = FieldState()
     }
 
     fun onNavigationHandled() {

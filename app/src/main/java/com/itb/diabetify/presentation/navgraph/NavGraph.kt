@@ -103,7 +103,14 @@ fun NavGraph(
             composable(
                 route = Route.RegisterSuccessScreen.route
             ) {
-                SuccessScreen()
+                val registerViewModel: RegisterViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
+                )
+
+                SuccessScreen(
+                    navController = navController,
+                    viewModel = registerViewModel,
+                )
             }
 
             // Forgot Password Flow

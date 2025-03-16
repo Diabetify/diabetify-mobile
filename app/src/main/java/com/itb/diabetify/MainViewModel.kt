@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
 
             startDestination = when {
                 isLoggedIn -> Route.MainNavigation.route
-                shouldStartFromRegisterScreen -> Route.RegisterNavigation.route
+                shouldStartFromRegisterScreen -> Route.AuthNavigation.route
                 else -> Route.AppStartNavigation.route
             }
 

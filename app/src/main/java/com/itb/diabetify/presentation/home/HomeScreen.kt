@@ -23,7 +23,7 @@ fun HomeScreen(
         navigationEvent?.let {
             when (it) {
                 "LOGIN_SCREEN" -> {
-                    navController.navigate(Route.LoginNavigation.route)
+                    navController.navigate(Route.LoginScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }

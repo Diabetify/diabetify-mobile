@@ -3,7 +3,6 @@ package com.itb.diabetify.presentation.navgraph
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -46,14 +45,27 @@ fun NavGraph(
         }
 
         navigation(
-            route = Route.RegisterNavigation.route,
-            startDestination = Route.RegisterScreen.route
+            route = Route.AuthNavigation.route,
+            startDestination = Route.LoginScreen.route
         ) {
+            // Login Screen
+            composable(
+                route = Route.LoginScreen.route
+            ) {
+                val loginViewModel: LoginViewModel = hiltViewModel()
+
+                LoginScreen(
+                    navController = navController,
+                    viewModel = loginViewModel,
+                )
+            }
+
+            // Register Flow
             composable(
                 route = Route.RegisterScreen.route
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
                 )
 
                 RegisterScreen(
@@ -66,7 +78,7 @@ fun NavGraph(
                 route = Route.BiodataScreen.route
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
                 )
 
                 BiodataScreen(
@@ -79,7 +91,7 @@ fun NavGraph(
                 route = Route.OtpScreen.route
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.RegisterNavigation.route)
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
                 )
 
                 OtpScreen(
@@ -94,42 +106,13 @@ fun NavGraph(
                 SuccessScreen()
             }
 
-            composable(
-                route = Route.LoginScreen.route
-            ) {
-                val loginViewModel: LoginViewModel = hiltViewModel()
-
-                LoginScreen(
-                    navController = navController,
-                    viewModel = loginViewModel,
-                )
-            }
-        }
-
-        navigation(
-            route = Route.LoginNavigation.route,
-            startDestination = Route.LoginScreen.route
-        ) {
-            composable(
-                route = Route.RegisterScreen.route
-            ) {
-                val registerViewModel: RegisterViewModel = hiltViewModel()
-
-                RegisterScreen(
-                    navController = navController,
-                    viewModel = registerViewModel,
-                )
-            }
-        }
-
-        navigation(
-            route = Route.ForgotPasswordNavigation.route,
-            startDestination = Route.ForgotPasswordScreen.route
-        ) {
+            // Forgot Password Flow
             composable(
                 route = Route.ForgotPasswordScreen.route
             ) {
-                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel()
+                val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
+                )
 
                 ForgotPasswordScreen(
                     navController = navController,
@@ -141,7 +124,7 @@ fun NavGraph(
                 route = Route.ChangePasswordScreen.route
             ) {
                 val forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.ForgotPasswordNavigation.route)
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
                 )
 
                 ChangePasswordScreen(
@@ -170,18 +153,6 @@ fun NavGraph(
 
                 MainScreen(
                     homeViewModel = homeViewModel
-                )
-            }
-
-            composable(
-                route = Route.LoginScreen.route
-            ) {
-                val loginViewModel: LoginViewModel = hiltViewModel(
-                )
-
-                LoginScreen(
-                    navController = navController,
-                    viewModel = loginViewModel
                 )
             }
         }

@@ -15,8 +15,6 @@ sealed class Route(
     object MainScreen : Route(route = "mainScreen")
     object HomeScreen: Route(route = "homeScreen")
     object AppStartNavigation : Route(route = "appStartNavigation")
-    object RegisterNavigation : Route(route = "registerNavigation")
-    object LoginNavigation : Route(route = "loginNavigation")
-    object ForgotPasswordNavigation : Route(route = "forgotPasswordNavigation")
+    object AuthNavigation : Route(route = "authNavigation")
     object MainNavigation : Route(route = "mainNavigation")
 }

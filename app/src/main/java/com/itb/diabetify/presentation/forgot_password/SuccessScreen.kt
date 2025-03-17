@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.forgot_password
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,5 +78,13 @@ fun SuccessScreen(
                 .offset(y = (-30).dp),
             enabled = true
         )
+    }
+
+    BackHandler {
+        navController.navigate(Route.LoginScreen.route) {
+            popUpTo(Route.AuthNavigation.route) {
+                saveState = false
+            }
+        }
     }
 }

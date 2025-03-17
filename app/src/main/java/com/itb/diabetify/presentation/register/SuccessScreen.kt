@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.register
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.Lottie
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -77,5 +79,13 @@ fun SuccessScreen(
                 .offset(y = (-30).dp),
             enabled = true
         )
+    }
+
+    BackHandler {
+        navController.navigate(Route.LoginScreen.route) {
+            popUpTo(Route.AuthNavigation.route) {
+                saveState = false
+            }
+        }
     }
 }

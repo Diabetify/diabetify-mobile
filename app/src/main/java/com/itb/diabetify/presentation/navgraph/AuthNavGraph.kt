@@ -10,10 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import com.itb.diabetify.presentation.forgot_password.ChangePasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordViewModel
-import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.login.LoginScreen
 import com.itb.diabetify.presentation.login.LoginViewModel
-import com.itb.diabetify.presentation.main.MainScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.itb.diabetify.presentation.register.BiodataScreen
@@ -24,7 +22,7 @@ import com.itb.diabetify.presentation.register.SuccessScreen
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
-fun NavGraph(
+fun AuthNavGraph(
     startDestination: String
 ) {
     val navController = rememberNavController()
@@ -156,10 +154,8 @@ fun NavGraph(
             composable(
                 route = Route.MainScreen.route
             ) {
-                val homeViewModel: HomeViewModel = hiltViewModel()
-
-                MainScreen(
-                    homeViewModel = homeViewModel
+                MainNavGraph(
+                    navController = navController
                 )
             }
         }

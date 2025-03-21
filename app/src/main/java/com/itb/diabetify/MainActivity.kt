@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.itb.diabetify.presentation.navgraph.NavGraph
+import com.itb.diabetify.presentation.navgraph.AuthNavGraph
 import com.itb.diabetify.ui.theme.DiabetifyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DiabetifyTheme {
                 val startDestination = viewModel.startDestination
-                NavGraph(startDestination)
+                AuthNavGraph(startDestination)
             }
         }
     }

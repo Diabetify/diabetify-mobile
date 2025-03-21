@@ -11,19 +11,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.itb.diabetify.presentation.common.PrimaryButton
-import com.itb.diabetify.presentation.navgraph.Route
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    onLogout: () -> Unit
 ) {
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
             when (it) {
                 "LOGIN_SCREEN" -> {
-                    navController.navigate(Route.LoginScreen.route)
+                    onLogout()
                     viewModel.onNavigationHandled()
                 }
             }

@@ -1,15 +1,23 @@
 package com.itb.diabetify.presentation.navbar
 
+import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -19,9 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.indicatorColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,18 +39,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.itb.diabetify.R
 
 @Composable
 fun BottomNavigationBar(
     modifier: Modifier = Modifier,
-    viewModel: NavigationViewModel = NavigationViewModel(),
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    viewModel: NavigationViewModel,
+    backgroundColor: Color = Color.White,
+    selectedColor: Color = colorResource(id = R.color.primary),
+    unselectedColor: Color = colorResource(id = R.color.tertiary),
+    indicatorColor: Color = colorResource(id = R.color.primary),
     elevation: Dp = 8.dp,
     onItemSelected: (String) -> Unit = {},
     onAddButtonClicked: () -> Unit = {}
@@ -65,24 +81,41 @@ fun BottomNavigationBar(
         modifier = modifier
     ) {
         NavigationBar(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(70.dp),
             containerColor = backgroundColor,
-            contentColor = contentColor,
             tonalElevation = elevation
         ) {
             items.forEachIndexed { index, item ->
                 if (index == middleIndex) {
-                    // Empty space for the add button
                     NavigationBarItem(
                         selected = false,
                         onClick = { },
                         icon = {
-                            // Transparent spacer
                             Spacer(modifier = Modifier.size(24.dp))
                         },
-                        label = { Text("") }
+                        label = { Text("") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = selectedColor,
+                            unselectedIconColor = unselectedColor,
+                            indicatorColor = Color.Transparent
+                        )
                     )
                 }
+
+                val iconSize by animateDpAsState(
+                    targetValue = if (selectedItem == item.route) 28.dp else 24.dp,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    label = "iconSize"
+                )
+
+                val iconColor by animateColorAsState(
+                    targetValue = if (selectedItem == item.route) selectedColor else unselectedColor,
+                    animationSpec = tween(300),
+                    label = "iconColor"
+                )
 
                 NavigationBarItem(
                     selected = selectedItem == item.route,
@@ -91,26 +124,46 @@ fun BottomNavigationBar(
                         onItemSelected(item.route)
                     },
                     icon = {
-                        Icon(
-                            painter = painterResource(id = item.icon),
-                            contentDescription = item.contentDescription
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.contentDescription,
+                                modifier = Modifier.size(iconSize),
+                                tint = iconColor
+                            )
+
+                            if (selectedItem == item.route) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(5.dp)
+                                        .clip(CircleShape)
+                                        .background(indicatorColor)
+                                )
+                            }
+                        }
                     },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = selectedColor,
+                        unselectedIconColor = unselectedColor,
+                        indicatorColor = Color.Transparent
+                    )
                 )
             }
         }
 
-        // Floating Add Button
         FloatingActionButton(
             onClick = {
                 showPopup = true
             },
             modifier = Modifier
                 .align(Alignment.Center),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            shape = CircleShape,
+            containerColor = colorResource(id = R.color.primary),
+            contentColor = colorResource(id = R.color.white)
         ) {
             Icon(
+                modifier = Modifier.scale(1.5f),
                 imageVector = Icons.Rounded.Add,
                 contentDescription = "Add"
             )

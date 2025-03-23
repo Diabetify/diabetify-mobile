@@ -1,5 +1,8 @@
 package com.itb.diabetify.presentation.navbar
 
+import com.itb.diabetify.R
+import com.itb.diabetify.presentation.navgraph.Route
+
 data class NavigationItem(
     val route: String,
     val title: String,
@@ -10,28 +13,28 @@ data class NavigationItem(
 object NavigationItems {
     val items = listOf(
         NavigationItem(
-            route = "home",
+            route = Route.HomeScreen.route,
             title = "Home",
-            icon = android.R.drawable.ic_menu_myplaces,
+            icon = R.drawable.ic_home,
             contentDescription = "Navigate to home screen"
         ),
         NavigationItem(
-            route = "history",
+            route = Route.HistoryScreen.route,
             title = "History",
-            icon = android.R.drawable.ic_menu_search,
+            icon = R.drawable.ic_history,
             contentDescription = "Navigate to history screen"
         ),
         NavigationItem(
-            route = "recommendation",
+            route = Route.RecommendationScreen.route,
             title = "Recommendation",
-            icon = android.R.drawable.ic_menu_myplaces,
+            icon = R.drawable.ic_thumbs,
             contentDescription = "Navigate to recommendation screen"
         ),
         NavigationItem(
-            route = "profile",
-            title = "Profile",
-            icon = android.R.drawable.ic_menu_preferences,
-            contentDescription = "Navigate to profile screen"
+            route = Route.SettingsScreen.route,
+            title = "Settings",
+            icon = R.drawable.ic_settings,
+            contentDescription = "Navigate to settings screen"
         )
     )
 }

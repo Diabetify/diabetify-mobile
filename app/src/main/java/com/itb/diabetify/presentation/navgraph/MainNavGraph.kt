@@ -19,9 +19,13 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.itb.diabetify.presentation.history.HistoryScreen
 import com.itb.diabetify.presentation.home.HomeScreen
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.navbar.BottomNavigationBar
+import com.itb.diabetify.presentation.navbar.NavigationViewModel
+import com.itb.diabetify.presentation.recommendation.RecommendationScreen
+import com.itb.diabetify.presentation.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,6 +34,7 @@ fun MainNavGraph(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val navigationViewModel: NavigationViewModel = hiltViewModel()
     val mainNavController = rememberNavController()
 
     var shouldNavigateToLogin by rememberSaveable { mutableStateOf(false) }
@@ -49,6 +54,7 @@ fun MainNavGraph(
         bottomBar = {
             BottomNavigationBar(
                 modifier = Modifier.fillMaxWidth(),
+                viewModel = navigationViewModel,
                 onItemSelected = { route ->
                     mainNavController.navigate(route) {
                         popUpTo(mainNavController.graph.findStartDestination().id) {
@@ -62,7 +68,7 @@ fun MainNavGraph(
                     scope.launch {
                         snackbarHostState.showSnackbar("Add action selected")
                     }
-                }
+                },
             )
         }
     ) { innerPadding ->
@@ -80,6 +86,18 @@ fun MainNavGraph(
                         shouldNavigateToLogin = true
                     }
                 )
+            }
+
+            composable(route = Route.HistoryScreen.route) {
+                HistoryScreen()
+            }
+
+            composable(route = Route.RecommendationScreen.route) {
+                RecommendationScreen()
+            }
+
+            composable(route = Route.SettingsScreen.route) {
+                SettingsScreen()
             }
         }
     }

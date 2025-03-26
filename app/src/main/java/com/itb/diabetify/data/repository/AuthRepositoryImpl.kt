@@ -3,6 +3,7 @@ package com.itb.diabetify.data.repository
 import com.itb.diabetify.data.remote.auth.ApiService
 import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
+import com.itb.diabetify.data.remote.auth.request.GoogleLoginRequest
 import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
 import com.itb.diabetify.data.remote.auth.request.VerifyOtpRequest
@@ -71,6 +72,20 @@ class AuthRepositoryImpl(
     ): Resource<Unit> {
         return try {
             val response = apiService.login(loginRequest)
+            tokenManager.saveToken(response.data.toString())
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun googleLogin(
+        googleLoginRequest: GoogleLoginRequest
+    ): Resource<Unit> {
+        return try {
+            val response = apiService.googleLogin(googleLoginRequest)
             tokenManager.saveToken(response.data.toString())
             Resource.Success(Unit)
         } catch (e: IOException) {

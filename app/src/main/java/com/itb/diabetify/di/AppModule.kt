@@ -14,6 +14,7 @@ import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
 import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
+import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
@@ -33,13 +34,13 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideLocalUserManager(
+    fun providesLocalUserManager(
         application: Application
     ): LocalUserManager = LocalUserManagerImpl(application)
 
     @Provides
     @Singleton
-    fun provideAppEntryUseCases(
+    fun providesAppEntryUseCases(
         localUserManager: LocalUserManager
     ) = AppEntryUseCase(
         readAppEntry = ReadAppEntry(localUserManager),
@@ -48,7 +49,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTokenManager(
+    fun providesTokenManager(
         @ApplicationContext context: Context
     ): TokenManager {
         return TokenManagerImpl(context)
@@ -106,6 +107,14 @@ object AppModule {
         repository: AuthRepository
     ): LoginUseCase {
         return LoginUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesGoogleLoginUseCase(
+        repository: AuthRepository
+    ): GoogleLoginUseCase {
+        return GoogleLoginUseCase(repository)
     }
 
     @Provides

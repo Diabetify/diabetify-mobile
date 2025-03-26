@@ -1,6 +1,7 @@
 package com.itb.diabetify.presentation.register
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -51,6 +52,18 @@ fun RegisterScreen(
     val passwordState = viewModel.passwordState.value
     var passwordVisible by remember { mutableStateOf(false) }
     val privacyPolicyState = viewModel.privacyPolicyState.value
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "HOME_SCREEN" -> {
+                    navController.navigate(Route.MainNavigation.route)
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
 
     val context = LocalContext.current
     val googleSignInClient = remember {
@@ -234,10 +247,7 @@ fun RegisterScreen(
                             if (account == null) {
                                 Log.e("GoogleSignIn", "Account is null")
                             } else {
-                                Log.d("GoogleSignIn", "Account: ${account.idToken}")
-//                                coroutineScope.launch {
-//                                    Log.d("GoogleSignIn", "Account: ${account}")
-//                                }
+                                viewModel.googleLogin(account.idToken!!)
                             }
                         } catch (e: ApiException) {
                             Log.d("GoogleSignIn", "signInResult:failed code=" + e.statusCode)

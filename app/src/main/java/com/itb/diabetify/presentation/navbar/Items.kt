@@ -33,7 +33,7 @@ object NavigationItems {
         NavigationItem(
             route = Route.SettingsScreen.route,
             title = "Settings",
-            icon = R.drawable.ic_settings,
+            icon = R.drawable.ic_user_settings,
             contentDescription = "Navigate to settings screen"
         )
     )

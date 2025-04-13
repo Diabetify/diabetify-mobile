@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -78,22 +79,81 @@ fun BottomNavigationBar(
     }
 
     Box(
-        modifier = modifier
+        modifier = modifier.background(color = backgroundColor)
     ) {
-        NavigationBar(
-            modifier = Modifier.fillMaxWidth().height(70.dp),
-            containerColor = backgroundColor,
-            tonalElevation = elevation
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = elevation,
+                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                )
         ) {
-            items.forEachIndexed { index, item ->
-                if (index == middleIndex) {
+            NavigationBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp),
+                containerColor = backgroundColor,
+                tonalElevation = 0.dp
+            ) {
+                items.forEachIndexed { index, item ->
+                    if (index == middleIndex) {
+                        NavigationBarItem(
+                            selected = false,
+                            onClick = { },
+                            icon = {
+                                Spacer(modifier = Modifier.size(24.dp))
+                            },
+                            label = { Text("") },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = selectedColor,
+                                unselectedIconColor = unselectedColor,
+                                indicatorColor = Color.Transparent
+                            )
+                        )
+                    }
+
+                    val iconSize by animateDpAsState(
+                        targetValue = if (selectedItem == item.route) 28.dp else 24.dp,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ),
+                        label = "iconSize"
+                    )
+
+                    val iconColor by animateColorAsState(
+                        targetValue = if (selectedItem == item.route) selectedColor else unselectedColor,
+                        animationSpec = tween(300),
+                        label = "iconColor"
+                    )
+
                     NavigationBarItem(
-                        selected = false,
-                        onClick = { },
-                        icon = {
-                            Spacer(modifier = Modifier.size(24.dp))
+                        selected = selectedItem == item.route,
+                        onClick = {
+                            viewModel.onNavigationItemSelected(item.route)
+                            onItemSelected(item.route)
                         },
-                        label = { Text("") },
+                        icon = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = item.contentDescription,
+                                    modifier = Modifier.size(iconSize),
+                                    tint = iconColor
+                                )
+
+                                if (selectedItem == item.route) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .size(5.dp)
+                                            .clip(CircleShape)
+                                            .background(indicatorColor)
+                                    )
+                                }
+                            }
+                        },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = selectedColor,
                             unselectedIconColor = unselectedColor,
@@ -101,54 +161,6 @@ fun BottomNavigationBar(
                         )
                     )
                 }
-
-                val iconSize by animateDpAsState(
-                    targetValue = if (selectedItem == item.route) 28.dp else 24.dp,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    ),
-                    label = "iconSize"
-                )
-
-                val iconColor by animateColorAsState(
-                    targetValue = if (selectedItem == item.route) selectedColor else unselectedColor,
-                    animationSpec = tween(300),
-                    label = "iconColor"
-                )
-
-                NavigationBarItem(
-                    selected = selectedItem == item.route,
-                    onClick = {
-                        viewModel.onNavigationItemSelected(item.route)
-                        onItemSelected(item.route)
-                    },
-                    icon = {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.contentDescription,
-                                modifier = Modifier.size(iconSize),
-                                tint = iconColor
-                            )
-
-                            if (selectedItem == item.route) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(5.dp)
-                                        .clip(CircleShape)
-                                        .background(indicatorColor)
-                                )
-                            }
-                        }
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = selectedColor,
-                        unselectedIconColor = unselectedColor,
-                        indicatorColor = Color.Transparent
-                    )
-                )
             }
         }
 
@@ -157,7 +169,8 @@ fun BottomNavigationBar(
                 showPopup = true
             },
             modifier = Modifier
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                .shadow(8.dp, CircleShape),
             shape = CircleShape,
             containerColor = colorResource(id = R.color.primary),
             contentColor = colorResource(id = R.color.white)
@@ -180,7 +193,8 @@ fun AddActionPopup(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp
+            tonalElevation = 8.dp,
+            shadowElevation = 8.dp
         ) {
             Column(
                 modifier = Modifier

@@ -15,31 +15,31 @@ data class ContentData(
 
 val cards = listOf(
     CardData(
-        title = "Account",
+        title = "Akun",
         contents = listOf(
             ContentData(
                 icon = R.drawable.ic_personal,
-                name = "Personal Data",
+                name = "Data Pribadi",
                 onClick = { }
             )
         )
     ),
     CardData(
-        title = "Other",
+        title = "Lainnya",
         contents = listOf(
             ContentData(
                 icon = R.drawable.ic_message,
-                name = "Contact Us",
+                name = "Kontak Kami",
                 onClick = { }
             ),
             ContentData(
                 icon = R.drawable.ic_shield,
-                name = "Privacy Policy",
+                name = "Privasi dan Ketentuan",
                 onClick = { }
             ),
             ContentData(
                 icon = R.drawable.ic_settings,
-                name = "Settings",
+                name = "Pengaturan",
                 onClick = { }
             )
         )

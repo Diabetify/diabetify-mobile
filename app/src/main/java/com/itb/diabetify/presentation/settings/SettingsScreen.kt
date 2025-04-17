@@ -59,7 +59,7 @@ fun SettingsScreen() {
             // Header
             Text(
                 modifier = Modifier.padding(horizontal = 30.dp, vertical = 30.dp),
-                text = "Profile",
+                text = "Profil",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -94,7 +94,7 @@ fun SettingsScreen() {
                         Text(
                             modifier = Modifier
                                 .padding(start = 10.dp),
-                            text = "User Name",
+                            text = "Bernardus",
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
@@ -144,7 +144,7 @@ fun SettingsScreen() {
                             )
                             Text(
                                 modifier = Modifier,
-                                text = "Height",
+                                text = "Tinggi",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 15.sp,
@@ -182,7 +182,7 @@ fun SettingsScreen() {
                             )
                             Text(
                                 modifier = Modifier,
-                                text = "Weight",
+                                text = "Berat",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 15.sp,
@@ -211,7 +211,7 @@ fun SettingsScreen() {
                         ) {
                             Text(
                                 modifier = Modifier,
-                                text = "22yo",
+                                text = "22",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 17.sp,
@@ -220,7 +220,7 @@ fun SettingsScreen() {
                             )
                             Text(
                                 modifier = Modifier,
-                                text = "Age",
+                                text = "Umur",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 15.sp,

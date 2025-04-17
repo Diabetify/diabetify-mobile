@@ -61,7 +61,7 @@ fun Card (
                 text = cardData.title,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 17.sp,
                 color = colorResource(id = R.color.primary),
             )
 
@@ -103,7 +103,7 @@ fun ContentItem(
                 text = contentData.name,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 color = colorResource(id = R.color.gray),
                 textAlign = TextAlign.Start
             )

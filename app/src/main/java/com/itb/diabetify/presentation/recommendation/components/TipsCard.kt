@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.presentation.recommendation.TipsCardData
+import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun TipsCard(
@@ -58,7 +59,8 @@ fun TipsCard(
             ) {
                 Text(
                     text = tipsCardData.title,
-                    fontSize = 16.sp,
+                    fontFamily = poppinsFontFamily,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     lineHeight = 20.sp,

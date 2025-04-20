@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.presentation.recommendation.GuideCardData
+import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun GuideCard(
@@ -59,8 +60,9 @@ fun GuideCard(
 
             Text(
                 text = guideCardData.title,
+                fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 color = Color.Black.copy(alpha = 0.8f),
             )
         }

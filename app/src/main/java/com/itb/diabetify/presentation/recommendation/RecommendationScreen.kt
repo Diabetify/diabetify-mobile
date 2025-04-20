@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.recommendation.components.FAQCard
 import com.itb.diabetify.presentation.recommendation.components.GuideCard
 import com.itb.diabetify.presentation.recommendation.components.TipsCard
 import com.itb.diabetify.ui.theme.poppinsFontFamily
@@ -179,6 +180,21 @@ fun RecommendationScreen() {
                             )
                         }
                     }
+                }
+
+                // FAQ
+                Text(
+                    modifier = Modifier.padding(top = 15.dp, bottom = 15.dp),
+                    text = "FAQ",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = colorResource(id = R.color.primary)
+                )
+
+                faqCards.forEach{ faqCardData ->
+                    FAQCard(faqCardData)
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }

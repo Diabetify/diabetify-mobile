@@ -34,5 +34,5 @@ val guideCards = listOf(
         title = "Prediksi AI",
         backgroundColor = Color(0xFFF8F0FF),
         iconColor = Color(0xFFAB68FF)
-    ),
+    )
 )

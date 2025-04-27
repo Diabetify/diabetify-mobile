@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,17 +28,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.common.SecondaryButton
@@ -45,7 +49,32 @@ import com.itb.diabetify.presentation.settings.components.Card
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    navController: NavController,
+    viewModel: SettingsViewModel,
+    onLogout: () -> Unit
+) {
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "LOGIN_SCREEN" -> {
+                    onLogout()
+                    viewModel.onNavigationHandled()
+                }
+            }
+        }
+    }
+
+    val context = LocalContext.current
+    val errorMessage = viewModel.errorMessage.value
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -242,7 +271,9 @@ fun SettingsScreen() {
                 // Logout button
                 PrimaryButton(
                     text = "Logout",
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        viewModel.logout()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

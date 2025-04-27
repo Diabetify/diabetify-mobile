@@ -26,6 +26,7 @@ import com.itb.diabetify.presentation.navbar.BottomNavigationBar
 import com.itb.diabetify.presentation.navbar.NavigationViewModel
 import com.itb.diabetify.presentation.recommendation.RecommendationScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
+import com.itb.diabetify.presentation.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,9 +83,6 @@ fun MainNavGraph(
                 HomeScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
-                    onLogout = {
-                        shouldNavigateToLogin = true
-                    }
                 )
             }
 
@@ -97,7 +95,14 @@ fun MainNavGraph(
             }
 
             composable(route = Route.SettingsScreen.route) {
-                SettingsScreen()
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                SettingsScreen(
+                    navController = mainNavController,
+                    viewModel = settingsViewModel,
+                    onLogout = {
+                        shouldNavigateToLogin = true
+                    }
+                )
             }
         }
     }

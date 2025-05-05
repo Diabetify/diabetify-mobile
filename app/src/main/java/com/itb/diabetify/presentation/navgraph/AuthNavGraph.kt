@@ -19,6 +19,7 @@ import com.itb.diabetify.presentation.register.OtpScreen
 import com.itb.diabetify.presentation.register.RegisterScreen
 import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.presentation.register.SuccessScreen
+import com.itb.diabetify.presentation.survey.SurveyScreen
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
@@ -144,6 +145,12 @@ fun AuthNavGraph(
                 com.itb.diabetify.presentation.forgot_password.SuccessScreen(
                     navController = navController
                 )
+            }
+
+            composable(
+                route = Route.SurveyScreen.route
+            ) {
+                SurveyScreen()
             }
         }
 

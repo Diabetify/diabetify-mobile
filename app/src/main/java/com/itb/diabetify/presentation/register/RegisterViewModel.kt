@@ -119,22 +119,6 @@ class RegisterViewModel @Inject constructor(
         _dobState.value = dobState.value.copy(text = value)
     }
 
-    private val _weightState = mutableStateOf(FieldState())
-    val weightState: State<FieldState> = _weightState
-
-    fun setWeight(value: String) {
-        _weightState.value = weightState.value.copy(error = null)
-        _weightState.value = weightState.value.copy(text = value)
-    }
-
-    private val _heightState = mutableStateOf(FieldState())
-    val heightState: State<FieldState> = _heightState
-
-    fun setHeight(value: String) {
-        _heightState.value = heightState.value.copy(error = null)
-        _heightState.value = heightState.value.copy(text = value)
-    }
-
     private val _otpState = mutableStateOf(FieldState())
     val otpState: State<FieldState> = _otpState
 
@@ -148,8 +132,6 @@ class RegisterViewModel @Inject constructor(
     fun validateBiodataFields(): Boolean {
         val gender = genderState.value.text
         val birthDate = dobState.value.text
-        val weight = weightState.value.text
-        val height = heightState.value.text
 
         var isValid = true
 
@@ -160,26 +142,6 @@ class RegisterViewModel @Inject constructor(
 
         if (birthDate.isEmpty()) {
             _dobState.value = dobState.value.copy(error = "Tanggal lahir tidak boleh kosong")
-            isValid = false
-        }
-
-        if (weight.isEmpty()) {
-            _weightState.value = weightState.value.copy(error = "Berat badan tidak boleh kosong")
-            isValid = false
-        }
-
-        if (height.isEmpty()) {
-            _heightState.value = heightState.value.copy(error = "Tinggi badan tidak boleh kosong")
-            isValid = false
-        }
-
-        if (weight != "" && weight.toInt() < 0) {
-            _weightState.value = weightState.value.copy(error = "Berat badan tidak boleh negatif")
-            isValid = false
-        }
-
-        if (height != "" && height.toInt() < 0) {
-            _heightState.value = heightState.value.copy(error = "Tinggi badan tidak boleh negatif")
             isValid = false
         }
 
@@ -202,13 +164,7 @@ class RegisterViewModel @Inject constructor(
                 email = emailState.value.text,
                 password = passwordState.value.text,
                 dob = dobFormatted,
-                hypertension = false,
-                cholesterol = false,
                 gender = genderFormatted,
-                disturbedVision = false,
-                weight = weightState.value.text.toInt(),
-                height = heightState.value.text.toInt(),
-                verified = false
             )
 
             _createAccountState.value = createAccountState.value.copy(isLoading = false)
@@ -231,14 +187,6 @@ class RegisterViewModel @Inject constructor(
 
             if (createAccountResult.genderError != null) {
                 _genderState.value = genderState.value.copy(error = createAccountResult.genderError)
-            }
-
-            if (createAccountResult.weightError != null) {
-                _weightState.value = weightState.value.copy(error = createAccountResult.weightError)
-            }
-
-            if (createAccountResult.heightError != null) {
-                _heightState.value = heightState.value.copy(error = createAccountResult.heightError)
             }
 
             when (createAccountResult.result) {
@@ -400,13 +348,7 @@ class RegisterViewModel @Inject constructor(
         _privacyPolicyState.value = false
         _genderState.value = FieldState()
         _dobState.value = FieldState()
-        _weightState.value = FieldState()
-        _heightState.value = FieldState()
         _otpState.value = FieldState()
-    }
-
-    fun resetName() {
-        _nameStateCopy.value = FieldState()
     }
 
     fun onNavigationHandled() {

@@ -11,18 +11,6 @@ data class CreateAccountRequest (
     val password: String,
     @SerializedName("dob")
     val dob: String,
-    @SerializedName("hypertension")
-    val hypertension: Boolean,
     @SerializedName("gender")
     val gender: String,
-    @SerializedName("cholesterol")
-    val cholesterol: Boolean,
-    @SerializedName("disturbedVision")
-    val disturbedVision: Boolean,
-    @SerializedName("weight")
-    val weight: Int,
-    @SerializedName("height")
-    val height: Int,
-    @SerializedName("verified")
-    val verified: Boolean
 )

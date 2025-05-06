@@ -63,8 +63,6 @@ fun BiodataScreen(
 ) {
     val genderState = viewModel.genderState.value
     val birthDateState = viewModel.dobState.value
-    val weightState = viewModel.weightState.value
-    val heightState = viewModel.heightState.value
     val showDatePicker = remember { mutableStateOf(false) }
 
     val navigationEvent = viewModel.navigationEvent.value
@@ -215,89 +213,89 @@ fun BiodataScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Weight field
-                    InputField(
-                        value = weightState.text,
-                        onValueChange = { viewModel.setWeight(it) },
-                        placeholderText = "Berat Badan",
-                        iconResId = R.drawable.ic_scale,
-                        modifier = Modifier.weight(1f),
-                        keyboardType = KeyboardType.Number,
-                        visualTransformation = VisualTransformation.None,
-                        singleLine = true,
-                        isError = weightState.error != null,
-                        errorMessage = weightState.error ?: ""
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Surface(
-                        modifier = Modifier.size(48.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        color = colorResource(id = R.color.primary),
-                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "KG",
-                                fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                color = colorResource(id = R.color.gray_3)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Height field
-                    InputField(
-                        value = heightState.text,
-                        onValueChange = { viewModel.setHeight(it) },
-                        placeholderText = "Tinggi Badan",
-                        iconResId = R.drawable.ic_swap,
-                        modifier = Modifier.weight(1f),
-                        keyboardType = KeyboardType.Number,
-                        visualTransformation = VisualTransformation.None,
-                        singleLine = true,
-                        isError = heightState.error != null,
-                        errorMessage = heightState.error ?: ""
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Surface(
-                        modifier = Modifier.size(48.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        color = colorResource(id = R.color.primary),
-                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "CM",
-                                fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                color = colorResource(id = R.color.gray_3)
-                            )
-                        }
-                    }
-                }
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    // Weight field
+//                    InputField(
+//                        value = weightState.text,
+//                        onValueChange = { viewModel.setWeight(it) },
+//                        placeholderText = "Berat Badan",
+//                        iconResId = R.drawable.ic_scale,
+//                        modifier = Modifier.weight(1f),
+//                        keyboardType = KeyboardType.Number,
+//                        visualTransformation = VisualTransformation.None,
+//                        singleLine = true,
+//                        isError = weightState.error != null,
+//                        errorMessage = weightState.error ?: ""
+//                    )
+//
+//                    Spacer(modifier = Modifier.width(16.dp))
+//
+//                    Surface(
+//                        modifier = Modifier.size(48.dp),
+//                        shape = RoundedCornerShape(15.dp),
+//                        color = colorResource(id = R.color.primary),
+//                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
+//                    ) {
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Text(
+//                                text = "KG",
+//                                fontFamily = poppinsFontFamily,
+//                                fontWeight = FontWeight.Bold,
+//                                fontSize = 12.sp,
+//                                color = colorResource(id = R.color.gray_3)
+//                            )
+//                        }
+//                    }
+//                }
+//
+//                Spacer(modifier = Modifier.height(16.dp))
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    // Height field
+//                    InputField(
+//                        value = heightState.text,
+//                        onValueChange = { viewModel.setHeight(it) },
+//                        placeholderText = "Tinggi Badan",
+//                        iconResId = R.drawable.ic_swap,
+//                        modifier = Modifier.weight(1f),
+//                        keyboardType = KeyboardType.Number,
+//                        visualTransformation = VisualTransformation.None,
+//                        singleLine = true,
+//                        isError = heightState.error != null,
+//                        errorMessage = heightState.error ?: ""
+//                    )
+//
+//                    Spacer(modifier = Modifier.width(16.dp))
+//
+//                    Surface(
+//                        modifier = Modifier.size(48.dp),
+//                        shape = RoundedCornerShape(15.dp),
+//                        color = colorResource(id = R.color.primary),
+//                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
+//                    ) {
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Text(
+//                                text = "CM",
+//                                fontFamily = poppinsFontFamily,
+//                                fontWeight = FontWeight.Bold,
+//                                fontSize = 12.sp,
+//                                color = colorResource(id = R.color.gray_3)
+//                            )
+//                        }
+//                    }
+//                }
             }
         }
 
@@ -314,7 +312,7 @@ fun BiodataScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = genderState.error == null && birthDateState.error == null && weightState.error == null && heightState.error == null && !isLoading,
+            enabled = genderState.error == null && birthDateState.error == null && !isLoading,
             rightImageResId = R.drawable.ic_chevron_right,
             isLoading = isLoading
         )

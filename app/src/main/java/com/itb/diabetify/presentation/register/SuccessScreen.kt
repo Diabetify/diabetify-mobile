@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -70,7 +71,11 @@ fun SuccessScreen(
         PrimaryButton(
             text = "Pergi ke Beranda",
             onClick = {
-                viewModel.resetName()
+                navController.navigate(Route.LoginScreen.route) {
+                    popUpTo(Route.AuthNavigation.route) {
+                        saveState = false
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

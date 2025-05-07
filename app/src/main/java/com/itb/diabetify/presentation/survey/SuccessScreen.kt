@@ -79,4 +79,8 @@ fun SuccessScreen(
             enabled = true
         )
     }
+
+    BackHandler {
+        navController.navigate(Route.MainNavigation.route) {}
+    }
 }

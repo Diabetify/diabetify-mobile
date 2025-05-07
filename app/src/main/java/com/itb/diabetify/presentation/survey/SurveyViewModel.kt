@@ -62,11 +62,6 @@ class SurveyViewModel @Inject constructor() : ViewModel() {
 
     private fun submitSurvey() {
         Log.d("SurveyViewModel", "Submitting survey with answers: ${_state.value.answers}")
-        _state.value = _state.value.copy(
-            isComplete = true,
-            showSnackbar = true,
-            snackbarMessage = "Survey berhasil dikirim!"
-        )
         _navigationEvent.value = "SUCCESS_SCREEN"
     }
 

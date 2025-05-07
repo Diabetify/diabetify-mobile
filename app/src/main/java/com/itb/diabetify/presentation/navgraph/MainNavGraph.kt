@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.navgraph
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -39,6 +40,8 @@ fun MainNavGraph(
     val mainNavController = rememberNavController()
 
     var shouldNavigateToLogin by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = true){}
 
     if (shouldNavigateToLogin) {
         shouldNavigateToLogin = false

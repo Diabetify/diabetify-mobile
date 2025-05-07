@@ -59,6 +59,7 @@ fun RegisterScreen(
             when (it) {
                 "HOME_SCREEN" -> {
                     navController.navigate(Route.MainNavigation.route)
+//                    navController.navigate(Route.SurveyScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }

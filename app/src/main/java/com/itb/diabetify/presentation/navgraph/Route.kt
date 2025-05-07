@@ -10,6 +10,7 @@ sealed class Route(
     object RegisterSuccessScreen : Route(route = "registerSuccessScreen")
     object LoginScreen : Route(route = "loginScreen")
     object SurveyScreen : Route(route = "surveyScreen")
+    object SurveySuccessScreen : Route(route = "surveySuccessScreen")
     object ForgotPasswordScreen : Route(route = "forgotPasswordScreen")
     object ChangePasswordScreen : Route(route = "changePasswordScreen")
     object ResetPasswordSuccessScreen : Route(route = "resetPasswordSuccessScreen")

@@ -20,6 +20,7 @@ import com.itb.diabetify.presentation.register.RegisterScreen
 import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.presentation.register.SuccessScreen
 import com.itb.diabetify.presentation.survey.SurveyScreen
+import com.itb.diabetify.presentation.survey.SurveyViewModel
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
@@ -150,7 +151,22 @@ fun AuthNavGraph(
             composable(
                 route = Route.SurveyScreen.route
             ) {
-                SurveyScreen()
+                val surveyViewModel: SurveyViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.AuthNavigation.route)
+                )
+
+                SurveyScreen(
+                    navController = navController,
+                    viewModel = surveyViewModel,
+                )
+            }
+
+            composable(
+                route = Route.SurveySuccessScreen.route
+            ) {
+                com.itb.diabetify.presentation.survey.SuccessScreen(
+                    navController = navController
+                )
             }
         }
 

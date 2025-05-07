@@ -17,12 +17,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,26 +28,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.presentation.survey.components.SurveyPage
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.launch
 
 @Composable
-fun SurveyScreen() {
-    val questions = SurveyData.questions
-    val answersState = remember { mutableStateMapOf<String, String>() }
-    var currentPage by remember { mutableIntStateOf(0) }
+fun SurveyScreen(
+    navController: NavController,
+    viewModel: SurveyViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Logic to handle conditional questions
-    val displayedQuestions = remember(answersState) {
-        questions.filter { question ->
-            when (question.id) {
-                "smoking_age", "smoking_amount" -> answersState["smoking_status"] == "active"
-                else -> true
+    LaunchedEffect(state.showSnackbar) {
+        if (state.showSnackbar) {
+            scope.launch {
+                snackbarHostState.showSnackbar(state.snackbarMessage)
+                viewModel.clearSnackbar()
+            }
+        }
+    }
+
+    val navigationEvent = viewModel.navigationEvent.value
+    LaunchedEffect(navigationEvent) {
+        navigationEvent?.let {
+            when (it) {
+                "SUCCESS_SCREEN" -> {
+                    navController.navigate(Route.SurveySuccessScreen.route)
+                    viewModel.onNavigationHandled()
+                }
             }
         }
     }
@@ -65,7 +77,6 @@ fun SurveyScreen() {
                 .background(Color.White),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Middle section with survey questions
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -73,13 +84,13 @@ fun SurveyScreen() {
                 contentAlignment = Alignment.Center
             ) {
                 // Survey question page
-                if (displayedQuestions.isNotEmpty()) {
+                if (viewModel.displayedQuestions.isNotEmpty()) {
                     SurveyPage(
-                        question = displayedQuestions[currentPage],
+                        question = viewModel.getCurrentQuestion(),
                         onAnswerSelected = { questionId, answer ->
-                            answersState[questionId] = answer
+                            viewModel.setAnswer(questionId, answer)
                         },
-                        selectedAnswer = answersState[displayedQuestions[currentPage].id]
+                        selectedAnswer = state.answers[viewModel.getCurrentQuestion().id]
                     )
                 }
             }
@@ -93,7 +104,7 @@ fun SurveyScreen() {
             ) {
                 // Current question number
                 Text(
-                    text = "Pertanyaan ${currentPage + 1} dari ${displayedQuestions.size}",
+                    text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedQuestions.size}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
@@ -105,7 +116,7 @@ fun SurveyScreen() {
 
                 // Progress indicator
                 LinearProgressIndicator(
-                    progress = { (currentPage + 1).toFloat() / displayedQuestions.size },
+                    progress = { viewModel.getProgress() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
@@ -125,12 +136,8 @@ fun SurveyScreen() {
                 ) {
                     PrimaryButton(
                         text = "<",
-                        onClick = {
-                            if (currentPage > 0) {
-                                currentPage--
-                            }
-                        },
-                        enabled = currentPage > 0,
+                        onClick = { viewModel.previousPage() },
+                        enabled = viewModel.canGoPrevious(),
                         modifier = Modifier
                             .width(100.dp)
                             .height(50.dp),
@@ -138,28 +145,8 @@ fun SurveyScreen() {
 
                     PrimaryButton(
                         text = ">",
-                        onClick = {
-                            val currentQuestion = displayedQuestions[currentPage]
-                            val answer = answersState[currentQuestion.id]
-
-                            // Validate answer
-                            if (answer.isNullOrBlank()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Mohon jawab pertanyaan ini dahulu")
-                                }
-                                return@PrimaryButton
-                            }
-
-                            if (currentPage < displayedQuestions.size - 1) {
-                                currentPage++
-                            } else {
-                                // Submit survey
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Survey berhasil dikirim!")
-                                }
-                            }
-                        },
-                        enabled = answersState[displayedQuestions[currentPage].id]?.isNotBlank() == true,
+                        onClick = { viewModel.nextPage() },
+                        enabled = viewModel.canGoNext(),
                         modifier = Modifier
                             .width(100.dp)
                             .height(50.dp),

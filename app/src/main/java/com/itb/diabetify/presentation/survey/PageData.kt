@@ -23,6 +23,20 @@ data class SurveyQuestion(
 object SurveyData {
     val questions = listOf(
         SurveyQuestion(
+            id = "weight",
+            category = "Berat Badan",
+            questionText = "Berapa berat badan Anda saat ini?",
+            questionType = SurveyQuestionType.Numeric,
+            numericUnit = "KG",
+        ),
+        SurveyQuestion(
+            id = "height",
+            category = "Tinggi Badan",
+            questionText = "Berapa tinggi badan Anda saat ini?",
+            questionType = SurveyQuestionType.Numeric,
+            numericUnit = "CM",
+        ),
+        SurveyQuestion(
             id = "pregnancy",
             category = "Riwayat Kehamilan",
             questionText = "Apakah Anda pernah melahirkan bayi dengan berat 4 kg atau lebih?",

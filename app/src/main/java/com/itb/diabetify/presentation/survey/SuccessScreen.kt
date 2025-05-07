@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.register
+package com.itb.diabetify.presentation.survey
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -28,8 +27,7 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun SuccessScreen(
-    navController: NavController,
-    viewModel: RegisterViewModel
+    navController: NavController
 ) {
     Box(
         modifier = Modifier
@@ -48,7 +46,7 @@ fun SuccessScreen(
 
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 5.dp),
-                text = "Selamat Datang, ${viewModel.nameStateCopy.value.text}!",
+                text = "Data Pribadi Berhasil Dikirim",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -57,7 +55,7 @@ fun SuccessScreen(
 
             Text(
                 modifier = Modifier.padding(start = 50.dp, end = 50.dp, top = 0.dp, bottom = 25.dp),
-                text = "Semua siap! Mari capai tujuan kesehatan Anda bersama Diabetify!",
+                text = "Data pribadi Anda telah berhasil dikirim. Jangan lupa untuk mengubah data pribadi Anda jika ada perubahan.",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
@@ -67,15 +65,11 @@ fun SuccessScreen(
             )
         }
 
-        // Go to Login
+        // Go to Home button
         PrimaryButton(
-            text = "Masuk",
+            text = "Beranda",
             onClick = {
-                navController.navigate(Route.LoginScreen.route) {
-                    popUpTo(Route.AuthNavigation.route) {
-                        saveState = false
-                    }
-                }
+                navController.navigate(Route.MainNavigation.route)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -84,13 +78,5 @@ fun SuccessScreen(
                 .offset(y = (-30).dp),
             enabled = true
         )
-    }
-
-    BackHandler {
-        navController.navigate(Route.LoginScreen.route) {
-            popUpTo(Route.AuthNavigation.route) {
-                saveState = false
-            }
-        }
     }
 }

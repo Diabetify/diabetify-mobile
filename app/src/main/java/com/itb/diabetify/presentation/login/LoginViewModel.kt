@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.presentation.common.FieldState
@@ -17,10 +18,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val googleLoginUseCase: GoogleLoginUseCase,
 ): ViewModel() {
     private var _loginState = mutableStateOf(DataState())
     val loginState: State<DataState> = _loginState
+
+    private var _googleLoginState = mutableStateOf(DataState())
+    val googleLoginState: State<DataState> = _googleLoginState
 
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
@@ -100,6 +105,37 @@ class LoginViewModel @Inject constructor(
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("LoginViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
+    fun googleLogin(token: String) {
+        viewModelScope.launch {
+            _googleLoginState.value = googleLoginState.value.copy(isLoading = true)
+
+            val googleLoginResult = googleLoginUseCase(
+                token = token
+            )
+
+            _googleLoginState.value = googleLoginState.value.copy(isLoading = false)
+
+            when (googleLoginResult.result) {
+                is Resource.Success -> {
+                    _navigationEvent.value = "HOME_SCREEN"
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = googleLoginResult.result.message ?: "Unknown error occurred"
+                    googleLoginResult.result.message?.let { Log.d("RegisterViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("RegisterViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("RegisterViewModel", "Unexpected error")
                 }
             }
         }

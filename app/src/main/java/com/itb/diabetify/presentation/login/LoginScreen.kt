@@ -1,6 +1,8 @@
 package com.itb.diabetify.presentation.login
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,12 +49,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.itb.diabetify.BuildConfig
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.Divider
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import com.itb.diabetify.util.AuthResultContract
 
 @Composable
 fun LoginScreen(
@@ -82,6 +89,16 @@ fun LoginScreen(
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
             viewModel.onErrorShown()
         }
+    }
+
+    val googleSignInClient = remember {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestProfile()
+            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
+            .build()
+
+        GoogleSignIn.getClient(context, gso)
     }
 
     val isLoading = viewModel.loginState.value.isLoading
@@ -217,8 +234,23 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
+                val signInRequestCode = 1
+                val authResultLauncher =
+                    rememberLauncherForActivityResult(contract = AuthResultContract(googleSignInClient)) {
+                        try {
+                            val account = it?.getResult(ApiException::class.java)
+                            if (account == null) {
+                                Log.e("GoogleSignIn", "Account is null")
+                            } else {
+                                viewModel.googleLogin(account.idToken!!)
+                            }
+                        } catch (e: ApiException) {
+                            Log.d("GoogleSignIn", "signInResult:failed code=" + e.statusCode)
+                        }
+                    }
+
                 Surface(
-                    onClick = { /* Handle Google login */ },
+                    onClick = { authResultLauncher.launch(signInRequestCode) },
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(15.dp),
                     color = Color.White,

@@ -1,7 +1,6 @@
 package com.itb.diabetify.presentation.register
 
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -238,9 +237,7 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                val coroutineScope = rememberCoroutineScope()
                 val signInRequestCode = 1
-
                 val authResultLauncher =
                     rememberLauncherForActivityResult(contract = AuthResultContract(googleSignInClient)) {
                         try {

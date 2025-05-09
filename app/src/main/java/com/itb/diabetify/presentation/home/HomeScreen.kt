@@ -1,6 +1,6 @@
 package com.itb.diabetify.presentation.home
 
-import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -8,8 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.itb.diabetify.R
 import com.itb.diabetify.presentation.home.components.PieChart
 
 @Composable
@@ -17,7 +19,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize().background(colorResource(R.color.white)), contentAlignment = Alignment.Center) {
         PieChart(
             data = listOf(
                 35f to "BMI",

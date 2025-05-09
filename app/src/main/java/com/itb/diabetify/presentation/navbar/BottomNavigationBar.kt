@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.navbar.components.AddActionPopup
 
 @Composable
 fun BottomNavigationBar(
@@ -70,10 +71,10 @@ fun BottomNavigationBar(
 
     if (showPopup) {
         AddActionPopup(
-            onDismiss = { showPopup = false },
-            onActionSelected = { action ->
+            isVisible = showPopup,
+            onDismissRequest = { showPopup = false },
+            onTrackingOptionSelected = { option ->
                 showPopup = false
-                onAddButtonClicked()
             }
         )
     }
@@ -180,72 +181,6 @@ fun BottomNavigationBar(
                 imageVector = Icons.Rounded.Add,
                 contentDescription = "Add"
             )
-        }
-    }
-}
-
-@Composable
-fun AddActionPopup(
-    onDismiss: () -> Unit,
-    onActionSelected: (String) -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp,
-            shadowElevation = 8.dp
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .width(280.dp)
-            ) {
-                Text(
-                    text = "Add New",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                val actions: List<Pair<String, androidx.compose.ui.graphics.vector.ImageVector>> = listOf(
-                    "Post" to Icons.Default.Clear,
-                    "Photo" to Icons.Default.Clear,
-                    "Event" to Icons.Default.Clear,
-                    "Document" to Icons.Default.Clear
-                )
-
-                actions.forEach { pair ->
-                    val actionName = pair.first
-                    val icon = pair.second
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onActionSelected(actionName) }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = actionName,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = actionName,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(top = 8.dp)
-                ) {
-                    Text("Cancel")
-                }
-            }
         }
     }
 }

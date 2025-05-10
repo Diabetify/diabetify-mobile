@@ -25,7 +25,6 @@ fun PieChart(
     animationDuration: Int = 1000,
     modifier: Modifier
 ) {
-    // Default colors if none provided
     val chartColors = colors?.map { it.toArgb() } ?:
     listOf(
         Color(0xFF5D9CEC).toArgb(),
@@ -39,14 +38,12 @@ fun PieChart(
     AndroidView(
         factory = { context ->
             PieChart(context).apply {
-                // Basic chart setup
                 description.isEnabled = false
                 isDrawHoleEnabled = true
                 setHoleColor(Color.Transparent.toArgb())
                 this.holeRadius = holeRadius
                 transparentCircleRadius = holeRadius + 5f
 
-                // Center text setup if provided
                 if (centerText != null) {
                     setDrawCenterText(true)
                     this.centerText = centerText
@@ -57,29 +54,23 @@ fun PieChart(
                     setDrawCenterText(false)
                 }
 
-                // Legend setup
                 legend.isEnabled = showLegend
                 legend.textSize = 12f
                 legend.formSize = 12f
 
-                // Rotation and touch
                 rotationAngle = 0f
                 isRotationEnabled = true
                 isHighlightPerTapEnabled = true
 
-                // Data setup
                 val entries = data.map { PieEntry(it.first, it.second) }
                 val dataSet = PieDataSet(entries, "").apply {
-                    // Use provided colors, recycling if needed
                     this.colors = chartColors
 
-                    // Value text formatting
                     valueTextSize = if (showPercentValues) 12f else 0f
                     valueTextColor = Color.White.toArgb()
 //                    valueFormatter = PercentFormatter(this@apply)
                     valueTypeface = Typeface.DEFAULT_BOLD
 
-                    // Slice appearance
                     sliceSpace = 2f
                     selectionShift = 5f
                 }
@@ -88,12 +79,10 @@ fun PieChart(
                 this.data.setValueFormatter(PercentFormatter())
                 this.data.setDrawValues(showPercentValues)
 
-                // Animation
                 animateY(animationDuration)
             }
         },
         update = { chart ->
-            // Update method for recomposition
             val entries = data.map { PieEntry(it.first, it.second) }
             val dataSet = PieDataSet(entries, "").apply {
                 this.colors = chartColors
@@ -112,7 +101,7 @@ fun PieChart(
                 chart.setCenterTextColor(centerTextColor.toArgb())
             }
 
-            chart.invalidate() // Refresh chart
+            chart.invalidate()
         },
         modifier = modifier.fillMaxSize()
     )

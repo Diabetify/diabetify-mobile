@@ -136,28 +136,18 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         PieChart(
-                            data = listOf(
-                                35f to "BMI",
-                                25f to "Blood Glucose",
-                                15f to "Family History",
-                                10f to "Physical Activity",
-                                10f to "Age",
-                                5f to "Blood Pressure"
-                            ),
-                            centerText = "Risk\nFactors",
-                            centerTextColor = Color.DarkGray,
-                            showPercentValues = true,
-                            modifier = Modifier.height(300.dp)
+                            dataPercentages = listOf(35f, 25f, 15f, 10f, -10f, -5f),
+                            centerText = "Faktor\nRisiko",
+                            centerTextColor = colorResource(id = R.color.primary),
+                            modifier = Modifier.height(350.dp)
                         )
 
                         PrimaryButton(
                             text = "Lihat Detail",
-                            onClick = {
-                                navController.navigate("detail")
-                            },
+                            onClick = {},
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 20.dp)
+                                .padding(top = 70.dp)
                         )
                     }
                 }

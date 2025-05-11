@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.register.components
+package com.itb.diabetify.presentation.common
 
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog

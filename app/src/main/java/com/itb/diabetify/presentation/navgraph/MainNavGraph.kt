@@ -8,12 +8,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -21,6 +23,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.itb.diabetify.R
 import com.itb.diabetify.presentation.history.HistoryScreen
 import com.itb.diabetify.presentation.home.HomeScreen
 import com.itb.diabetify.presentation.home.HomeViewModel
@@ -41,6 +45,16 @@ fun MainNavGraph(
     var shouldNavigateToLogin by rememberSaveable { mutableStateOf(false) }
     val navigationHistory = remember { mutableListOf<String>() }
     val currentRoute = mainNavController.currentBackStackEntryAsState().value?.destination?.route
+
+    val systemUiController = rememberSystemUiController()
+    val primaryColor = colorResource(id = R.color.primary)
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = primaryColor,
+            darkIcons = false
+        )
+    }
 
     LaunchedEffect(currentRoute) {
         currentRoute?.let { route ->

@@ -86,6 +86,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.google.android.gms:play-services-auth:20.2.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

@@ -2,11 +2,15 @@ package com.itb.diabetify.presentation.navgraph
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.res.colorResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.itb.diabetify.R
 import com.itb.diabetify.presentation.forgot_password.ChangePasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordScreen
 import com.itb.diabetify.presentation.forgot_password.ForgotPasswordViewModel
@@ -28,6 +32,16 @@ fun AuthNavGraph(
     startDestination: String
 ) {
     val navController = rememberNavController()
+
+    val systemUiController = rememberSystemUiController()
+    val primaryColor = colorResource(id = R.color.primary)
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = primaryColor,
+            darkIcons = false
+        )
+    }
 
     NavHost(navController = navController, startDestination = startDestination) {
         navigation(

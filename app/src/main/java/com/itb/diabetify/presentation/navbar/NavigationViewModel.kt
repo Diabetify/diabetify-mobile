@@ -1,6 +1,5 @@
 package com.itb.diabetify.presentation.navbar
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,7 +12,7 @@ class NavigationViewModel @Inject constructor() : ViewModel() {
     private val _selectedItem = mutableStateOf(Route.HomeScreen.route)
     val selectedItem: State<String> = _selectedItem
 
-    val navigationItems = NavigationItems.items
+    val navigationItems = items
 
     fun onNavigationItemSelected(route: String) {
         _selectedItem.value = route

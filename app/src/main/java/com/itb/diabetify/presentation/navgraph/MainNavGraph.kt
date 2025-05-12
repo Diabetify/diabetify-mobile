@@ -7,8 +7,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.itb.diabetify.presentation.history.HistoryScreen
 import com.itb.diabetify.presentation.home.HomeScreen
@@ -28,20 +29,43 @@ import com.itb.diabetify.presentation.navbar.NavigationViewModel
 import com.itb.diabetify.presentation.recommendation.RecommendationScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainNavGraph(
     navController: NavController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val navigationViewModel: NavigationViewModel = hiltViewModel()
     val mainNavController = rememberNavController()
 
     var shouldNavigateToLogin by rememberSaveable { mutableStateOf(false) }
+    val navigationHistory = remember { mutableListOf<String>() }
+    val currentRoute = mainNavController.currentBackStackEntryAsState().value?.destination?.route
 
-    BackHandler(enabled = true){}
+    LaunchedEffect(currentRoute) {
+        currentRoute?.let { route ->
+            if (navigationViewModel.navigationItems.any { it.route == route }) {
+                if (navigationHistory.isEmpty() || navigationHistory.last() != route) {
+                    navigationHistory.add(route)
+                }
+                navigationViewModel.onNavigationItemSelected(route)
+            }
+        }
+    }
+
+    val homeRoute = Route.HomeScreen.route
+    BackHandler {
+        if (currentRoute != homeRoute) {
+            navigationViewModel.onNavigationItemSelected(homeRoute)
+
+            mainNavController.navigate(homeRoute) {
+                popUpTo(mainNavController.graph.findStartDestination().id) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
 
     if (shouldNavigateToLogin) {
         shouldNavigateToLogin = false

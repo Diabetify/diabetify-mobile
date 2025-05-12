@@ -1,37 +1,27 @@
 package com.itb.diabetify.presentation.navbar
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.indicatorColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +37,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.itb.diabetify.R
-import com.itb.diabetify.presentation.navbar.components.AddActionPopup
+import com.itb.diabetify.presentation.navbar.add_activity.AddActionPopup
 
 @Composable
 fun BottomNavigationBar(
@@ -61,7 +50,6 @@ fun BottomNavigationBar(
     indicatorColor: Color = colorResource(id = R.color.primary),
     elevation: Dp = 8.dp,
     onItemSelected: (String) -> Unit = {},
-    onAddButtonClicked: () -> Unit = {}
 ) {
     val selectedItem = viewModel.selectedItem.value
     val items = viewModel.navigationItems
@@ -73,9 +61,6 @@ fun BottomNavigationBar(
         AddActionPopup(
             isVisible = showPopup,
             onDismissRequest = { showPopup = false },
-            onTrackingOptionSelected = { option ->
-                showPopup = false
-            }
         )
     }
 

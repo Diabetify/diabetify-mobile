@@ -43,8 +43,7 @@ object SurveyData {
             questionType = SurveyQuestionType.Selection,
             options = listOf(
                 SurveyOption("yes", "Pernah"),
-                SurveyOption("no", "Tidak"),
-                SurveyOption("never", "Saya tidak pernah melahirkan")
+                SurveyOption("no", "Tidak")
             )
         ),
         SurveyQuestion(

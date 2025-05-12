@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.navbar.components
+package com.itb.diabetify.presentation.navbar.add_activity
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -27,6 +27,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,8 +51,32 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun AddActionPopup(
     isVisible: Boolean,
     onDismissRequest: () -> Unit,
-    onTrackingOptionSelected: (String) -> Unit
 ) {
+    val currentValues = mapOf(
+        "weight" to "68.5",
+        "height" to "175",
+        "cigarette" to "0",
+        "activity" to "0",
+
+        "birth" to "no",
+        "hypertension" to "yes"
+    )
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var currentQuestionType by remember { mutableStateOf("weight") }
+
+    if (showBottomSheet) {
+        val isNumericQuestion = listOf("weight", "height", "cigarette", "activity").contains(currentQuestionType)
+
+        BottomSheet(
+            isVisible = showBottomSheet,
+            onDismissRequest = { showBottomSheet = false },
+            questionType = currentQuestionType,
+            currentNumericValue = if (isNumericQuestion) currentValues[currentQuestionType] else null,
+            currentSelectionValue = if (!isNumericQuestion) currentValues[currentQuestionType] else null,
+        )
+    }
+
     if (isVisible) {
         Dialog(
             onDismissRequest = onDismissRequest,
@@ -103,7 +131,7 @@ fun AddActionPopup(
                                     fontSize = 14.sp,
                                     lineHeight = 16.sp,
                                     fontStyle = FontStyle.Italic,
-                                     textAlign = TextAlign.Center,
+                                    textAlign = TextAlign.Center,
                                     color = colorResource(id = R.color.white)
                                 )
                             }
@@ -117,14 +145,20 @@ fun AddActionPopup(
                                 icon = R.drawable.ic_weight,
                                 label = "Berat",
                                 delayMillis = 150,
-                                onClick = { onTrackingOptionSelected("weight") }
+                                onClick = {
+                                    currentQuestionType = "weight"
+                                    showBottomSheet = true
+                                }
                             )
 
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_height,
                                 label = "Tinggi",
                                 delayMillis = 200,
-                                onClick = { onTrackingOptionSelected("height") }
+                                onClick = {
+                                    currentQuestionType = "height"
+                                    showBottomSheet = true
+                                }
                             )
                         }
 
@@ -134,16 +168,22 @@ fun AddActionPopup(
                         ) {
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_baby,
-                                label = "Melahirkan",
+                                label = "Kehamilan",
                                 delayMillis = 250,
-                                onClick = { onTrackingOptionSelected("birth") }
+                                onClick = {
+                                    currentQuestionType = "birth"
+                                    showBottomSheet = true
+                                }
                             )
 
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_hypertension,
                                 label = "Hipertensi",
                                 delayMillis = 300,
-                                onClick = { onTrackingOptionSelected("hypertension") }
+                                onClick = {
+                                    currentQuestionType = "hypertension"
+                                    showBottomSheet = true
+                                }
                             )
                         }
 
@@ -188,14 +228,20 @@ fun AddActionPopup(
                                 icon = R.drawable.ic_smoking,
                                 label = "Rokok",
                                 delayMillis = 50,
-                                onClick = { onTrackingOptionSelected("cigarette") }
+                                onClick = {
+                                    currentQuestionType = "cigarette"
+                                    showBottomSheet = true
+                                }
                             )
 
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_walk,
                                 label = "Aktivitas",
                                 delayMillis = 100,
-                                onClick = { onTrackingOptionSelected("activity") }
+                                onClick = {
+                                    currentQuestionType = "activity"
+                                    showBottomSheet = true
+                                }
                             )
                         }
 

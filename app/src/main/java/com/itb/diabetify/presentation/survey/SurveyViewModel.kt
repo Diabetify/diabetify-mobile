@@ -7,14 +7,6 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-data class SurveyState(
-    val currentPageIndex: Int = 0,
-    val answers: Map<String, String> = emptyMap(),
-    val showSnackbar: Boolean = false,
-    val snackbarMessage: String = "",
-    val isComplete: Boolean = false
-)
-
 @HiltViewModel
 class SurveyViewModel @Inject constructor() : ViewModel() {
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -24,10 +16,10 @@ class SurveyViewModel @Inject constructor() : ViewModel() {
     private val _state = mutableStateOf(SurveyState())
     val state: State<SurveyState> = _state
 
-    private val questions = SurveyData.questions
+    private val surveyQuestions = questions
 
-    val displayedQuestions: List<SurveyQuestion>
-        get() = questions.filter { question ->
+    val displayedSurveyQuestions: List<SurveyQuestion>
+        get() = surveyQuestions.filter { question ->
             when (question.id) {
                 "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "active"
                 else -> true
@@ -35,7 +27,7 @@ class SurveyViewModel @Inject constructor() : ViewModel() {
         }
 
     fun nextPage() {
-        val currentQuestion = displayedQuestions[_state.value.currentPageIndex]
+        val currentQuestion = displayedSurveyQuestions[_state.value.currentPageIndex]
         val answer = _state.value.answers[currentQuestion.id]
 
         if (answer.isNullOrBlank()) {
@@ -43,7 +35,7 @@ class SurveyViewModel @Inject constructor() : ViewModel() {
             return
         }
 
-        if (_state.value.currentPageIndex < displayedQuestions.size - 1) {
+        if (_state.value.currentPageIndex < displayedSurveyQuestions.size - 1) {
             _state.value = _state.value.copy(
                 currentPageIndex = _state.value.currentPageIndex + 1
             )
@@ -89,11 +81,11 @@ class SurveyViewModel @Inject constructor() : ViewModel() {
     }
 
     fun getCurrentQuestion(): SurveyQuestion {
-        return displayedQuestions[_state.value.currentPageIndex]
+        return displayedSurveyQuestions[_state.value.currentPageIndex]
     }
 
     fun getProgress(): Float {
-        return (_state.value.currentPageIndex + 1).toFloat() / displayedQuestions.size
+        return (_state.value.currentPageIndex + 1).toFloat() / displayedSurveyQuestions.size
     }
 
     fun canGoNext(): Boolean {

@@ -84,7 +84,7 @@ fun SurveyScreen(
                 contentAlignment = Alignment.Center
             ) {
                 // Survey question page
-                if (viewModel.displayedQuestions.isNotEmpty()) {
+                if (viewModel.displayedSurveyQuestions.isNotEmpty()) {
                     SurveyPage(
                         question = viewModel.getCurrentQuestion(),
                         onAnswerSelected = { questionId, answer ->
@@ -104,7 +104,7 @@ fun SurveyScreen(
             ) {
                 // Current question number
                 Text(
-                    text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedQuestions.size}",
+                    text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,

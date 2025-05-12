@@ -67,12 +67,7 @@ fun MainNavGraph(
                         launchSingleTop = true
                         restoreState = true
                     }
-                },
-                onAddButtonClicked = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Add action selected")
-                    }
-                },
+                }
             )
         }
     ) { innerPadding ->

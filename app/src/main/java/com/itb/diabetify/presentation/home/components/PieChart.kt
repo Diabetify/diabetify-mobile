@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,12 +32,13 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
 
 @Composable
 fun PieChart(
-    dataPercentages: List<Float>,
+    riskFactors: List<HomeViewModel.RiskFactor>,
     centerText: String? = null,
     holeRadius: Float = 30f,
     animationDuration: Int = 1000,
@@ -57,19 +56,11 @@ fun PieChart(
         Typeface.DEFAULT_BOLD
     }
 
-    val riskFactors = listOf(
-        "Indeks Massa Tubuh" to "IMT",
-        "Hipertensi" to "HTN",
-        "Riwayat Kelahiran" to "RK",
-        "Aktivitas Fisik" to "AF",
-        "Usia" to "U",
-        "Indeks Merokok" to "IM"
-    )
+    // Sort risk factors by absolute percentage value (high to low)
+    val sortedRiskFactors = riskFactors.sortedByDescending { abs(it.percentage) }
 
-    val data = dataPercentages.mapIndexed { index, percentage ->
-        val pair = riskFactors.getOrNull(index)
-        percentage to (pair?.first ?: "Unknown")
-    }
+    // Extract percentages from sorted risk factors
+    val dataPercentages = sortedRiskFactors.map { it.percentage }
 
     val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
     val maxNegativeValue = dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
@@ -122,9 +113,10 @@ fun PieChart(
                     setEntryLabelColor(Color.Transparent.toArgb())
                     setEntryLabelTextSize(0f)
 
-                    val entries = data.map { (value, label) ->
-                        PieEntry(abs(value), label)
+                    val entries = sortedRiskFactors.map { riskFactor ->
+                        PieEntry(abs(riskFactor.percentage), riskFactor.name)
                     }
+
                     val dataSet = PieDataSet(entries, "").apply {
                         this.colors = chartColors
 
@@ -138,17 +130,14 @@ fun PieChart(
                         valueFormatter = object : ValueFormatter() {
                             @SuppressLint("DefaultLocale")
                             override fun getFormattedValue(value: Float): String {
-                                val originalValue = dataPercentages[entries.indexOfFirst { it.value == value }]
-                                return if (originalValue >= 0) {
-                                    String.format("%.1f", originalValue)
-                                } else {
-                                    String.format("%.1f", originalValue)
-                                }
+                                val index = entries.indexOfFirst { it.value == value }
+                                val originalValue = sortedRiskFactors[index].percentage
+                                return String.format("%.1f", originalValue)
                             }
 
                             override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-                                val fullName = pieEntry?.label
-                                return riskFactors.find { it.first == fullName }?.second ?: ""
+                                val fullName = pieEntry?.label ?: ""
+                                return sortedRiskFactors.find { it.name == fullName }?.abbreviation ?: ""
                             }
                         }
                     }
@@ -166,18 +155,18 @@ fun PieChart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Legend
+        // Legend - already sorted by abs percentage
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .wrapContentHeight()
         ) {
-            dataPercentages.take(riskFactors.size).forEachIndexed { index, percentage ->
+            sortedRiskFactors.forEach { riskFactor ->
                 LegendItem(
-                    color = Color(chartColors[index]),
-                    label = riskFactors[index].first,
-                    value = percentage
+                    color = Color(chartColors[sortedRiskFactors.indexOf(riskFactor)]),
+                    label = riskFactor.name,
+                    value = riskFactor.percentage
                 )
             }
         }

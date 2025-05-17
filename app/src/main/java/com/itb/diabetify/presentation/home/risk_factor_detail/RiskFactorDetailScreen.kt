@@ -60,63 +60,63 @@ fun RiskFactorDetailScreen(
     viewModel: HomeViewModel,
 ) {
     val scrollState = rememberScrollState()
-    val riskFactors = listOf(
-        RiskFactor(
-            name = "IMT",
-            fullName = "Indeks Massa Tubuh",
-            impactPercentage = 35.2f,
-            color = Color(0xFFFF0000),
-            description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
-            idealValue = "18.5 - 24.9 kg/m²",
-            currentValue = "28.4 kg/m²"
-        ),
-        RiskFactor(
-            name = "HTN",
-            fullName = "Hipertensi",
-            impactPercentage = 25.8f,
-            color = Color(0xFFE63946),
-            description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
-            idealValue = "< 120/80 mmHg",
-            currentValue = "145/90 mmHg"
-        ),
-        RiskFactor(
-            name = "RK",
-            fullName = "Riwayat Kelahiran",
-            impactPercentage = 12.5f,
-            color = Color(0xFFB23A48),
-            description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
-            idealValue = "Berat lahir normal, kelahiran cukup bulan",
-            currentValue = "Riwayat kelahiran prematur"
-        ),
-        RiskFactor(
-            name = "AF",
-            fullName = "Aktivitas Fisik",
-            impactPercentage = 10.3f,
-            color = Color(0xFFC1666B),
-            description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
-            idealValue = "Min. 150 menit aktivitas sedang per minggu",
-            currentValue = "60 menit per minggu"
-        ),
-        RiskFactor(
-            name = "U",
-            fullName = "Usia",
-            impactPercentage = 9.2f,
-            color = Color(0xFF0000FF),
-            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
-            idealValue = "Tidak dapat dimodifikasi",
-            currentValue = "58 tahun",
-            isModifiable = false
-        ),
-        RiskFactor(
-            name = "IM",
-            fullName = "Indeks Merokok",
-            impactPercentage = 7.0f,
-            color = Color(0xFF4361EE),
-            description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
-            idealValue = "0 (tidak merokok)",
-            currentValue = "10 batang per hari"
-        )
-    )
+//    val riskFactors = listOf(
+//        RiskFactor(
+//            name = "IMT",
+//            fullName = "Indeks Massa Tubuh",
+//            impactPercentage = 35.2f,
+//            color = Color(0xFFFF0000),
+//            description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
+//            idealValue = "18.5 - 24.9 kg/m²",
+//            currentValue = "28.4 kg/m²"
+//        ),
+//        RiskFactor(
+//            name = "HTN",
+//            fullName = "Hipertensi",
+//            impactPercentage = 25.8f,
+//            color = Color(0xFFE63946),
+//            description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
+//            idealValue = "< 120/80 mmHg",
+//            currentValue = "145/90 mmHg"
+//        ),
+//        RiskFactor(
+//            name = "RK",
+//            fullName = "Riwayat Kelahiran",
+//            impactPercentage = 12.5f,
+//            color = Color(0xFFB23A48),
+//            description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
+//            idealValue = "Berat lahir normal, kelahiran cukup bulan",
+//            currentValue = "Riwayat kelahiran prematur"
+//        ),
+//        RiskFactor(
+//            name = "AF",
+//            fullName = "Aktivitas Fisik",
+//            impactPercentage = 10.3f,
+//            color = Color(0xFFC1666B),
+//            description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
+//            idealValue = "Min. 150 menit aktivitas sedang per minggu",
+//            currentValue = "60 menit per minggu"
+//        ),
+//        RiskFactor(
+//            name = "U",
+//            fullName = "Usia",
+//            impactPercentage = 9.2f,
+//            color = Color(0xFF0000FF),
+//            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+//            idealValue = "Tidak dapat dimodifikasi",
+//            currentValue = "58 tahun",
+//            isModifiable = false
+//        ),
+//        RiskFactor(
+//            name = "IM",
+//            fullName = "Indeks Merokok",
+//            impactPercentage = 7.0f,
+//            color = Color(0xFF4361EE),
+//            description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
+//            idealValue = "0 (tidak merokok)",
+//            currentValue = "10 batang per hari"
+//        )
+//    )
 
     Column(
         modifier = Modifier
@@ -156,35 +156,26 @@ fun RiskFactorDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
         ) {
-            SummarySection(riskFactors)
+            SummarySection(viewModel.riskFactors)
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Risk Factors Breakdown
-            Text(
-                text = "Detail Setiap Faktor Risiko",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            riskFactors.forEach { factor ->
-                RiskFactorCard(
-                    riskFactor = factor,
-                    onManageClick = { }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Recommendations Section
-            RecommendationsCard()
+//            riskFactors.forEach { factor ->
+//                RiskFactorCard(
+//                    riskFactor = factor,
+//                    onManageClick = { }
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            RecommendationsCard()
         }
     }
 }
 
 @Composable
-fun SummarySection(riskFactors: List<RiskFactor>) {
+fun SummarySection(riskFactors: List<HomeViewModel.RiskFactor>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,69 +189,31 @@ fun SummarySection(riskFactors: List<RiskFactor>) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Kontribusi Faktor Risiko",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
             // Risk Pie Chart
             PieChart(
-                dataPercentages = listOf(35f, 25f, 15f, 10f, -10f, -5f),
+                riskFactors = riskFactors,
                 centerText = "Faktor\nRisiko",
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Total Impact Gauge
-            val highRiskFactors = riskFactors.filter { it.impactPercentage > 20f }
-            val totalHighRiskPercentage = highRiskFactors.sumOf { it.impactPercentage.toDouble() }.toFloat()
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Fokus Utama:",
-                fontSize = 14.sp,
+                text = "Penjelasan:",
+                fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp)
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.primary)
             )
 
             Text(
-                text = "Faktor ${highRiskFactors.joinToString(" dan ") { it.name }} berkontribusi sebesar ${"%.1f".format(totalHighRiskPercentage)}% dari total risiko Anda",
+                text = "Faktor IMT berkontribusi sebesar 35% dari total risiko Anda.",
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
-                color = Color.DarkGray
+                lineHeight = 22.sp,
+                color = colorResource(id = R.color.primary)
             )
-        }
-    }
-}
-
-@Composable
-fun FlowRow(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Layout(
-        content = content,
-        modifier = modifier
-    ) { measurables, constraints ->
-        val placeables = measurables.map { it.measure(constraints) }
-
-        layout(constraints.maxWidth, constraints.maxHeight) {
-            var xPos = 0
-            var yPos = 0
-            var maxHeight = 0
-
-            placeables.forEach { placeable ->
-                if (xPos + placeable.width > constraints.maxWidth) {
-                    xPos = 0
-                    yPos += maxHeight
-                    maxHeight = 0
-                }
-
-                placeable.place(xPos, yPos)
-                xPos += placeable.width
-                maxHeight = maxOf(maxHeight, placeable.height)
-            }
         }
     }
 }

@@ -169,7 +169,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         PieChart(
-                            dataPercentages = listOf(35f, 25f, 15f, 10f, -10f, -5f),
+                            riskFactors = viewModel.riskFactors,
                             centerText = "Faktor\nRisiko",
                             modifier = Modifier.fillMaxWidth()
                         )

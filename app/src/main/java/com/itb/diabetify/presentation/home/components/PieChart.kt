@@ -3,44 +3,49 @@ package com.itb.diabetify.presentation.home.components
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.itb.diabetify.R
+import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
 
 @Composable
 fun PieChart(
     dataPercentages: List<Float>,
     centerText: String? = null,
-    centerTextColor: Color = Color.Black,
     holeRadius: Float = 30f,
-    showLegend: Boolean = true,
     animationDuration: Int = 1000,
     modifier: Modifier
 ) {
     val context = LocalContext.current
-
-    val poppinsTypeface = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        try {
-            ResourcesCompat.getFont(context, R.font.poppins_regular)
-        } catch (e: Exception) {
-            Typeface.DEFAULT
-        }
-    } else {
-        Typeface.DEFAULT
-    }
 
     val poppinsBoldTypeface = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         try {
@@ -86,143 +91,138 @@ fun PieChart(
         }
     }
 
-    AndroidView(
-        factory = { context ->
-            PieChart(context).apply {
-                description.isEnabled = false
-                isDrawHoleEnabled = true
-                setHoleColor(Color.Transparent.toArgb())
-                this.holeRadius = holeRadius
-                transparentCircleRadius = holeRadius + 5f
+    Column(modifier = modifier.wrapContentHeight()) {
+        // PieChart
+        AndroidView(
+            factory = { context ->
+                PieChart(context).apply {
+                    description.isEnabled = false
+                    isDrawHoleEnabled = true
+                    setHoleColor(Color.Transparent.toArgb())
+                    this.holeRadius = holeRadius
+                    transparentCircleRadius = holeRadius + 5f
 
-                if (centerText != null) {
-                    setDrawCenterText(true)
-                    this.centerText = centerText
-                    setCenterTextSize(16f)
-                    setCenterTextColor(centerTextColor.toArgb())
-                    setCenterTextTypeface(poppinsBoldTypeface)
-                } else {
-                    setDrawCenterText(false)
-                }
+                    if (centerText != null) {
+                        setDrawCenterText(true)
+                        this.centerText = centerText
+                        setCenterTextSize(16f)
+                        setCenterTextColor(Color.Black.toArgb())
+                        setCenterTextTypeface(poppinsBoldTypeface)
+                    } else {
+                        setDrawCenterText(false)
+                    }
 
-                legend.isEnabled = showLegend
-                legend.orientation = Legend.LegendOrientation.VERTICAL
-                legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
-                legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                legend.textSize = 12f
-                legend.formSize = 12f
-                legend.isWordWrapEnabled = true
-                legend.setDrawInside(false)
-                legend.typeface = poppinsTypeface
+                    legend.isEnabled = false
 
-                rotationAngle = 0f
-                isRotationEnabled = true
-                isHighlightPerTapEnabled = true
+                    rotationAngle = 0f
+                    isRotationEnabled = true
+                    isHighlightPerTapEnabled = true
 
-                setDrawEntryLabels(false)
-                setEntryLabelColor(Color.Transparent.toArgb())
-                setEntryLabelTextSize(0f)
+                    setDrawEntryLabels(false)
+                    setEntryLabelColor(Color.Transparent.toArgb())
+                    setEntryLabelTextSize(0f)
 
-                val entries = data.map { (value, label) ->
-                    PieEntry(abs(value), label)
-                }
-                val dataSet = PieDataSet(entries, "").apply {
-                    this.colors = chartColors
+                    val entries = data.map { (value, label) ->
+                        PieEntry(abs(value), label)
+                    }
+                    val dataSet = PieDataSet(entries, "").apply {
+                        this.colors = chartColors
 
-                    valueTextSize = 12f
-                    valueTextColor = Color.White.toArgb()
-                    valueTypeface = poppinsBoldTypeface
+                        valueTextSize = 12f
+                        valueTextColor = Color.White.toArgb()
+                        valueTypeface = poppinsBoldTypeface
 
-                    sliceSpace = 2f
-                    selectionShift = 5f
+                        sliceSpace = 2f
+                        selectionShift = 5f
 
-                    valueFormatter = object : ValueFormatter() {
-                        @SuppressLint("DefaultLocale")
-                        override fun getFormattedValue(value: Float): String {
-                            val originalValue = dataPercentages[entries.indexOfFirst { it.value == value }]
-                            return if (originalValue >= 0) {
-                                String.format("%.1f", originalValue)
-                            } else {
-                                String.format("%.1f", originalValue)
+                        valueFormatter = object : ValueFormatter() {
+                            @SuppressLint("DefaultLocale")
+                            override fun getFormattedValue(value: Float): String {
+                                val originalValue = dataPercentages[entries.indexOfFirst { it.value == value }]
+                                return if (originalValue >= 0) {
+                                    String.format("%.1f", originalValue)
+                                } else {
+                                    String.format("%.1f", originalValue)
+                                }
+                            }
+
+                            override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
+                                val fullName = pieEntry?.label
+                                return riskFactors.find { it.first == fullName }?.second ?: ""
                             }
                         }
-
-                        override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-                            val fullName = pieEntry?.label
-                            return riskFactors.find { it.first == fullName }?.second ?: ""
-                        }
                     }
+
+                    this.data = PieData(dataSet)
+                    this.data.setDrawValues(true)
+
+                    animateY(animationDuration)
                 }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(270.dp)
+        )
 
-                this.data = PieData(dataSet)
-                this.data.setDrawValues(true)
+        Spacer(modifier = Modifier.height(16.dp))
 
-                legend.setCustom(
-                    riskFactors.mapIndexed { index, (fullName, abbreviation) ->
-                        legend.entries?.get(index)?.apply {
-                            label = "$abbreviation: $fullName"
-                        }
-                    }.toTypedArray()
+        // Legend
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .wrapContentHeight()
+        ) {
+            dataPercentages.take(riskFactors.size).forEachIndexed { index, percentage ->
+                LegendItem(
+                    color = Color(chartColors[index]),
+                    label = riskFactors[index].first,
+                    value = percentage
                 )
-
-                animateY(animationDuration)
             }
-        },
-        update = { chart ->
-            chart.setDrawEntryLabels(false)
-            chart.setEntryLabelColor(Color.Transparent.toArgb())
-            chart.setEntryLabelTextSize(0f)
+        }
+    }
+}
 
-            val entries = data.map { (value, label) ->
-                PieEntry(abs(value), label)
-            }
-            val dataSet = PieDataSet(entries, "").apply {
-                this.colors = chartColors
-                valueTextSize = 15f
-                valueTextColor = Color.White.toArgb()
-                valueTypeface = poppinsBoldTypeface
-                sliceSpace = 2f
-                selectionShift = 5f
+@SuppressLint("DefaultLocale")
+@Composable
+fun LegendItem(
+    color: Color,
+    label: String,
+    value: Float
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Color box
+        Box(
+            modifier = Modifier
+                .size(16.dp)
+                .background(color)
+        )
 
-                valueFormatter = object : ValueFormatter() {
-                    @SuppressLint("DefaultLocale")
-                    override fun getFormattedValue(value: Float): String {
-                        val originalValue = dataPercentages[entries.indexOfFirst { it.value == value }]
-                        return if (originalValue >= 0) {
-                            String.format("%.1f", originalValue)
-                        } else {
-                            String.format("%.1f", originalValue)
-                        }
-                    }
+        // Label
+        Text(
+            text = label,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .weight(1f),
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            color = colorResource(id = R.color.primary)
+        )
 
-                    override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-                        val fullName = pieEntry?.label
-                        return riskFactors.find { it.first == fullName }?.second ?: ""
-                    }
-                }
-            }
-
-            chart.data = PieData(dataSet)
-            chart.data.setDrawValues(true)
-
-            if (centerText != null) {
-                chart.centerText = centerText
-                chart.setCenterTextColor(centerTextColor.toArgb())
-                chart.setCenterTextTypeface(poppinsBoldTypeface)
-            }
-
-            chart.legend.typeface = poppinsTypeface
-
-            chart.legend.setCustom(
-                riskFactors.mapIndexed { index, (fullName, abbreviation) ->
-                    chart.legend.entries?.get(index)?.apply {
-                        label = "$abbreviation: $fullName"
-                    }
-                }.toTypedArray()
-            )
-
-            chart.invalidate()
-        },
-        modifier = modifier.fillMaxSize()
-    )
+        // Value with sign
+        Text(
+            text = if (value >= 0) "+${String.format("%.1f", value)}%" else "${String.format("%.1f", value)}%",
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = if (value >= 0) Color(0xFF2E7D32) else Color(0xFFC62828)
+        )
+    }
 }

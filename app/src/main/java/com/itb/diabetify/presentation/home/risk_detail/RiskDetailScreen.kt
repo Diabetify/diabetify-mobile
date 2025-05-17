@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.risk_detail
+package com.itb.diabetify.presentation.home.risk_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

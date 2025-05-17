@@ -171,16 +171,17 @@ fun HomeScreen(
                         PieChart(
                             dataPercentages = listOf(35f, 25f, 15f, 10f, -10f, -5f),
                             centerText = "Faktor\nRisiko",
-                            centerTextColor = colorResource(id = R.color.primary),
-                            modifier = Modifier.height(350.dp)
+                            modifier = Modifier.fillMaxWidth()
                         )
 
                         PrimaryButton(
                             text = "Lihat Detail",
-                            onClick = {},
+                            onClick = {
+                                navController.navigate(Route.RiskFactorDetailScreen.route)
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 70.dp)
+                                .padding(top = 10.dp)
                         )
                     }
                 }

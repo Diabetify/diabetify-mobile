@@ -17,6 +17,7 @@ sealed class Route(
     object MainScreen : Route(route = "mainScreen")
     object HomeScreen: Route(route = "homeScreen")
     object RiskDetailScreen: Route(route = "riskDetailScreen")
+    object RiskFactorDetailScreen: Route(route = "riskFactorDetailScreen")
     object HistoryScreen: Route(route = "historyScreen")
     object RecommendationScreen: Route(route = "recommendationScreen")
     object SettingsScreen: Route(route = "settingsScreen")

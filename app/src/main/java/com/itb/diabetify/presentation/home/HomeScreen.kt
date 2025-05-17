@@ -37,6 +37,7 @@ import com.itb.diabetify.presentation.home.components.formatRiwayatKehamilan
 import com.itb.diabetify.presentation.home.components.getActivityLevelColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
+import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -122,6 +123,16 @@ fun HomeScreen(
 
                         RiskIndicator(
                             percentage = 63
+                        )
+
+                        PrimaryButton(
+                            text = "Lihat Detail",
+                            onClick = {
+                                navController.navigate(Route.RiskDetailScreen.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp)
                         )
                     }
                 }

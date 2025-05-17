@@ -16,6 +16,7 @@ sealed class Route(
     object ResetPasswordSuccessScreen : Route(route = "resetPasswordSuccessScreen")
     object MainScreen : Route(route = "mainScreen")
     object HomeScreen: Route(route = "homeScreen")
+    object RiskDetailScreen: Route(route = "riskDetailScreen")
     object HistoryScreen: Route(route = "historyScreen")
     object RecommendationScreen: Route(route = "recommendationScreen")
     object SettingsScreen: Route(route = "settingsScreen")

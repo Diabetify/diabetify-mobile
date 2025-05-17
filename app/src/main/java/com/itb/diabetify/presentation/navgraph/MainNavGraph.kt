@@ -31,6 +31,7 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.navbar.BottomNavigationBar
 import com.itb.diabetify.presentation.navbar.NavigationViewModel
 import com.itb.diabetify.presentation.recommendation.RecommendationScreen
+import com.itb.diabetify.presentation.risk_detail.RiskDetailScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 
@@ -119,6 +120,14 @@ fun MainNavGraph(
                 HomeScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
+                )
+            }
+
+            composable(route = Route.RiskDetailScreen.route) {
+                val homeViewModel: HomeViewModel = hiltViewModel()
+                RiskDetailScreen(
+                    navController = mainNavController,
+                     viewModel = homeViewModel,
                 )
             }
 

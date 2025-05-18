@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
+import com.itb.diabetify.presentation.home.components.calculateProgress
+import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
 
@@ -212,106 +214,5 @@ fun ComparisonBar(riskFactor: RiskFactorDetails) {
             color = color,
             modifier = Modifier.padding(top = 4.dp)
         )
-    }
-}
-
-fun calculateRiskFactorColor(percentage: Float): Color {
-    return when {
-        percentage >= 0 -> {
-            val intensity = percentage / 25f
-            val red = (255 * (0.5f + 0.5f * intensity)).coerceIn(0f, 255f).toInt()
-            val green = (128 * (1 - intensity)).coerceIn(0f, 128f).toInt()
-            Color(red, green, green)
-        }
-        else -> {
-            val intensity = abs(percentage) / 15f
-            val blue = (255 * (0.5f + 0.5f * intensity)).coerceIn(0f, 255f).toInt()
-            val red = (128 * (1 - intensity)).coerceIn(0f, 128f).toInt()
-            Color(red, red, blue)
-        }
-    }
-}
-
-fun extractNumericValue(value: String): Float? {
-    val numericRegex = """(\d+\.?\d*)""".toRegex()
-    val match = numericRegex.find(value)
-    return match?.groupValues?.get(1)?.toFloatOrNull()
-}
-
-fun calculateProgress(riskFactor: RiskFactorDetails): Float {
-    if (!riskFactor.isModifiable) return 50f
-
-    when (riskFactor.name) {
-        "IMT" -> {
-            val currentBMI = extractNumericValue(riskFactor.currentValue) ?: return 0f
-
-            val idealRange = """(\d+\.?\d*)\s*-\s*(\d+\.?\d*)""".toRegex()
-                .find(riskFactor.idealValue)
-
-            if (idealRange != null) {
-                val lowerBound = idealRange.groupValues[1].toFloatOrNull() ?: 18.5f
-                val upperBound = idealRange.groupValues[2].toFloatOrNull() ?: 24.9f
-
-                return when {
-                    currentBMI in lowerBound..upperBound -> 100f
-                    currentBMI < lowerBound -> {
-                        val ratio = currentBMI / lowerBound
-                        (ratio * 100f).coerceIn(0f, 100f)
-                    }
-                    else -> {
-                        val maxBMI = upperBound * 1.5f
-                        val ratio = 1f - ((currentBMI - upperBound) / (maxBMI - upperBound))
-                        (ratio * 100f).coerceIn(0f, 100f)
-                    }
-                }
-            }
-            return 50f
-        }
-
-        "HTN" -> {
-            val currentSystolic = extractNumericValue(riskFactor.currentValue) ?: return 0f
-            val idealSystolic = 120f
-
-            val ratio = idealSystolic / currentSystolic
-            return (ratio * 100f).coerceIn(0f, 100f)
-        }
-
-        "RK" -> {
-            return if (riskFactor.currentValue.contains("prematur", ignoreCase = true)) {
-                40f
-            } else {
-                90f
-            }
-        }
-
-        "AF" -> {
-            val currentMinutes = extractNumericValue(riskFactor.currentValue) ?: return 0f
-            val idealMinutes = 150f
-
-            val ratio = currentMinutes / idealMinutes
-            return (ratio * 100f).coerceIn(0f, 100f)
-        }
-
-        "IM" -> {
-            val currentCigarettes = extractNumericValue(riskFactor.currentValue) ?: return 0f
-            val idealCigarettes = 0f
-
-            val worstCase = 20f
-            val ratio = 1f - (currentCigarettes / worstCase)
-            return (ratio * 100f).coerceIn(0f, 100f)
-        }
-
-        else -> {
-            val currentValue = extractNumericValue(riskFactor.currentValue) ?: return 50f
-            val idealValue = extractNumericValue(riskFactor.idealValue) ?: return 50f
-
-            val ratio = if (riskFactor.impactPercentage < 0) {
-                idealValue / currentValue
-            } else {
-                currentValue / idealValue
-            }
-
-            return (ratio * 100f).coerceIn(0f, 100f)
-        }
     }
 }

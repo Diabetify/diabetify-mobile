@@ -1,19 +1,22 @@
 package com.itb.diabetify.presentation.common
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,8 +37,15 @@ fun PrimaryButton(
     rightImageResId: Int? = null,
     isLoading: Boolean = false
 ) {
-    Button(
-        onClick = onClick,
+    val isEnabled = (enabled ?: true) && !isLoading
+    val gradient = Brush.horizontalGradient(
+        colors = listOf(
+            colorResource(id = R.color.primary),
+            colorResource(id = R.color.primary).copy(alpha = 0.8f)
+        )
+    )
+
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
@@ -43,47 +53,68 @@ fun PrimaryButton(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(28.dp)
             ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.primary),
-            disabledContainerColor = colorResource(id = R.color.primary).copy(alpha = 0.5f)
-        ),
         shape = RoundedCornerShape(28.dp),
-        enabled = (enabled ?: true) && !isLoading
+        color = Color.Transparent
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = Color.White,
-                strokeWidth = 2.dp
-            )
-        } else {
-            if (leftImageResId != null) {
-                Image(
-                    painter = painterResource(id = leftImageResId),
-                    contentDescription = "Left Image",
-                    modifier = Modifier.size(15.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = if (isEnabled) gradient else Brush.horizontalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.primary).copy(alpha = 0.5f),
+                            colorResource(id = R.color.primary).copy(alpha = 0.4f)
+                        )
+                    )
                 )
-            }
-
-            Spacer(modifier = Modifier.size(10.dp))
-
-            Text(
-                text = text,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 18.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.size(10.dp))
-
-            if (rightImageResId != null) {
-                Image(
-                    painter = painterResource(id = rightImageResId),
-                    contentDescription = "Right Image",
-                    modifier = Modifier.size(15.dp)
+                .clickable(
+                    enabled = isEnabled,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
                 )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (leftImageResId != null) {
+                        Image(
+                            painter = painterResource(id = leftImageResId),
+                            contentDescription = "Left Image",
+                            modifier = Modifier
+                                .size(15.dp)
+                                .align(Alignment.CenterStart)
+                                .padding(start = 16.dp)
+                        )
+                    }
+
+                    Text(
+                        text = text,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+
+                    if (rightImageResId != null) {
+                        Image(
+                            painter = painterResource(id = rightImageResId),
+                            contentDescription = "Right Image",
+                            modifier = Modifier
+                                .size(15.dp)
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 16.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -96,23 +127,48 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean? = true
 ) {
-    Button(
-        modifier = modifier,
-        onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.primary)
-        ),
-        enabled = (enabled ?: true)
-    ) {
-        Text(
-            text = text,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            color = colorResource(id = R.color.white),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 8.dp)
+    val isEnabled = (enabled ?: true)
+    val gradient = Brush.horizontalGradient(
+        colors = listOf(
+            colorResource(id = R.color.primary),
+            colorResource(id = R.color.primary).copy(alpha = 0.8f)
         )
+    )
+
+    Surface(
+        modifier = modifier
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        shape = RoundedCornerShape(20.dp),
+        color = Color.Transparent
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = if (isEnabled) gradient else Brush.horizontalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.primary).copy(alpha = 0.5f),
+                            colorResource(id = R.color.primary).copy(alpha = 0.4f)
+                        )
+                    )
+                )
+                .clickable(
+                    enabled = isEnabled,
+                    onClick = onClick
+                )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.white),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

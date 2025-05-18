@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -29,11 +30,9 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,6 +51,7 @@ import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.components.RiskIndicator
@@ -288,6 +288,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 16.dp)
+                                .height(50.dp)
                         )
                     }
                 }
@@ -295,7 +296,7 @@ fun HomeScreen(
 
             // What-If Simulation Card
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             ) {
                 HomeCard(
                     title = "Simulasi What-If"
@@ -306,7 +307,6 @@ fun HomeScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Improvement preview (new)
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -333,6 +333,7 @@ fun HomeScreen(
                                     Text(
                                         text = "Potensi penurunan risiko",
                                         fontSize = 14.sp,
+                                        fontFamily = poppinsFontFamily,
                                         fontWeight = FontWeight.Medium,
                                         color = Color(0xFF059669)
                                     )
@@ -343,6 +344,7 @@ fun HomeScreen(
                                 Text(
                                     text = "Jika Anda mengurangi konsumsi rokok dan meningkatkan aktivitas fisik, risiko diabetes dapat turun hingga",
                                     fontSize = 12.sp,
+                                    fontFamily = poppinsFontFamily,
                                     color = Color(0xFF065F46)
                                 )
 
@@ -352,6 +354,7 @@ fun HomeScreen(
                                     text = "-17%",
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
+                                    fontFamily = poppinsFontFamily,
                                     color = Color(0xFF059669),
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
@@ -376,19 +379,27 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 16.dp)
+                                .height(50.dp)
                         )
                     }
                 }
             }
 
             // Today's Data Section
-            SectionHeader(
-                title = "Data Hari Ini",
-                actionText = "Perbarui",
-                onActionClick = { /* Handle update action */ }
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+            ) {
+                Text(
+                    text = "Data Hari Ini",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+            }
 
-            // BMI Card with Progress Bar (Enhanced)
+            // BMI Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -446,7 +457,7 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // BMI progress indicator (new)
+                    // BMI progress indicator
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -454,7 +465,6 @@ fun HomeScreen(
                             .clip(RoundedCornerShape(4.dp))
                             .background(Color(0xFFE5E7EB))
                     ) {
-                        // BMI scale visualization
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -477,15 +487,13 @@ fun HomeScreen(
                                 .size(12.dp)
                                 .offset(
                                     x = ((bmiValue - 10) / 30f * (1f - 12f/360f)) * 360.dp,
-                                    y = (-2).dp
                                 )
                                 .clip(CircleShape)
                                 .background(Color.White)
-                                .border(2.dp, bmiColor, CircleShape)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
                     // BMI scale labels
                     Row(
@@ -495,35 +503,39 @@ fun HomeScreen(
                         Text(
                             text = "Kurus",
                             fontSize = 10.sp,
-                            color = Color(0xFFF59E0B)
+                            fontFamily = poppinsFontFamily,
+                            color = Color(0xFFF59E0B),
                         )
                         Text(
                             text = "Normal",
                             fontSize = 10.sp,
+                            fontFamily = poppinsFontFamily,
                             color = Color(0xFF10B981)
                         )
                         Text(
                             text = "Gemuk",
                             fontSize = 10.sp,
+                            fontFamily = poppinsFontFamily,
                             color = Color(0xFFF59E0B)
                         )
                         Text(
                             text = "Obesitas",
                             fontSize = 10.sp,
+                            fontFamily = poppinsFontFamily,
                             color = Color(0xFFEF4444)
                         )
                     }
                 }
             }
 
-            // Height and Weight Cards (Enhanced)
+            // Height and Weight Cards
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                EnhancedMeasurementCard(
+                MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Berat",
                     value = "70",
@@ -532,7 +544,7 @@ fun HomeScreen(
                     trend = "up"
                 )
 
-                EnhancedMeasurementCard(
+                MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Tinggi",
                     value = "165",
@@ -542,7 +554,7 @@ fun HomeScreen(
                 )
             }
 
-            // Health Status Card (Enhanced)
+            // Health Status Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -603,7 +615,7 @@ fun HomeScreen(
                         )
                     }
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp),
@@ -645,7 +657,7 @@ fun HomeScreen(
                 }
             }
 
-            // Lifestyle Factors Card (Enhanced)
+            // Lifestyle Factors Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -707,7 +719,7 @@ fun HomeScreen(
                         }
                     }
 
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp),
@@ -741,7 +753,7 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // Progress indicator for activity level (new)
+                        // Progress indicator for activity level
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -751,7 +763,7 @@ fun HomeScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth(0.45f) // 45 minutes out of recommended 100
+                                    .fillMaxWidth(0.45f)
                                     .height(8.dp)
                                     .clip(RoundedCornerShape(4.dp))
                                     .background(getActivityLevelColor(45))
@@ -760,7 +772,7 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        // Activity level label (new)
+                        // Activity level label
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -768,11 +780,13 @@ fun HomeScreen(
                             Text(
                                 text = "0 min",
                                 fontSize = 10.sp,
+                                fontFamily = poppinsFontFamily,
                                 color = Color(0xFF6B7280)
                             )
                             Text(
-                                text = "Target: 100 min",
+                                text = "Ideal: 100 min",
                                 fontSize = 10.sp,
+                                fontFamily = poppinsFontFamily,
                                 color = Color(0xFF6B7280)
                             )
                         }
@@ -780,7 +794,7 @@ fun HomeScreen(
                 }
             }
 
-            // Tips Card (New)
+            // Tips Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -828,338 +842,9 @@ fun HomeScreen(
                         color = Color(0xFF1E3A8A),
                         lineHeight = 20.sp
                     )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Lihat Semua Tips",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp,
-                            color = Color(0xFF3B82F6)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowForward,
-                            contentDescription = "See All Tips",
-                            tint = Color(0xFF3B82F6),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
                 }
             }
-
-            // Daily Tasks Card (New)
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(16.dp),
-                        spotColor = Color.Gray.copy(alpha = 0.2f)
-                    ),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = colorResource(id = R.color.white)
-                ),
-                onClick = { /* Navigate to tasks */ }
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Tugas Harian",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = colorResource(id = R.color.primary)
-                        )
-
-                        Text(
-                            text = "2 dari 5 selesai",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF6B7280)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Progress indicator (new)
-                    LinearProgressIndicator(
-                        progress = 0.4f,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        color = colorResource(id = R.color.primary),
-                        trackColor = Color(0xFFE5E7EB)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Task item (new)
-                    DailyTaskItem(
-                        taskName = "Aktivitas fisik 30 menit",
-                        isCompleted = true
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Task item (new)
-                    DailyTaskItem(
-                        taskName = "Minum 8 gelas air",
-                        isCompleted = true
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Task item (new)
-                    DailyTaskItem(
-                        taskName = "Cek berat badan",
-                        isCompleted = false
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Lihat Semua",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            color = colorResource(id = R.color.primary)
-                        )
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
 }
-
-@Composable
-fun SectionHeader(
-    title: String,
-    actionText: String? = null,
-    onActionClick: (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp, bottom = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            color = colorResource(id = R.color.primary)
-        )
-
-        if (actionText != null && onActionClick != null) {
-            Surface(
-                onClick = onActionClick,
-                shape = RoundedCornerShape(16.dp),
-                color = Color.Transparent
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(
-                        text = actionText,
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
-                        color = colorResource(id = R.color.primary)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Outlined.Refresh,
-                        contentDescription = "Action",
-                        tint = colorResource(id = R.color.primary),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun EnhancedMeasurementCard(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String,
-    unit: String,
-    changeIndicator: String,
-    trend: String // "up", "down", or "stable"
-) {
-    Card(
-        modifier = modifier
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Gray.copy(alpha = 0.2f)
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.white)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = label,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.primary),
-                modifier = Modifier.align(Alignment.Start)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    text = value,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = colorResource(id = R.color.primary),
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = unit,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = colorResource(id = R.color.primary),
-                    modifier = Modifier.padding(bottom = 3.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Change indicator
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val trendColor = when (trend) {
-                    "up" -> Color(0xFFDC2626)
-                    "down" -> Color(0xFF059669)
-                    else -> Color(0xFF6B7280)
-                }
-
-                val trendIcon = when (trend) {
-                    "up" -> "↑"
-                    "down" -> "↓"
-                    else -> "→"
-                }
-
-                if (trend != "stable") {
-                    Text(
-                        text = trendIcon,
-                        color = trendColor,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                }
-
-                Text(
-                    text = if (trend == "stable") "Stabil" else "$changeIndicator $unit",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
-                    color = trendColor
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun DailyTaskItem(
-    taskName: String,
-    isCompleted: Boolean
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isCompleted) Color(0xFFF0FDF4) else Color(0xFFF9FAFB)
-            )
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isCompleted) Color(0xFF10B981) else Color(0xFFE5E7EB)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (isCompleted) {
-                Icon(
-                    imageVector = Icons.Outlined.CheckCircle,
-                    contentDescription = "Completed",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Text(
-            text = taskName,
-            fontFamily = poppinsFontFamily,
-            fontWeight = if (isCompleted) FontWeight.Medium else FontWeight.SemiBold,
-            fontSize = 14.sp,
-            color = if (isCompleted) Color(0xFF6B7280) else colorResource(id = R.color.primary),
-            textDecoration = if (isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
-        )
-    }
-}
-
-// Extension function for Border
-fun Modifier.border(
-    width: androidx.compose.ui.unit.Dp,
-    color: Color,
-    shape: androidx.compose.foundation.shape.RoundedCornerShape
-) = this.then(
-    Modifier.shadow(
-        elevation = width,
-        shape = shape,
-        clip = true,
-        ambientColor = color,
-        spotColor = color
-    )
-)

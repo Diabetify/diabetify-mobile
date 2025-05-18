@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -153,18 +156,27 @@ fun PieChart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .wrapContentHeight()
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFF9FAFB)
+            ),
+            shape = RoundedCornerShape(8.dp)
         ) {
-            sortedRiskFactors.forEach { riskFactor ->
-                LegendItem(
-                    color = Color(chartColors[sortedRiskFactors.indexOf(riskFactor)]),
-                    label = riskFactor.name,
-                    value = riskFactor.percentage
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .wrapContentHeight()
+            ) {
+                sortedRiskFactors.forEach { riskFactor ->
+                    LegendItem(
+                        color = Color(chartColors[sortedRiskFactors.indexOf(riskFactor)]),
+                        label = riskFactor.name,
+                        value = riskFactor.percentage
+                    )
+                }
             }
         }
     }

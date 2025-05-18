@@ -1,6 +1,7 @@
 package com.itb.diabetify.presentation.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,34 +10,58 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.components.RiskIndicator
+import com.itb.diabetify.presentation.home.components.StatItem
 import com.itb.diabetify.presentation.home.components.formatHipertensi
 import com.itb.diabetify.presentation.home.components.formatRiwayatKehamilan
 import com.itb.diabetify.presentation.home.components.getActivityLevelColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
+import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.text.SimpleDateFormat
@@ -48,7 +73,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(id = R.color.white))
@@ -59,70 +84,168 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 30.dp, vertical = 30.dp),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
-            Column(
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Column {
+                    Text(
+                        text = "Selamat Datang Kembali,",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                    Text(
+                        text = "Bernardus",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_calendar),
+                            contentDescription = "Date",
+                            tint = colorResource(id = R.color.gray),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
+                        val formattedDate = dateFormat.format(Date())
+                        Text(
+                            text = formattedDate,
+                            fontSize = 14.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            color = colorResource(id = R.color.gray)
+                        )
+                    }
+                }
+
+                Row {
+                    BadgedBox(
+                        badge = {
+                            Badge(
+                                containerColor = Color(0xFFDC2626),
+                                contentColor = Color.White
+                            ) {
+                                Text(text = "3")
+                            }
+                        }
+                    ) {
+                        IconButton(
+                            onClick = { /* Handle notification */ }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notifications",
+                                tint = colorResource(id = R.color.primary)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Quick Stats Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.primary).copy(alpha = 0.05f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StatItem(
+                        label = "Pemeriksaan Terakhir",
+                        value = "2 hari lalu",
+                        icon = Icons.Outlined.Info
+                    )
+
+                    // Vertical Divider
+                    Box(
+                        modifier = Modifier
+                            .height(60.dp)
+                            .width(1.dp)
+                            .background(Color.Gray.copy(alpha = 0.3f))
+                    )
+
+                    StatItem(
+                        label = "Data harian terisi",
+                        value = "1 dari 2",
+                        icon = Icons.Outlined.CheckCircle
+                    )
+                }
+            }
+
+            // Last update text
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+                    .clickable {
+
+                    },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Refresh,
+                    contentDescription = "Last Update",
+                    tint = colorResource(id = R.color.gray),
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Welcome Back,",
+                    text = "Terakhir diperbarui: Hari ini, 08:30",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = colorResource(id = R.color.primary)
-                )
-                Text(
-                    text = "Bernardus",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = colorResource(id = R.color.primary)
-                )
-
-                val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
-                val formattedDate = dateFormat.format(Date())
-                Text(
-                    text = formattedDate,
-                    fontSize = 14.sp,
-                    color = Color(0xFF6B7280),
-                    modifier = Modifier.fillMaxWidth()
+                    fontSize = 12.sp,
+                    color = Color(0xFF6B7280)
                 )
             }
 
+            // Risk Percentage Card
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 40.dp,
-                            shape = RoundedCornerShape(20.dp),
-                            spotColor = Color.Gray.copy(alpha = 0.5f)
-                        )
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colorResource(id = R.color.white))
+                HomeCard(
+                    title = "Persentase Resiko",
+                    hasWarning = true
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(15.dp)
+                            .padding(16.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Persentase Resiko",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = colorResource(id = R.color.primary)
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         RiskIndicator(
                             percentage = 63
+                        )
+
+                        RiskCategory(
+                            modifier = Modifier.padding(vertical = 10.dp),
+                            color = viewModel.highRiskColor,
+                            description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
                         )
 
                         PrimaryButton(
@@ -132,42 +255,25 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 20.dp)
+                                .height(50.dp),
                         )
                     }
                 }
             }
 
+            // Risk Factor Contribution Card
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 40.dp,
-                            shape = RoundedCornerShape(20.dp),
-                            spotColor = Color.Gray.copy(alpha = 0.5f)
-                        )
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colorResource(id = R.color.white))
+                HomeCard(
+                    title = "Kontribusi Faktor Risiko"
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(15.dp)
+                            .padding(16.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Kontribusi Faktor Risiko",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = colorResource(id = R.color.primary)
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
                         PieChart(
                             riskFactors = viewModel.riskFactors,
                             centerText = "Faktor\nRisiko",
@@ -181,317 +287,664 @@ fun HomeScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 10.dp)
+                                .padding(top = 16.dp)
                         )
                     }
                 }
             }
 
+            // What-If Simulation Card
             Column(
                 modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
             ) {
-                Text(
-                    text = "Data Hari Ini",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = colorResource(id = R.color.primary),
-                    modifier = Modifier.padding(bottom = 12.dp)
+                HomeCard(
+                    title = "Simulasi What-If"
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Improvement preview (new)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFECFDF5)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Info,
+                                        contentDescription = "Info",
+                                        tint = Color(0xFF059669),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Potensi penurunan risiko",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color(0xFF059669)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "Jika Anda mengurangi konsumsi rokok dan meningkatkan aktivitas fisik, risiko diabetes dapat turun hingga",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF065F46)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "-17%",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF059669),
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "Simulasikan bagaimana perubahan gaya hidup dapat mempengaruhi risiko diabetes Anda",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Color(0xFF6B7280),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        PrimaryButton(
+                            text = "Mulai Simulasi",
+                            onClick = {
+                                // navController.navigate(Route.WhatIfScreen.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp)
+                        )
+                    }
+                }
+            }
+
+            // Today's Data Section
+            SectionHeader(
+                title = "Data Hari Ini",
+                actionText = "Perbarui",
+                onActionClick = { /* Handle update action */ }
+            )
+
+            // BMI Card with Progress Bar (Enhanced)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white)
                 )
+            ) {
+                val heightInMeters = 165 / 100.0
+                val bmiValue = 70 / (heightInMeters * heightInMeters)
+                val bmi = String.format("%.1f", bmiValue)
+                val bmiCategory = getBmiCategory(bmi.toDouble())
+                val bmiColor = getBmiCategoryColor(bmi.toDouble())
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    // BMI Card
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                elevation = 10.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                spotColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorResource(id = R.color.white)
-                        )
-                    ) {
-                        val heightInMeters = 165 / 100.0
-                        val bmi = String.format("%.1f", 70 / (heightInMeters * heightInMeters))
-
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "BMI",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                Text(
-                                    text = bmi,
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Kategori",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                Text(
-                                    text = getBmiCategory(bmi.toDouble()),
-                                    color = getBmiCategoryColor(bmi.toDouble()),
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 14.sp,
-                                )
-                            }
-                        }
-                    }
-
-                    // Height and Weight
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .shadow(
-                                    elevation = 10.dp,
-                                    shape = RoundedCornerShape(12.dp),
-                                    spotColor = Color.Gray.copy(alpha = 0.5f)
-                                ),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = colorResource(id = R.color.white)
+                        Column {
+                            Text(
+                                text = "BMI",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
                             )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Text(
-                                    text = "Berat",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                Row(
-                                    verticalAlignment = Alignment.Bottom
-                                ) {
-                                    Text(
-                                        text = "70",
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 16.sp,
-                                        color = colorResource(id = R.color.primary),
-                                    )
-                                    Spacer(modifier = Modifier.width(2.dp))
-                                    Text(
-                                        text = "kg",
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 10.sp,
-                                        color = colorResource(id = R.color.primary),
-                                        modifier = Modifier.padding(bottom = 2.dp)
-                                    )
-                                }
-                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = bmiCategory,
+                                color = bmiColor,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                            )
                         }
 
-                        Card(
+                        Text(
+                            text = bmi,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
+                            color = bmiColor,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // BMI progress indicator (new)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFFE5E7EB))
+                    ) {
+                        // BMI scale visualization
+                        Box(
                             modifier = Modifier
-                                .weight(1f)
-                                .shadow(
-                                    elevation = 10.dp,
-                                    shape = RoundedCornerShape(12.dp),
-                                    spotColor = Color.Gray.copy(alpha = 0.5f)
-                                ),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = colorResource(id = R.color.white)
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Text(
-                                    text = "Tinggi",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            Color(0xFFF59E0B), // Underweight
+                                            Color(0xFF10B981), // Normal
+                                            Color(0xFFF59E0B), // Overweight
+                                            Color(0xFFEF4444)  // Obese
+                                        )
+                                    )
                                 )
-                                Row(
-                                    verticalAlignment = Alignment.Bottom
-                                ) {
-                                    Text(
-                                        text = "165",
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 16.sp,
-                                        color = colorResource(id = R.color.primary),
-                                    )
-                                    Spacer(modifier = Modifier.width(2.dp))
-                                    Text(
-                                        text = "cm",
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 10.sp,
-                                        color = colorResource(id = R.color.primary),
-                                        modifier = Modifier.padding(bottom = 2.dp)
-                                    )
-                                }
-                            }
+                        )
+
+                        // BMI indicator
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .offset(
+                                    x = ((bmiValue - 10) / 30f * (1f - 12f/360f)) * 360.dp,
+                                    y = (-2).dp
+                                )
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .border(2.dp, bmiColor, CircleShape)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // BMI scale labels
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Kurus",
+                            fontSize = 10.sp,
+                            color = Color(0xFFF59E0B)
+                        )
+                        Text(
+                            text = "Normal",
+                            fontSize = 10.sp,
+                            color = Color(0xFF10B981)
+                        )
+                        Text(
+                            text = "Gemuk",
+                            fontSize = 10.sp,
+                            color = Color(0xFFF59E0B)
+                        )
+                        Text(
+                            text = "Obesitas",
+                            fontSize = 10.sp,
+                            color = Color(0xFFEF4444)
+                        )
+                    }
+                }
+            }
+
+            // Height and Weight Cards (Enhanced)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                EnhancedMeasurementCard(
+                    modifier = Modifier.weight(1f),
+                    label = "Berat",
+                    value = "70",
+                    unit = "kg",
+                    changeIndicator = "+0.5",
+                    trend = "up"
+                )
+
+                EnhancedMeasurementCard(
+                    modifier = Modifier.weight(1f),
+                    label = "Tinggi",
+                    value = "165",
+                    unit = "cm",
+                    changeIndicator = "0",
+                    trend = "stable"
+                )
+            }
+
+            // Health Status Card (Enhanced)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Status Kesehatan",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Warning,
+                                contentDescription = "Warning",
+                                tint = Color(0xFFD97706),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Hipertensi",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+                        }
+
+                        val hipertensi = "ya"
+                        Text(
+                            text = formatHipertensi(hipertensi),
+                            color = if (hipertensi != "tidak") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                        )
+                    }
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        color = Color(0xFFE5E7EB)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CheckCircle,
+                                contentDescription = "Check",
+                                tint = colorResource(id = R.color.primary),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Riwayat Kehamilan",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+                        }
+
+                        Text(
+                            text = formatRiwayatKehamilan("tidak"),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = colorResource(id = R.color.primary),
+                        )
+                    }
+                }
+            }
+
+            // Lifestyle Factors Card (Enhanced)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Faktor Gaya Hidup",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Jumlah Rokok",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+                        }
+
+                        val jumlahRokok = 2
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFFEF2F2)
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(
+                                text = "${jumlahRokok} batang",
+                                color = Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
                         }
                     }
 
-                    // Health Status
-                    Card(
+                    Divider(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .shadow(
-                                elevation = 10.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                spotColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorResource(id = R.color.white)
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Hipertensi",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                val hipertensi = "ya"
-                                Text(
-                                    text = formatHipertensi(hipertensi),
-                                    color = if (hipertensi != "tidak") Color(0xFFD97706) else colorResource(id = R.color.primary),
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                )
-                            }
+                            .padding(vertical = 12.dp),
+                        color = Color(0xFFE5E7EB)
+                    )
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Riwayat Kehamilan",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                Text(
-                                    text = formatRiwayatKehamilan("tidak"),
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                            }
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Aktivitas Fisik",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+
+                            Text(
+                                text = "45 menit",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = getActivityLevelColor(45),
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Progress indicator for activity level (new)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(Color(0xFFE5E7EB))
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.45f) // 45 minutes out of recommended 100
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(getActivityLevelColor(45))
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Activity level label (new)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "0 min",
+                                fontSize = 10.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                            Text(
+                                text = "Target: 100 min",
+                                fontSize = 10.sp,
+                                color = Color(0xFF6B7280)
+                            )
                         }
                     }
+                }
+            }
 
-                    // Lifestyle Factors
-                    Card(
+            // Tips Card (New)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFEFF6FF)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = "Tips",
+                            tint = Color(0xFF3B82F6),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Tips Hari Ini",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color(0xFF3B82F6)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Untuk menurunkan risiko hipertensi, kurangi asupan garam hingga kurang dari 5 gram per hari dan perbanyak konsumsi buah dan sayuran.",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        color = Color(0xFF1E3A8A),
+                        lineHeight = 20.sp
+                    )
+
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .shadow(
-                                elevation = 10.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                spotColor = Color.Gray.copy(alpha = 0.5f)
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorResource(id = R.color.white)
-                        )
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Jumlah Rokok",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
+                        Text(
+                            text = "Lihat Semua Tips",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp,
+                            color = Color(0xFF3B82F6)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowForward,
+                            contentDescription = "See All Tips",
+                            tint = Color(0xFF3B82F6),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
 
-                                val jumlahRokok = 2
-                                Text(
-                                    text = "${jumlahRokok} batang",
-                                    color = if (jumlahRokok > 0) Color(0xFFDC2626) else colorResource(id = R.color.primary),
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                )
-                            }
+            // Daily Tasks Card (New)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white)
+                ),
+                onClick = { /* Navigate to tasks */ }
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Tugas Harian",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = colorResource(id = R.color.primary)
+                        )
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Aktivitas Fisik",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = colorResource(id = R.color.primary),
-                                )
-                                Column(
-                                    horizontalAlignment = Alignment.End
-                                ) {
-                                    Text(
-                                        text = "45 menit",
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 16.sp,
-                                        color = getActivityLevelColor(45),
-                                    )
-                                }
-                            }
-                        }
+                        Text(
+                            text = "2 dari 5 selesai",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Color(0xFF6B7280)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Progress indicator (new)
+                    LinearProgressIndicator(
+                        progress = 0.4f,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        color = colorResource(id = R.color.primary),
+                        trackColor = Color(0xFFE5E7EB)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Task item (new)
+                    DailyTaskItem(
+                        taskName = "Aktivitas fisik 30 menit",
+                        isCompleted = true
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Task item (new)
+                    DailyTaskItem(
+                        taskName = "Minum 8 gelas air",
+                        isCompleted = true
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Task item (new)
+                    DailyTaskItem(
+                        taskName = "Cek berat badan",
+                        isCompleted = false
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Lihat Semua",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = colorResource(id = R.color.primary)
+                        )
                     }
                 }
             }
@@ -500,3 +953,213 @@ fun HomeScreen(
         }
     }
 }
+
+@Composable
+fun SectionHeader(
+    title: String,
+    actionText: String? = null,
+    onActionClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp, bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = colorResource(id = R.color.primary)
+        )
+
+        if (actionText != null && onActionClick != null) {
+            Surface(
+                onClick = onActionClick,
+                shape = RoundedCornerShape(16.dp),
+                color = Color.Transparent
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    Text(
+                        text = actionText,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Refresh,
+                        contentDescription = "Action",
+                        tint = colorResource(id = R.color.primary),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EnhancedMeasurementCard(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    unit: String,
+    changeIndicator: String,
+    trend: String // "up", "down", or "stable"
+) {
+    Card(
+        modifier = modifier
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color.Gray.copy(alpha = 0.2f)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(id = R.color.white)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.primary),
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = value,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = colorResource(id = R.color.primary),
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = unit,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(bottom = 3.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Change indicator
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val trendColor = when (trend) {
+                    "up" -> Color(0xFFDC2626)
+                    "down" -> Color(0xFF059669)
+                    else -> Color(0xFF6B7280)
+                }
+
+                val trendIcon = when (trend) {
+                    "up" -> "↑"
+                    "down" -> "↓"
+                    else -> "→"
+                }
+
+                if (trend != "stable") {
+                    Text(
+                        text = trendIcon,
+                        color = trendColor,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                }
+
+                Text(
+                    text = if (trend == "stable") "Stabil" else "$changeIndicator $unit",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                    color = trendColor
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DailyTaskItem(
+    taskName: String,
+    isCompleted: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (isCompleted) Color(0xFFF0FDF4) else Color(0xFFF9FAFB)
+            )
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isCompleted) Color(0xFF10B981) else Color(0xFFE5E7EB)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isCompleted) {
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = "Completed",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = taskName,
+            fontFamily = poppinsFontFamily,
+            fontWeight = if (isCompleted) FontWeight.Medium else FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = if (isCompleted) Color(0xFF6B7280) else colorResource(id = R.color.primary),
+            textDecoration = if (isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+        )
+    }
+}
+
+// Extension function for Border
+fun Modifier.border(
+    width: androidx.compose.ui.unit.Dp,
+    color: Color,
+    shape: androidx.compose.foundation.shape.RoundedCornerShape
+) = this.then(
+    Modifier.shadow(
+        elevation = width,
+        shape = shape,
+        clip = true,
+        ambientColor = color,
+        spotColor = color
+    )
+)

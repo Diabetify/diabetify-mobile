@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.home.HomeViewModel
+import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
+import com.itb.diabetify.presentation.home.risk_detail.components.RiskScoreGauge
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -41,11 +43,6 @@ fun RiskDetailScreen(
 ) {
     val riskScore = 50
     val scrollState = rememberScrollState()
-
-    val lowRiskColor = Color(0xFF8BC34A)    // Green
-    val mediumRiskColor = Color(0xFFFFC107) // Yellow
-    val highRiskColor = Color(0xFFFA821F)   // Orange
-    val veryHighRiskColor = Color(0xFFF44336) // Red
 
     Column(
         modifier = Modifier
@@ -87,10 +84,10 @@ fun RiskDetailScreen(
         ) {
             RiskScoreGauge(
                 score = riskScore,
-                lowRiskColor = lowRiskColor,
-                mediumRiskColor = mediumRiskColor,
-                highRiskColor = highRiskColor,
-                veryHighRiskColor = veryHighRiskColor
+                lowRiskColor = viewModel.lowRiskColor,
+                mediumRiskColor = viewModel.mediumRiskColor,
+                highRiskColor = viewModel.highRiskColor,
+                veryHighRiskColor = viewModel.veryHighRiskColor
             )
 
             Text(
@@ -105,137 +102,27 @@ fun RiskDetailScreen(
 
             // Risk categories
             RiskCategory(
-                color = lowRiskColor,
+                color = viewModel.lowRiskColor,
                 title = "0 - 0.3: Rendah",
                 description = "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes"
             )
 
             RiskCategory(
-                color = mediumRiskColor,
+                color = viewModel.mediumRiskColor,
                 title = "0.3 - 0.5: Sedang",
                 description = "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes"
             )
 
             RiskCategory(
-                color = highRiskColor,
+                color = viewModel.highRiskColor,
                 title = "0.5 - 0.65: Tinggi",
                 description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
             )
 
             RiskCategory(
-                color = veryHighRiskColor,
+                color = viewModel.veryHighRiskColor,
                 title = "0.65 - 1: Sangat Tinggi",
                 description = "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes"
-            )
-        }
-    }
-}
-
-@Composable
-fun RiskScoreGauge(
-    score: Int,
-    lowRiskColor: Color,
-    mediumRiskColor: Color,
-    highRiskColor: Color,
-    veryHighRiskColor: Color
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colorStops = arrayOf(
-                            0.0f to lowRiskColor,
-                            0.3f to mediumRiskColor,
-                            0.5f to highRiskColor,
-                            0.65f to veryHighRiskColor,
-                            1.0f to veryHighRiskColor
-                        )
-                    )
-                )
-        )
-
-        val normalizedScore = score.coerceIn(0, 100) / 100f
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (normalizedScore > 0) {
-                Spacer(
-                    modifier = Modifier
-                        .weight(normalizedScore)
-                        .height(1.dp)
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .background(color = colorResource(R.color.primary), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = score.toString(),
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = colorResource(id = R.color.white)
-                )
-            }
-
-            if (normalizedScore < 1) {
-                Spacer(
-                    modifier = Modifier
-                        .weight(1f - normalizedScore)
-                        .height(1.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun RiskCategory(color: Color, title: String, description: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(color, RoundedCornerShape(4.dp))
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(start = 16.dp)
-        ) {
-            Text(
-                text = title,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.primary)
-            )
-
-            Text(
-                text = description,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                lineHeight = 22.sp,
-                color = colorResource(id = R.color.black)
             )
         }
     }

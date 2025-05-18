@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.home
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -7,6 +8,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 ): ViewModel() {
+    val lowRiskColor = Color(0xFF8BC34A)    // Green
+    val mediumRiskColor = Color(0xFFFFC107) // Yellow
+    val highRiskColor = Color(0xFFFA821F)   // Orange
+    val veryHighRiskColor = Color(0xFFF44336) // Red
+
     data class RiskFactor(
         val name: String,
         val abbreviation: String,

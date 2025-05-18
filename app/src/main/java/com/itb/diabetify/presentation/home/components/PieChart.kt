@@ -56,10 +56,8 @@ fun PieChart(
         Typeface.DEFAULT_BOLD
     }
 
-    // Sort risk factors by absolute percentage value (high to low)
     val sortedRiskFactors = riskFactors.sortedByDescending { abs(it.percentage) }
 
-    // Extract percentages from sorted risk factors
     val dataPercentages = sortedRiskFactors.map { it.percentage }
 
     val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
@@ -155,7 +153,6 @@ fun PieChart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Legend - already sorted by abs percentage
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -211,7 +208,7 @@ fun LegendItem(
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = if (value >= 0) Color(0xFF2E7D32) else Color(0xFFC62828)
+            color = if (value >= 0) Color(0xFFC62828) else Color(0xFF2E7D32)
         )
     }
 }

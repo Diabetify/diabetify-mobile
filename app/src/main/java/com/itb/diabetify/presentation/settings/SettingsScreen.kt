@@ -23,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -86,80 +88,102 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp),
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
-            Text(
-                modifier = Modifier.padding(vertical = 25.dp),
-                text = "Profil",
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = colorResource(id = R.color.primary)
-            )
-
-            // User profile card
-            ProfileCard(
-                name = "Bernardus",
-                email = "bernardus@gmail.com",
-                onEditClick = { /* TODO */ }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // User statistics section
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                colorResource(id = R.color.primary),
+                                colorResource(id = R.color.primary).copy(alpha = 0.8f)
+                            )
+                        )
+                    )
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
             ) {
-                StatisticItem(
-                    value = "85",
-                    label = "Entries",
-                    iconRes = R.drawable.ic_calendar,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                StatisticItem(
-                    value = "14",
-                    label = "Days Streak",
-                    iconRes = R.drawable.ic_calendar,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                StatisticItem(
-                    value = "6",
-                    label = "Reminders",
-                    iconRes = R.drawable.ic_calendar,
-                    modifier = Modifier.weight(1f)
-                )
+                Column {
+                    Text(
+                        text = "Profil",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = Color.White
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-            // Cards section
-            cards.forEach { cardData ->
-                SettingsCard(cardData = cardData)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // Logout button
-            PrimaryButton(
-                text = "Logout",
-                onClick = { showLogoutDialog = true },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-            )
+                    .padding(horizontal = 16.dp)
+            ) {
+
+                // User profile card
+                ProfileCard(
+                    name = "Bernardus",
+                    email = "bernardus@gmail.com",
+                    onEditClick = { /* TODO */ }
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // User statistics section
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    StatisticItem(
+                        value = "85",
+                        label = "Entries",
+                        iconRes = R.drawable.ic_calendar,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    StatisticItem(
+                        value = "14",
+                        label = "Days Streak",
+                        iconRes = R.drawable.ic_calendar,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    StatisticItem(
+                        value = "6",
+                        label = "Reminders",
+                        iconRes = R.drawable.ic_calendar,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Cards section
+                cards.forEach { cardData ->
+                    SettingsCard(cardData = cardData)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Logout button
+                PrimaryButton(
+                    text = "Logout",
+                    onClick = { showLogoutDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                )
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
         }

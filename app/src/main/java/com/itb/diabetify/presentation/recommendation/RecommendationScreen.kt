@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,14 +56,31 @@ fun RecommendationScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
-            Text(
-                modifier = Modifier.padding(horizontal = 30.dp, vertical = 30.dp),
-                text = "Panduan",
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = colorResource(id = R.color.primary)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                colorResource(id = R.color.primary),
+                                colorResource(id = R.color.primary).copy(alpha = 0.8f)
+                            )
+                        )
+                    )
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "Panduan",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = Color.White
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
 
             Column(
                 modifier = Modifier

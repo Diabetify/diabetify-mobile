@@ -7,7 +7,7 @@ data class GuideCardData(
     val icon: Int,
     val title: String,
     val backgroundColor: Color,
-    val iconColor: Color
+    val iconColor: Color,
 )
 
 val guideCards = listOf(
@@ -15,7 +15,7 @@ val guideCards = listOf(
         icon = R.drawable.ic_heart,
         title = "Tentang Diabetes",
         backgroundColor = Color(0xFFFFF1F1),
-        iconColor = Color(0xFFE57373)
+        iconColor = Color(0xFFE57373),
     ),
     GuideCardData(
         icon = R.drawable.ic_danger,

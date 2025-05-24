@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -36,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.recommendation.components.FAQCard
 import com.itb.diabetify.presentation.recommendation.components.GuideCard
+import com.itb.diabetify.presentation.recommendation.components.SectionHeader
 import com.itb.diabetify.presentation.recommendation.components.TipsCard
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
@@ -85,17 +82,14 @@ fun RecommendationScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 35.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
                 // Guide
-                Text(
-                    modifier = Modifier.padding(top = 0.dp, bottom = 15.dp),
-                    text = "Diabetes dan XAI",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = colorResource(id = R.color.primary)
+                SectionHeader(
+                    title = "Diabetes dan XAI",
+                    subtitle = "Pelajari dasar-dasar diabetes dan bagaimana XAI dapat membantu dalam pengelolaannya.",
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 val chunkedCards = guideCards.chunked(2)
@@ -117,20 +111,35 @@ fun RecommendationScreen() {
                             }
 
                             if (rowCards.size == 1) {
-                                androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
                 }
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    colorResource(id = R.color.primary).copy(alpha = 0.2f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+
                 // Tips
-                Text(
-                    modifier = Modifier.padding(top = 30.dp, bottom = 15.dp),
-                    text = "Tips Kesehatan",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = colorResource(id = R.color.primary)
+                SectionHeader(
+                    title = "Tips Kesehatan",
+                    subtitle = "Saran praktis untuk menjaga kesehatan Anda dalam mengelola diabetes.",
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
 
                 val pageCount = ceil(tipsCard.size / 2f).toInt()
@@ -200,20 +209,37 @@ fun RecommendationScreen() {
                     }
                 }
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    colorResource(id = R.color.primary).copy(alpha = 0.2f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+
                 // FAQ
-                Text(
-                    modifier = Modifier.padding(top = 15.dp, bottom = 15.dp),
-                    text = "FAQ",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = colorResource(id = R.color.primary)
+                SectionHeader(
+                    title = "FAQ",
+                    subtitle = "Pertanyaan yang sering diajukan tentang diabetes dan XAI.",
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
 
                 faqCards.forEach{ faqCardData ->
                     FAQCard(faqCardData)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }

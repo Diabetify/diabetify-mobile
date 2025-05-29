@@ -3,6 +3,7 @@ package com.itb.diabetify.presentation.settings.edit_profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -41,10 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.DatePickerModal
+import com.itb.diabetify.presentation.common.DropdownField
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun EditProfileScreen(
@@ -53,7 +60,11 @@ fun EditProfileScreen(
 ) {
     val nameState = viewModel.nameState.value
     val emailState = viewModel.emailState.value
+    val genderState = viewModel.genderState.value
+    val birthDateState = viewModel.dobState.value
+
     var showImagePicker by remember { mutableStateOf(false) }
+    val showDatePicker = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -165,7 +176,7 @@ fun EditProfileScreen(
                         errorMessage = nameState.error ?: ""
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Email field
                     InputField(
@@ -178,6 +189,70 @@ fun EditProfileScreen(
                         isError = emailState.error != null,
                         errorMessage = emailState.error ?: ""
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val options = listOf("Laki-laki", "Perempuan")
+
+                    // Gender dropdown
+                    DropdownField(
+                        selectedOption = genderState.text,
+                        onOptionSelected = { viewModel.setGender(it) },
+                        options = options,
+                        placeHolderText = "Pilih Jenis Kelamin",
+                        iconResId = R.drawable.ic_users,
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = genderState.error != null,
+                        errorMessage = genderState.error ?: ""
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Birth date field
+                    InputField(
+                        value = birthDateState.text,
+                        onValueChange = { },
+                        placeholderText = "Tanggal Lahir",
+                        iconResId = R.drawable.ic_calendar,
+                        modifier = Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            showDatePicker.value = true
+                        },
+                        enabled = false,
+                        trailingIcon = {
+                            if (birthDateState.text.isNotEmpty()) {
+                                IconButton(
+                                    onClick = { viewModel.setDob("") },
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Clear date",
+                                        tint = colorResource(id = R.color.gray),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        },
+                        isError = birthDateState.error != null,
+                        errorMessage = birthDateState.error ?: ""
+                    )
+
+                    // Date picker dialog
+                    if (showDatePicker.value) {
+                        DatePickerModal(
+                            onDateSelected = { dateMillis ->
+                                dateMillis?.let {
+                                    val date = Date(it)
+                                    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    viewModel.setDob(formatter.format(date))
+                                }
+                            },
+                            onDismiss = { showDatePicker.value = false }
+                        )
+                    }
                 }
             }
 

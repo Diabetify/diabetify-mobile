@@ -53,9 +53,16 @@ class SettingsViewModel @Inject constructor(
                         text = it.name ?: "",
                         error = null
                     )
-
                     _emailState.value = emailState.value.copy(
                         text = it.email ?: "",
+                        error = null
+                    )
+                    _genderState.value = genderState.value.copy(
+                        text = it.gender ?: "",
+                        error = null
+                    )
+                    _dobState.value = dobState.value.copy(
+                        text = it.dob ?: "",
                         error = null
                     )
                 }
@@ -79,6 +86,22 @@ class SettingsViewModel @Inject constructor(
     fun setEmail(value: String) {
         _emailState.value = emailState.value.copy(error = null)
         _emailState.value = emailState.value.copy(text = value)
+    }
+
+    private val _genderState = mutableStateOf(FieldState())
+    val genderState: State<FieldState> = _genderState
+
+    fun setGender(value: String) {
+        _genderState.value = genderState.value.copy(error = null)
+        _genderState.value = genderState.value.copy(text = value)
+    }
+
+    private val _dobState = mutableStateOf(FieldState())
+    val dobState: State<FieldState> = _dobState
+
+    fun setDob(value: String) {
+        _dobState.value = dobState.value.copy(error = null)
+        _dobState.value = dobState.value.copy(text = value)
     }
 
     fun validateEditProfileFields(): Boolean {

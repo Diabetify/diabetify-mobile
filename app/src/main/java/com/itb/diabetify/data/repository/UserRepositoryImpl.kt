@@ -37,11 +37,27 @@ class UserRepositoryImpl(
         }
     }
 
+    @SuppressLint("NewApi")
     override suspend fun fetchUser(): Resource<Unit> {
         return try {
             val response = userApiService.getUser()
             response.data?.let {
-                userManager.saveUser(User(name = it.name, email = it.email))
+                userManager.saveUser(
+                    User(
+                        name = it.name,
+                        email = it.email,
+                        gender = when (it.gender.lowercase()) {
+                            "male" -> "Laki-laki"
+                            "female" -> "Perempuan"
+                            else -> it.gender
+                        },
+                        dob = it.dob.let { dateString ->
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                            val dateTime = LocalDateTime.parse(dateString, formatter)
+                            dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        }
+                    )
+                )
             }
             return Resource.Success(Unit)
         } catch (e: IOException) {

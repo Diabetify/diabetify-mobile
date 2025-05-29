@@ -1,7 +1,7 @@
 package com.itb.diabetify.domain.usecases.auth
 
 import com.itb.diabetify.data.remote.auth.request.VerifyOtpRequest
-import com.itb.diabetify.domain.model.VerifyOtpResult
+import com.itb.diabetify.domain.model.auth.VerifyOtpResult
 import com.itb.diabetify.domain.repository.AuthRepository
 
 class VerifyOtpUseCase(

@@ -1,9 +1,9 @@
-package com.itb.diabetify.domain.model
+package com.itb.diabetify.domain.model.user
 
 import com.itb.diabetify.util.Resource
 
-class VerifyOtpResult (
+class EditUserResult (
+    val nameError: String? = null,
     val emailError: String? = null,
-    val codeError: String? = null,
     val result: Resource<Unit>? = null
 )

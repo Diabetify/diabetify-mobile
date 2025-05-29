@@ -2,7 +2,7 @@ package com.itb.diabetify.domain.usecases.auth
 
 import android.util.Patterns
 import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
-import com.itb.diabetify.domain.model.ChangePasswordResult
+import com.itb.diabetify.domain.model.auth.ChangePasswordResult
 import com.itb.diabetify.domain.repository.AuthRepository
 
 class ChangePasswordUseCase(

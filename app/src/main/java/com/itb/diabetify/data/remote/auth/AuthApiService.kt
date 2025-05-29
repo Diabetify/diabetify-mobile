@@ -10,7 +10,7 @@ import com.itb.diabetify.data.remote.auth.response.AuthResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface ApiService {
+interface AuthApiService {
     @POST("users")
     suspend fun createAccount(
         @Body createAccountRequest: CreateAccountRequest

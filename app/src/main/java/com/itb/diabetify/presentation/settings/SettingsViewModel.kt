@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
+import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -16,8 +17,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    private val editUserUseCase: EditUserUseCase,
     private val logoutUseCase: LogoutUseCase
 ): ViewModel() {
+    private var _editProfileState = mutableStateOf(DataState())
+    val editProfileState: State<DataState> = _editProfileState
+
     private var _logoutState = mutableStateOf(DataState())
     val logoutState: State<DataState> = _logoutState
 
@@ -60,6 +65,38 @@ class SettingsViewModel @Inject constructor(
         }
 
         return isValid
+    }
+
+    fun editProfile() {
+        viewModelScope.launch {
+            _editProfileState.value = editProfileState.value.copy(isLoading = true)
+
+            val editUserResult = editUserUseCase(
+                name = nameState.value.text,
+                email = emailState.value.text
+            )
+
+            _editProfileState.value = editProfileState.value.copy(isLoading = false)
+
+            when (editUserResult.result) {
+                is Resource.Success -> {
+                    Log.d("SettingsViewModel", "Profile updated successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = editUserResult.result.message ?: "Unknown error occurred"
+                    editUserResult.result.message?.let { Log.d("SettingsViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("SettingsViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("SettingsViewModel", "Unexpected error")
+                }
+            }
+        }
     }
 
     fun logout() {

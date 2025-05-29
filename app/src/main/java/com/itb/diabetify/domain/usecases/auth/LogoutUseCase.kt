@@ -1,6 +1,6 @@
 package com.itb.diabetify.domain.usecases.auth
 
-import com.itb.diabetify.domain.model.LogoutResult
+import com.itb.diabetify.domain.model.auth.LogoutResult
 import com.itb.diabetify.domain.repository.AuthRepository
 
 class LogoutUseCase(

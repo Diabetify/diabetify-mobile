@@ -1,6 +1,7 @@
 package com.itb.diabetify.data.repository
 
-import com.itb.diabetify.data.remote.auth.ApiService
+import android.util.Log
+import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
 import com.itb.diabetify.data.remote.auth.request.GoogleLoginRequest
@@ -14,14 +15,14 @@ import okio.IOException
 import retrofit2.HttpException
 
 class AuthRepositoryImpl(
-    private val apiService: ApiService,
+    private val authApiService: AuthApiService,
     private val tokenManager: TokenManager
 ): AuthRepository {
     override suspend fun createAccount(
         createAccountRequest: CreateAccountRequest
     ): Resource<Unit> {
         return try {
-            val response = apiService.createAccount(createAccountRequest)
+            val response = authApiService.createAccount(createAccountRequest)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")
@@ -37,10 +38,10 @@ class AuthRepositoryImpl(
         return try {
             when (type) {
                 "register" -> {
-                    val response = apiService.sendVerification(sendVerificationRequest)
+                    val response = authApiService.sendVerification(sendVerificationRequest)
                 }
                 "reset-password" -> {
-                    val response = apiService.sendResetPasswordVerification(sendVerificationRequest)
+                    val response = authApiService.sendResetPasswordVerification(sendVerificationRequest)
                 }
                 else -> {
                     return Resource.Error("Invalid type")
@@ -58,7 +59,7 @@ class AuthRepositoryImpl(
         verifyOtpRequest: VerifyOtpRequest
     ): Resource<Unit> {
         return try {
-            val response = apiService.verifyOtp(verifyOtpRequest)
+            val response = authApiService.verifyOtp(verifyOtpRequest)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")
@@ -71,7 +72,7 @@ class AuthRepositoryImpl(
         loginRequest: LoginRequest
     ): Resource<Unit> {
         return try {
-            val response = apiService.login(loginRequest)
+            val response = authApiService.login(loginRequest)
             tokenManager.saveToken(response.data.toString())
             Resource.Success(Unit)
         } catch (e: IOException) {
@@ -85,7 +86,7 @@ class AuthRepositoryImpl(
         googleLoginRequest: GoogleLoginRequest
     ): Resource<Unit> {
         return try {
-            val response = apiService.googleLogin(googleLoginRequest)
+            val response = authApiService.googleLogin(googleLoginRequest)
             tokenManager.saveToken(response.data.toString())
             Resource.Success(Unit)
         } catch (e: IOException) {
@@ -99,7 +100,7 @@ class AuthRepositoryImpl(
         changePasswordRequest: ChangePasswordRequest
     ): Resource<Unit> {
         return try {
-            val response = apiService.changePassword(changePasswordRequest)
+            val response = authApiService.changePassword(changePasswordRequest)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

@@ -2,7 +2,7 @@ package com.itb.diabetify.domain.usecases.auth;
 
 import android.util.Patterns
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
-import com.itb.diabetify.domain.model.SendVerificationResult;
+import com.itb.diabetify.domain.model.auth.SendVerificationResult;
 import com.itb.diabetify.domain.repository.AuthRepository;
 
 class SendVerificationUseCase(

@@ -2,7 +2,7 @@ package com.itb.diabetify.domain.usecases.auth
 
 import android.util.Patterns
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
-import com.itb.diabetify.domain.model.CreateAccountResult
+import com.itb.diabetify.domain.model.auth.CreateAccountResult
 import com.itb.diabetify.domain.repository.AuthRepository
 
 class CreateAccountUseCase(

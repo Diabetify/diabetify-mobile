@@ -3,7 +3,6 @@ package com.itb.diabetify.presentation.settings.edit_profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -45,7 +43,6 @@ import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
-import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
@@ -190,7 +187,7 @@ fun EditProfileScreen(
                 onClick = {
                     val isValid = viewModel.validateEditProfileFields()
                     if (isValid) {
-                        navController.navigate(Route.BiodataScreen.route)
+                        viewModel.editProfile()
                     }
                 },
                 modifier = Modifier

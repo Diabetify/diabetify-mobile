@@ -4,11 +4,15 @@ import android.app.Application
 import android.content.Context
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
-import com.itb.diabetify.data.remote.auth.ApiService
+import com.itb.diabetify.data.remote.auth.AuthApiService
+import com.itb.diabetify.data.remote.interceptor.AuthInterceptor
+import com.itb.diabetify.data.remote.user.UserApiService
 import com.itb.diabetify.data.repository.AuthRepositoryImpl
+import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.repository.AuthRepository
+import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
@@ -19,12 +23,14 @@ import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
+import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -57,22 +63,33 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesApiService(): ApiService {
+    fun providesOkHttpClient(
+        authInterceptor: AuthInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuthApiService(okHttpClient: OkHttpClient): AuthApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+            .create(AuthApiService::class.java)
     }
 
     @Provides
     @Singleton
     fun providesAuthRepository(
-        apiService: ApiService,
+        authApiService: AuthApiService,
         tokenManager: TokenManager
     ): AuthRepository {
         return AuthRepositoryImpl(
-            apiService = apiService,
+            authApiService = authApiService,
             tokenManager = tokenManager
         )
     }
@@ -131,5 +148,36 @@ object AppModule {
         repository: AuthRepository
     ): LogoutUseCase {
         return LogoutUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserApiService(okHttpClient: OkHttpClient): UserApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserRepository(
+        userApiService: UserApiService,
+        tokenManager: TokenManager
+    ): UserRepository {
+        return UserRepositoryImpl(
+            userApiService = userApiService,
+            tokenManager = tokenManager
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providesEditUserUseCase(
+        repository: UserRepository
+    ): EditUserUseCase {
+        return EditUserUseCase(repository)
     }
 }

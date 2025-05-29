@@ -1,7 +1,7 @@
 package com.itb.diabetify.domain.usecases.auth
 
 import com.itb.diabetify.data.remote.auth.request.GoogleLoginRequest
-import com.itb.diabetify.domain.model.GoogleLoginResult
+import com.itb.diabetify.domain.model.auth.GoogleLoginResult
 import com.itb.diabetify.domain.repository.AuthRepository
 
 class GoogleLoginUseCase (

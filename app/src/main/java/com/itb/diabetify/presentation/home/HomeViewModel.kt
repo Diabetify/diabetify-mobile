@@ -1,13 +1,61 @@
 package com.itb.diabetify.presentation.home
 
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
+import com.itb.diabetify.domain.usecases.user.GetUserUseCase
+import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val getUserUseCase: GetUserUseCase,
 ): ViewModel() {
+    private var _userState = mutableStateOf(DataState())
+    val userState: State<DataState> = _userState
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+
+    init {
+        loadUserData()
+    }
+
+    private fun loadUserData() {
+        viewModelScope.launch {
+            _userState.value = userState.value.copy(isLoading = true)
+
+            val getUserResult = getUserUseCase()
+
+            _userState.value = userState.value.copy(isLoading = false)
+
+            when (getUserResult.result) {
+                is Resource.Success -> {
+                    Log.d("HomeViewModel", "User data loaded successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = getUserResult.result.message ?: "Unknown error occurred"
+                    getUserResult.result.message?.let { Log.d("HomeViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("HomeViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("HomeViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
     val lowRiskColor = Color(0xFF8BC34A)    // Green
     val mediumRiskColor = Color(0xFFFFC107) // Yellow
     val highRiskColor = Color(0xFFFA821F)   // Orange

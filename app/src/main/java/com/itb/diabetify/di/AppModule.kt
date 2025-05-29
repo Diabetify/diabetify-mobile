@@ -2,8 +2,10 @@ package com.itb.diabetify.di
 
 import android.app.Application
 import android.content.Context
+import com.google.gson.Gson
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
+import com.itb.diabetify.data.manager.UserManagerImpl
 import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.interceptor.AuthInterceptor
 import com.itb.diabetify.data.remote.user.UserApiService
@@ -11,6 +13,7 @@ import com.itb.diabetify.data.repository.AuthRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
+import com.itb.diabetify.domain.manager.UserManager
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
@@ -24,6 +27,7 @@ import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
+import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -163,14 +167,39 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesGson(): Gson {
+        return Gson()
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserManager(
+        @ApplicationContext context: Context,
+        gson: Gson
+    ): UserManager {
+        return UserManagerImpl(context, gson)
+    }
+
+    @Provides
+    @Singleton
     fun providesUserRepository(
         userApiService: UserApiService,
-        tokenManager: TokenManager
+        tokenManager: TokenManager,
+        userManager: UserManager
     ): UserRepository {
         return UserRepositoryImpl(
             userApiService = userApiService,
-            tokenManager = tokenManager
+            tokenManager = tokenManager,
+            userManager = userManager
         )
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetUserUseCase(
+        repository: UserRepository
+    ): GetUserUseCase {
+        return GetUserUseCase(repository)
     }
 
     @Provides

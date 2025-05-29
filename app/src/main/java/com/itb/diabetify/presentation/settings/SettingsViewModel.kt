@@ -6,20 +6,27 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    private val userRepository: UserRepository,
     private val editUserUseCase: EditUserUseCase,
     private val logoutUseCase: LogoutUseCase
 ): ViewModel() {
+    private var _userState = mutableStateOf(DataState())
+    val state: State<DataState> = _userState
+
     private var _editProfileState = mutableStateOf(DataState())
     val editProfileState: State<DataState> = _editProfileState
 
@@ -31,6 +38,32 @@ class SettingsViewModel @Inject constructor(
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
+
+    init {
+        loadUserData()
+    }
+
+    private fun loadUserData() {
+        viewModelScope.launch {
+            _userState.value = state.value.copy(isLoading = true)
+
+            userRepository.getUser().onEach { user ->
+                user?.let {
+                    _nameState.value = nameState.value.copy(
+                        text = it.name ?: "",
+                        error = null
+                    )
+
+                    _emailState.value = emailState.value.copy(
+                        text = it.email ?: "",
+                        error = null
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+            _userState.value = state.value.copy(isLoading = false)
+        }
+    }
 
     private val _nameState = mutableStateOf(FieldState())
     val nameState: State<FieldState> = _nameState

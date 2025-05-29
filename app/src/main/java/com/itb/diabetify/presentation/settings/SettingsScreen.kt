@@ -173,7 +173,13 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Cards section
-                cards.forEach { cardData ->
+                getSettingsCards(
+                    onDataPribadiClick = {
+                        navController.navigate(Route.EditSurveyScreen.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                ).forEach { cardData ->
                     SettingsCard(cardData = cardData)
                     Spacer(modifier = Modifier.height(8.dp))
                 }

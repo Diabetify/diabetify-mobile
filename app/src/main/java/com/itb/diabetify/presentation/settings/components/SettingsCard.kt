@@ -77,7 +77,7 @@ fun SettingsCard(
             cardData.contents.forEachIndexed { index, content ->
                 ContentItem(
                     contentData = content,
-                    onClick = { }
+                    onClick = content.onClick
                 )
 
                 if (index < cardData.contents.size - 1) {

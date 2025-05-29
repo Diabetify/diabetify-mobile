@@ -127,12 +127,37 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _editProfileState.value = editProfileState.value.copy(isLoading = true)
 
+            val dob = dobState.value.text
+            val dobParts = dob.split("/")
+            val dobFormatted = "${dobParts[2]}-${dobParts[1]}-${dobParts[0]}"
+
+            val gender = genderState.value.text
+            val genderFormatted = if (gender == "Laki-laki") { "male" } else { "female" }
+
             val editUserResult = editUserUseCase(
                 name = nameState.value.text,
-                email = emailState.value.text
+                email = emailState.value.text,
+                dob = dobFormatted,
+                gender = genderFormatted
             )
 
             _editProfileState.value = editProfileState.value.copy(isLoading = false)
+
+            if (editUserResult.nameError != null) {
+                _nameState.value = nameState.value.copy(error = editUserResult.nameError)
+            }
+
+            if (editUserResult.emailError != null) {
+                _emailState.value = emailState.value.copy(error = editUserResult.emailError)
+            }
+
+            if (editUserResult.genderError != null) {
+                _genderState.value = genderState.value.copy(error = editUserResult.genderError)
+            }
+
+            if (editUserResult.dobError != null) {
+                _dobState.value = dobState.value.copy(error = editUserResult.dobError)
+            }
 
             when (editUserResult.result) {
                 is Resource.Success -> {

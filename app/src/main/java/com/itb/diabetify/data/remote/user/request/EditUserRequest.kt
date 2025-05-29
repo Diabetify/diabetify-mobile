@@ -6,5 +6,9 @@ data class EditUserRequest(
     @SerializedName("name")
     val name: String,
     @SerializedName("email")
-    val email: String?,
+    val email: String,
+    @SerializedName("gender")
+    val gender: String,
+    @SerializedName("dob")
+    val dob: String
 )

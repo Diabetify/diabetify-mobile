@@ -39,6 +39,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -112,57 +113,68 @@ fun EditProfileScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(15.dp))
-
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Profile image section
                     Box(
-                        modifier = Modifier.padding(bottom = 32.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(150.dp)
-                                .clip(CircleShape)
-                                .background(colorResource(id = R.color.primary).copy(alpha = 0.1f))
-                                .clickable { showImagePicker = true },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_background),
-                                contentDescription = "Profile Image",
+                        Box() {
+                            // Profile image section
+                            Box(
                                 modifier = Modifier
-                                    .size(140.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                                    .size(150.dp)
+                                    .clip(CircleShape)
+                                    .background(colorResource(id = R.color.primary).copy(alpha = 0.1f))
+                                    .clickable { showImagePicker = true },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                                    contentDescription = "Profile Image",
+                                    modifier = Modifier
+                                        .size(140.dp)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
 
-                        // Edit icon overlay
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .align(Alignment.BottomEnd)
-                                .offset(x = (-4).dp, y = (-4).dp)
-                                .clip(CircleShape)
-                                .background(colorResource(id = R.color.primary))
-                                .clickable { showImagePicker = true },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Edit Photo",
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            // Edit icon overlay
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .offset(x = (-4).dp, y = (-4).dp)
+                                    .clip(CircleShape)
+                                    .background(colorResource(id = R.color.primary))
+                                    .clickable { showImagePicker = true },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit Photo",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Label for name field
+                    Text(
+                        text = "Nama",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary),
+                        textAlign = TextAlign.Start
+                    )
 
                     // Name field
                     InputField(
@@ -176,7 +188,17 @@ fun EditProfileScreen(
                         errorMessage = nameState.error ?: ""
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Label for email field
+                    Text(
+                        text = "Email",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary),
+                        textAlign = TextAlign.Start
+                    )
 
                     // Email field
                     InputField(
@@ -190,10 +212,19 @@ fun EditProfileScreen(
                         errorMessage = emailState.error ?: ""
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Label for gender field
+                    Text(
+                        text = "Jenis Kelamin",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary),
+                        textAlign = TextAlign.Start
+                    )
 
                     val options = listOf("Laki-laki", "Perempuan")
-
                     // Gender dropdown
                     DropdownField(
                         selectedOption = genderState.text,
@@ -206,7 +237,17 @@ fun EditProfileScreen(
                         errorMessage = genderState.error ?: ""
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Label for birth date field
+                    Text(
+                        text = "Tanggal Lahir",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary),
+                        textAlign = TextAlign.Start
+                    )
 
                     // Birth date field
                     InputField(

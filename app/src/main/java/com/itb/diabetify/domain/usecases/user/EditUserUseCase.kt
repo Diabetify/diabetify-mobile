@@ -2,7 +2,6 @@ package com.itb.diabetify.domain.usecases.user
 
 import android.util.Patterns
 import com.itb.diabetify.data.remote.user.request.EditUserRequest
-import com.itb.diabetify.domain.model.auth.CreateAccountResult
 import com.itb.diabetify.domain.model.user.EditUserResult
 import com.itb.diabetify.domain.repository.UserRepository
 

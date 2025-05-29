@@ -87,6 +87,7 @@ class AuthRepositoryImpl(
     ): Resource<Unit> {
         return try {
             val response = authApiService.googleLogin(googleLoginRequest)
+            Log.d("AuthRepositoryImpl", "Google login response: ${response.data.toString()}")
             tokenManager.saveToken(response.data.toString())
             Resource.Success(Unit)
         } catch (e: IOException) {

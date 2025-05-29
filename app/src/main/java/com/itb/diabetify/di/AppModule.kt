@@ -6,16 +6,20 @@ import com.google.gson.Gson
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
 import com.itb.diabetify.data.manager.UserManagerImpl
+import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.interceptor.AuthInterceptor
 import com.itb.diabetify.data.remote.user.UserApiService
+import com.itb.diabetify.data.repository.ActivityRepositoryImpl
 import com.itb.diabetify.data.repository.AuthRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
+import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.repository.UserRepository
+import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
@@ -209,4 +213,36 @@ object AppModule {
     ): EditUserUseCase {
         return EditUserUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    fun providesActivityApiService(okHttpClient: OkHttpClient): ActivityApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ActivityApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesActivityRepository(
+        activityApiService: ActivityApiService,
+        tokenManager: TokenManager,
+    ): ActivityRepository {
+        return ActivityRepositoryImpl(
+            activityApiService = activityApiService,
+            tokenManager = tokenManager,
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providesAddActivityUseCase(
+        repository: ActivityRepository
+    ): AddActivityUseCase {
+        return AddActivityUseCase(repository)
+    }
+
 }

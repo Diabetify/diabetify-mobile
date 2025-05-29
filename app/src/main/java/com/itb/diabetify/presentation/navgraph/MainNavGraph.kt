@@ -35,6 +35,7 @@ import com.itb.diabetify.presentation.home.risk_detail.RiskDetailScreen
 import com.itb.diabetify.presentation.home.risk_factor_detail.RiskFactorDetailScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
+import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
 
 @Composable
 fun MainNavGraph(
@@ -156,6 +157,14 @@ fun MainNavGraph(
                     onLogout = {
                         shouldNavigateToLogin = true
                     }
+                )
+            }
+
+            composable(route = Route.EditProfileScreen.route) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                EditProfileScreen(
+                    navController = mainNavController,
+                    viewModel = settingsViewModel,
                 )
             }
         }

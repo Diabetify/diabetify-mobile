@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.presentation.settings.components.ConfirmationDialog
 import com.itb.diabetify.presentation.settings.components.ProfileCard
 import com.itb.diabetify.presentation.settings.components.SettingsCard
@@ -127,7 +128,11 @@ fun SettingsScreen(
                 ProfileCard(
                     name = "Bernardus",
                     email = "bernardus@gmail.com",
-                    onEditClick = { /* TODO */ }
+                    onEditClick = {
+                        navController.navigate(Route.EditProfileScreen.route) {
+                            launchSingleTop = true
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))

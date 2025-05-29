@@ -1,11 +1,13 @@
 package com.itb.diabetify.presentation.settings
 
 import android.util.Log
+import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
+import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,41 @@ class SettingsViewModel @Inject constructor(
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
+
+    private val _nameState = mutableStateOf(FieldState())
+    val nameState: State<FieldState> = _nameState
+
+    fun setName(value: String) {
+        _nameState.value = nameState.value.copy(error = null)
+        _nameState.value = nameState.value.copy(text = value)
+    }
+
+    private val _emailState = mutableStateOf(FieldState())
+    val emailState: State<FieldState> = _emailState
+
+    fun setEmail(value: String) {
+        _emailState.value = emailState.value.copy(error = null)
+        _emailState.value = emailState.value.copy(text = value)
+    }
+
+    fun validateEditProfileFields(): Boolean {
+        val name = nameState.value.text
+        val email = emailState.value.text
+
+        var isValid = true
+
+        if (name.isEmpty()) {
+            _nameState.value = nameState.value.copy(error = "Nama tidak boleh kosong")
+            isValid = false
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _emailState.value = emailState.value.copy(error = "Email tidak valid")
+            isValid = false
+        }
+
+        return isValid
+    }
 
     fun logout() {
         viewModelScope.launch {

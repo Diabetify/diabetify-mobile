@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
@@ -17,14 +18,19 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
+    private val getActivityTodayUseCase: GetActivityTodayUseCase
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
+
+    private var _activityTodayState = mutableStateOf(DataState())
+    val activityTodayState: State<DataState> = _activityTodayState
 
     private val _errorMessage = mutableStateOf<String?>(null)
 
     init {
         loadUserData()
+        loadActivityTodayData()
     }
 
     private fun loadUserData() {
@@ -42,6 +48,35 @@ class HomeViewModel @Inject constructor(
                 is Resource.Error -> {
                     _errorMessage.value = getUserResult.result.message ?: "Unknown error occurred"
                     getUserResult.result.message?.let { Log.d("HomeViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("HomeViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("HomeViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
+    private fun loadActivityTodayData() {
+        viewModelScope.launch {
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
+
+            val getActivityTodayResult = getActivityTodayUseCase()
+
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
+
+            when (getActivityTodayResult.result) {
+                is Resource.Success -> {
+                    Log.d("HomeViewModel", "Activity data loaded successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = getActivityTodayResult.result.message ?: "Unknown error occurred"
+                    getActivityTodayResult.result.message?.let { Log.d("HomeViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("HomeViewModel", "Loading")

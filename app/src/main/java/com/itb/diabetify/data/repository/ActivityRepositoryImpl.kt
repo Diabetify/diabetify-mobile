@@ -1,18 +1,22 @@
 package com.itb.diabetify.data.repository
 
+import android.annotation.SuppressLint
 import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.activity.request.AddActivityRequest
+import com.itb.diabetify.domain.manager.ActivityManager
 import com.itb.diabetify.domain.manager.TokenManager
+import com.itb.diabetify.domain.model.Activity
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.util.Resource
+import kotlinx.coroutines.flow.Flow
 import okio.IOException
 import retrofit2.HttpException
 
 class ActivityRepositoryImpl(
     private val activityApiService: ActivityApiService,
     private val tokenManager: TokenManager,
+    private val activityManager: ActivityManager
 ): ActivityRepository {
-
     override suspend fun getToken(): String? {
         return tokenManager.getToken()
     }
@@ -28,5 +32,44 @@ class ActivityRepositoryImpl(
         } catch (e: HttpException) {
             Resource.Error("${e.message}")
         }
+    }
+
+
+    @SuppressLint("NewApi")
+    override suspend fun fetchActivityToday(): Resource<Unit> {
+        return try {
+            val currentDate = java.time.LocalDate.now()
+            val startDate = currentDate.toString()
+            val response = activityApiService.getActivityByDate(startDate, startDate)
+            response.data?.let { activities ->
+                val smokingValue = if (activities.smoke.isEmpty()) {
+                    "0"
+                } else {
+                    activities.smoke[0].value.toString() ?: "0"
+                }
+
+                val workoutValue = if (activities.workout.isEmpty()) {
+                    "0"
+                } else {
+                    activities.workout[0].value.toString() ?: "0"
+                }
+
+                activityManager.saveActivity(
+                    Activity(
+                        smokingValue = smokingValue,
+                        workoutValue = workoutValue,
+                    )
+                )
+            }
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override fun getActivityToday(): Flow<Activity?> {
+        return activityManager.getActivityToday()
     }
 }

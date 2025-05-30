@@ -3,6 +3,7 @@ package com.itb.diabetify.di
 import android.app.Application
 import android.content.Context
 import com.google.gson.Gson
+import com.itb.diabetify.data.manager.ActivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
 import com.itb.diabetify.data.manager.UserManagerImpl
@@ -16,10 +17,12 @@ import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
+import com.itb.diabetify.domain.manager.ActivityManager
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
+import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
@@ -160,6 +163,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesGson(): Gson {
+        return Gson()
+    }
+
+    @Provides
+    @Singleton
     fun providesUserApiService(okHttpClient: OkHttpClient): UserApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -167,12 +176,6 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(UserApiService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGson(): Gson {
-        return Gson()
     }
 
     @Provides
@@ -227,13 +230,24 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesActivityManager(
+        @ApplicationContext context: Context,
+        gson: Gson
+    ): ActivityManager {
+        return ActivityManagerImpl(context, gson)
+    }
+
+    @Provides
+    @Singleton
     fun providesActivityRepository(
         activityApiService: ActivityApiService,
         tokenManager: TokenManager,
+        activityManager: ActivityManager
     ): ActivityRepository {
         return ActivityRepositoryImpl(
             activityApiService = activityApiService,
             tokenManager = tokenManager,
+            activityManager = activityManager
         )
     }
 
@@ -245,4 +259,11 @@ object AppModule {
         return AddActivityUseCase(repository)
     }
 
+    @Provides
+    @Singleton
+    fun providesGetActivityByDateUseCase(
+        repository: ActivityRepository
+    ): GetActivityTodayUseCase {
+        return GetActivityTodayUseCase(repository)
+    }
 }

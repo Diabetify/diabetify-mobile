@@ -51,13 +51,16 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun AddActionPopup(
     isVisible: Boolean,
     onDismissRequest: () -> Unit,
+    viewModel: AddActivityViewModel
 ) {
+    val smokeValueState = viewModel.smokeValueState.value
+    val workoutValueState = viewModel.workoutValueState.value
+
     val currentValues = mapOf(
         "weight" to "68.5",
         "height" to "175",
-        "cigarette" to "0",
-        "activity" to "0",
-
+        "cigarette" to smokeValueState.text,
+        "activity" to workoutValueState.text,
         "birth" to "no",
         "hypertension" to "yes"
     )
@@ -74,6 +77,12 @@ fun AddActionPopup(
             questionType = currentQuestionType,
             currentNumericValue = if (isNumericQuestion) currentValues[currentQuestionType] else null,
             currentSelectionValue = if (!isNumericQuestion) currentValues[currentQuestionType] else null,
+            onSaveResponse = { type, value ->
+                when (type) {
+                    "cigarette" -> viewModel.setSmokeValue(value)
+                    "activity" -> viewModel.setWorkoutValue(value)
+                }
+            }
         )
     }
 

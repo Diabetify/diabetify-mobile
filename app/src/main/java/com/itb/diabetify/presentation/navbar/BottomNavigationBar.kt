@@ -39,11 +39,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.navbar.add_activity.AddActionPopup
+import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
 
 @Composable
 fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     viewModel: NavigationViewModel,
+    addActivityViewModel: AddActivityViewModel,
     backgroundColor: Color = Color.White,
     selectedColor: Color = colorResource(id = R.color.primary),
     unselectedColor: Color = colorResource(id = R.color.tertiary),
@@ -61,6 +63,7 @@ fun BottomNavigationBar(
         AddActionPopup(
             isVisible = showPopup,
             onDismissRequest = { showPopup = false },
+            viewModel = addActivityViewModel
         )
     }
 

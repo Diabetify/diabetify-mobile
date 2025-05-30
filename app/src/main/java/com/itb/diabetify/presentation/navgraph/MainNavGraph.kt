@@ -37,6 +37,7 @@ import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
 import com.itb.diabetify.presentation.settings.edit_survey.EditSurveyScreen
+import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
 
 @Composable
 fun MainNavGraph(
@@ -44,6 +45,7 @@ fun MainNavGraph(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navigationViewModel: NavigationViewModel = hiltViewModel()
+    val addActivityViewModel: AddActivityViewModel = hiltViewModel()
     val mainNavController = rememberNavController()
 
     var shouldNavigateToLogin by rememberSaveable { mutableStateOf(false) }
@@ -101,6 +103,7 @@ fun MainNavGraph(
             BottomNavigationBar(
                 modifier = Modifier.fillMaxWidth(),
                 viewModel = navigationViewModel,
+                addActivityViewModel = addActivityViewModel,
                 onItemSelected = { route ->
                     mainNavController.navigate(route) {
                         popUpTo(mainNavController.graph.findStartDestination().id) {

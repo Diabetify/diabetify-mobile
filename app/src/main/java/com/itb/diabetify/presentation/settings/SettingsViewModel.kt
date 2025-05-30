@@ -25,7 +25,7 @@ class SettingsViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
-    val state: State<DataState> = _userState
+    val userState: State<DataState> = _userState
 
     private var _editProfileState = mutableStateOf(DataState())
     val editProfileState: State<DataState> = _editProfileState
@@ -45,7 +45,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun loadUserData() {
         viewModelScope.launch {
-            _userState.value = state.value.copy(isLoading = true)
+            _userState.value = userState.value.copy(isLoading = true)
 
             userRepository.getUser().onEach { user ->
                 user?.let {
@@ -68,7 +68,7 @@ class SettingsViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-            _userState.value = state.value.copy(isLoading = false)
+            _userState.value = userState.value.copy(isLoading = false)
         }
     }
 

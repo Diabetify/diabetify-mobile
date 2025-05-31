@@ -2,6 +2,7 @@ package com.itb.diabetify.data.repository
 
 import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.profile.ProfileApiService
+import com.itb.diabetify.data.remote.profile.request.UpdateProfileRequest
 import com.itb.diabetify.domain.manager.ProfileManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.model.Profile
@@ -18,6 +19,20 @@ class ProfileRepositoryImpl(
 ): ProfileRepository {
     override suspend fun getToken(): String? {
         return tokenManager.getToken()
+    }
+
+    override suspend fun updateProfile(
+        updateProfileRequest: UpdateProfileRequest
+    ): Resource<Unit> {
+        return try {
+            val response = profileApiService.updateProfile(updateProfileRequest)
+            fetchProfile()
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
     }
 
     override suspend fun fetchProfile(): Resource<Unit> {

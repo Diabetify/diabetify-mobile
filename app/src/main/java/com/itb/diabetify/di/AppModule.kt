@@ -45,6 +45,7 @@ import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
+import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
@@ -352,5 +353,13 @@ object AppModule {
         repository: ProfileRepository
     ): GetProfileUseCase {
         return GetProfileUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUpdateProfileUseCase(
+        repository: ProfileRepository
+    ): UpdateProfileUseCase {
+        return UpdateProfileUseCase(repository)
     }
 }

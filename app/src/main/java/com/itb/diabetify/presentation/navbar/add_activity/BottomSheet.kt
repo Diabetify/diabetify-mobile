@@ -135,7 +135,11 @@ fun BottomSheet(
                                         question = currentQuestion,
                                         currentValue = currentNumericValue,
                                         onSave = {
-                                            onSaveResponse(currentQuestion.id)
+                                            when (currentQuestion.id) {
+                                                "cigarette" -> viewModel.addActivity("smoke")
+                                                "activity" -> viewModel.addActivity("workout")
+                                                "weight", "height" -> viewModel.updateProfile(currentQuestion.id)
+                                            }
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel
@@ -144,7 +148,9 @@ fun BottomSheet(
                                         question = currentQuestion,
                                         currentValue = currentSelectionValue,
                                         onSave = {
-                                            onSaveResponse(currentQuestion.id)
+                                            when (currentQuestion.id) {
+                                                "birth", "hypertension" -> viewModel.updateProfile(currentQuestion.id)
+                                            }
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel

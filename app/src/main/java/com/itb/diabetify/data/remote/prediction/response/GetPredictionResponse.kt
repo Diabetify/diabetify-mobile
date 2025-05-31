@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class GetPredictionResponse (
     @SerializedName("data")
-    val data: List<PredictionData>,
+    val data: List<PredictionData?>,
     @SerializedName("message")
     val message: String,
     @SerializedName("status")

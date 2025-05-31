@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
+import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class AddActivityViewModel @Inject constructor(
     private val activityRepository: ActivityRepository,
     private val profileRepository: ProfileRepository,
-    private val addActivityUseCase: AddActivityUseCase
+    private val addActivityUseCase: AddActivityUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase
 ) : ViewModel() {
     private var _activityTodayState = mutableStateOf(DataState())
     val activityTodayState = _activityTodayState
@@ -34,6 +36,9 @@ class AddActivityViewModel @Inject constructor(
 
     private var _addActivityState = mutableStateOf(DataState())
     val addActivityState: State<DataState> = _addActivityState
+
+    private var _updateProfileState = mutableStateOf(DataState())
+    val updateProfileState: State<DataState> = _updateProfileState
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
@@ -173,6 +178,69 @@ class AddActivityViewModel @Inject constructor(
                 is Resource.Error -> {
                     _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
                     addActivityResult.result.message?.let { Log.d("AddActivityViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("AddActivityViewModel", "Loading")
+                }
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("AddActivityViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
+    fun updateProfile(type: String) {
+        viewModelScope.launch {
+            _updateProfileState.value = updateProfileState.value.copy(isLoading = true)
+
+            val weight = weightValueState.value.text
+            val height = heightValueState.value.text
+            val hypertension = hypertensionValueState.value.text.toBoolean()
+            val macrosomicBaby = birthValueState.value.text.toBoolean()
+
+            val updateProfileResult = when (type) {
+                "weight", "height", "hypertension", "birth" -> {
+                    updateProfileUseCase(
+                        weight = weight,
+                        height = height,
+                        hypertension = hypertension,
+                        macrosomicBaby = macrosomicBaby
+                    )
+                }
+                else -> {
+                    _errorMessage.value = "Invalid profile update type"
+                    Log.d("AddActivityViewModel", "Invalid profile update type")
+                    null
+                }
+            }
+
+            _updateProfileState.value = updateProfileState.value.copy(isLoading = false)
+
+            if (updateProfileResult?.weightError != null) {
+                _weightValueState.value = weightValueState.value.copy(error = updateProfileResult.weightError)
+            }
+
+            if (updateProfileResult?.heightError != null) {
+                _heightValueState.value = heightValueState.value.copy(error = updateProfileResult.heightError)
+            }
+
+            if (updateProfileResult?.hypertensionError != null) {
+                _hypertensionValueState.value = hypertensionValueState.value.copy(error = updateProfileResult.hypertensionError)
+            }
+
+            if (updateProfileResult?.macrosomicBabyError != null) {
+                _birthValueState.value = birthValueState.value.copy(error = updateProfileResult.macrosomicBabyError)
+            }
+
+            when (updateProfileResult?.result) {
+                is Resource.Success -> {
+                    Log.d("AddActivityViewModel", "Profile updated successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = updateProfileResult.result.message ?: "Unknown error occurred"
+                    updateProfileResult.result.message?.let { Log.d("AddActivityViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("AddActivityViewModel", "Loading")

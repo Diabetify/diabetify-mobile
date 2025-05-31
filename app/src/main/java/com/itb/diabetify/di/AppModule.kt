@@ -236,11 +236,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesActivityManager(
-        @ApplicationContext context: Context,
-        gson: Gson
-    ): ActivityManager {
-        return ActivityManagerImpl(context, gson)
+    fun providesActivityManager(): ActivityManager {
+        return ActivityManagerImpl()
     }
 
     @Provides
@@ -286,11 +283,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesPredictionManager(
-        @ApplicationContext context: Context,
-        gson: Gson
-    ): PredictionManager {
-        return PredictionManagerImpl(context, gson)
+    fun providesPredictionManager(): PredictionManager {
+        return PredictionManagerImpl()
     }
 
     @Provides

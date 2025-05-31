@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
+import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
-    private val getLatestPredictionUseCase: GetLatestPredictionUseCase
+    private val getLatestPredictionUseCase: GetLatestPredictionUseCase,
+    private val getProfileUseCase: GetProfileUseCase
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -31,12 +33,16 @@ class HomeViewModel @Inject constructor(
     private var _latestPredictionState = mutableStateOf(DataState())
     val latestPredictionState: State<DataState> = _latestPredictionState
 
+    private var _profileState = mutableStateOf(DataState())
+    val profileState: State<DataState> = _profileState
+
     private val _errorMessage = mutableStateOf<String?>(null)
 
     init {
         loadUserData()
         loadActivityTodayData()
 //        loadLatestPredictionData()
+        loadProfileData()
     }
 
     private fun loadUserData() {
@@ -121,6 +127,35 @@ class HomeViewModel @Inject constructor(
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("HomeViewModel", "Unexpected error loading latest prediction data")
+                }
+            }
+        }
+    }
+
+    private fun loadProfileData() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            val getProfileResult = getProfileUseCase()
+
+            _profileState.value = profileState.value.copy(isLoading = false)
+
+            when (getProfileResult.result) {
+                is Resource.Success -> {
+                    Log.d("HomeViewModel", "Profile data loaded successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = getProfileResult.result.message ?: "Unknown error occurred"
+                    getProfileResult.result.message?.let { Log.d("HomeViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("HomeViewModel", "Loading profile data")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("HomeViewModel", "Unexpected error loading profile data")
                 }
             }
         }

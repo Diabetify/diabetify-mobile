@@ -6,25 +6,30 @@ import com.google.gson.Gson
 import com.itb.diabetify.data.manager.ActivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.PredictionManagerImpl
+import com.itb.diabetify.data.manager.ProfileManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
 import com.itb.diabetify.data.manager.UserManagerImpl
 import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.interceptor.AuthInterceptor
 import com.itb.diabetify.data.remote.prediction.PredictionApiService
+import com.itb.diabetify.data.remote.profile.ProfileApiService
 import com.itb.diabetify.data.remote.user.UserApiService
 import com.itb.diabetify.data.repository.ActivityRepositoryImpl
 import com.itb.diabetify.data.repository.AuthRepositoryImpl
 import com.itb.diabetify.data.repository.PredictionRepositoryImpl
+import com.itb.diabetify.data.repository.ProfileRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
 import com.itb.diabetify.domain.manager.ActivityManager
 import com.itb.diabetify.domain.manager.PredictionManager
+import com.itb.diabetify.domain.manager.ProfileManager
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.AuthRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
+import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
@@ -39,6 +44,7 @@ import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
+import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
@@ -307,5 +313,44 @@ object AppModule {
         repository: PredictionRepository
     ): GetLatestPredictionUseCase {
         return GetLatestPredictionUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesProfileApiService(okHttpClient: OkHttpClient): ProfileApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ProfileApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesProfileManager(): ProfileManager {
+        return ProfileManagerImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun providesProfileRepository(
+        profileApiService: ProfileApiService,
+        tokenManager: TokenManager,
+        profileManager: ProfileManager
+    ): ProfileRepository {
+        return ProfileRepositoryImpl(
+            profileApiService = profileApiService,
+            tokenManager = tokenManager,
+            profileManager = profileManager
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetProfileUseCase(
+        repository: ProfileRepository
+    ): GetProfileUseCase {
+        return GetProfileUseCase(repository)
     }
 }

@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.history.HistoryScreen
+import com.itb.diabetify.presentation.history.HistoryViewModel
 import com.itb.diabetify.presentation.home.HomeScreen
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.navbar.BottomNavigationBar
@@ -146,7 +147,10 @@ fun MainNavGraph(
             }
 
             composable(route = Route.HistoryScreen.route) {
-                HistoryScreen()
+                val historyViewModel: HistoryViewModel = hiltViewModel()
+                HistoryScreen(
+                    viewModel = historyViewModel,
+                )
             }
 
             composable(route = Route.RecommendationScreen.route) {

@@ -12,11 +12,11 @@ interface ActivityApiService {
     @POST("activity")
     suspend fun addActivity(
         @Body addActivityRequest: AddActivityRequest
-    ) : ActivityResponse
+    ): ActivityResponse
 
     @GET("activity/me/date-range")
     suspend fun getActivityByDate(
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String
-    ) : GetActivityResponse
+    ): GetActivityResponse
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.history.components.HorizontalCalendar
 import com.itb.diabetify.presentation.history.components.LineGraph
@@ -32,10 +33,13 @@ import com.itb.diabetify.presentation.history.components.RiskFactorContribution
 import com.itb.diabetify.presentation.history.components.DailyInput
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @SuppressLint("NewApi")
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(
+    viewModel: HistoryViewModel
+) {
     val context = LocalContext.current
 
     Box(
@@ -81,9 +85,9 @@ fun HistoryScreen() {
             HorizontalCalendar(
                 modifier = Modifier,
                 onDateClickListener = { date ->
-                    Toast
-                        .makeText(context, date.toString(), Toast.LENGTH_SHORT)
-                        .show()
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    viewModel.setDate(date.format(formatter))
+                    Toast.makeText(context, "Selected date: ${date.format(formatter)}", Toast.LENGTH_SHORT).show()
                 },
             )
 
@@ -99,7 +103,11 @@ fun HistoryScreen() {
             // Daily Summary Section
             DailySummary(
                 summaryData = DailySummaryData(
-                    date = LocalDate.now(),
+                    date = if (viewModel.dateState.value.isNotEmpty()) {
+                        LocalDate.parse(viewModel.dateState.value)
+                    } else {
+                        LocalDate.now()
+                    },
                     riskPercentage = 65f,
                     riskFactorContributions = listOf(
                         RiskFactorContribution("BMI", 25f, true),

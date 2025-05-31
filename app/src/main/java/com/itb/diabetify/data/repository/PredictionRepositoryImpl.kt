@@ -7,7 +7,6 @@ import com.itb.diabetify.domain.model.Prediction
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import okio.IOException
 import retrofit2.HttpException
 
@@ -52,6 +51,20 @@ class PredictionRepositoryImpl (
                 )
             }
 
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun fetchPredictionScoreByDate(
+        startDate: String,
+        endDate: String
+    ): Resource<Unit> {
+        return try {
+            val response = predictionApiService.getPredictionScoreByDate(startDate, endDate)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

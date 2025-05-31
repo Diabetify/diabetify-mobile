@@ -44,6 +44,7 @@ import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
@@ -314,6 +315,14 @@ object AppModule {
         repository: PredictionRepository
     ): GetLatestPredictionUseCase {
         return GetLatestPredictionUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetPredictionScoreByDateUseCase(
+        repository: PredictionRepository
+    ): GetPredictionScoreByDateUseCase {
+        return GetPredictionScoreByDateUseCase(repository)
     }
 
     @Provides

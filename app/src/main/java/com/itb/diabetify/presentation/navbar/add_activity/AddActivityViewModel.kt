@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.ActivityRepository
+import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
@@ -22,10 +23,14 @@ import javax.inject.Inject
 @HiltViewModel
 class AddActivityViewModel @Inject constructor(
     private val activityRepository: ActivityRepository,
+    private val profileRepository: ProfileRepository,
     private val addActivityUseCase: AddActivityUseCase
 ) : ViewModel() {
     private var _activityTodayState = mutableStateOf(DataState())
     val activityTodayState = _activityTodayState
+
+    private var _profileState = mutableStateOf(DataState())
+    val profileState: State<DataState> = _profileState
 
     private var _addActivityState = mutableStateOf(DataState())
     val addActivityState: State<DataState> = _addActivityState
@@ -35,6 +40,7 @@ class AddActivityViewModel @Inject constructor(
 
     init {
         loadActivityTodayData()
+        loadProfileData()
     }
 
     private fun loadActivityTodayData() {
@@ -58,6 +64,35 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
+    private fun loadProfileData() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            profileRepository.getProfile().onEach { profile ->
+                _profileState.value = profileState.value.copy(isLoading = false)
+
+                profile?.let {
+                    _weightValueState.value = FieldState(
+                        text = it.weight.toString(),
+                        error = null
+                    )
+                    _heightValueState.value = FieldState(
+                        text = it.height.toString(),
+                        error = null
+                    )
+                    _birthValueState.value = FieldState(
+                        text = it.macrosomicBaby.toString(),
+                        error = null
+                    )
+                    _hypertensionValueState.value = FieldState(
+                        text = it.hypertension.toString(),
+                        error = null
+                    )
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
     private val _smokeValueState = mutableStateOf(FieldState())
     val smokeValueState: State<FieldState> = _smokeValueState
 
@@ -72,6 +107,38 @@ class AddActivityViewModel @Inject constructor(
     fun setWorkoutValue(value: String) {
         _workoutValueState.value = workoutValueState.value.copy(error = null)
         _workoutValueState.value = workoutValueState.value.copy(text = value)
+    }
+
+    private val _weightValueState = mutableStateOf(FieldState())
+    val weightValueState: State<FieldState> = _weightValueState
+
+    fun setWeightValue(value: String) {
+        _weightValueState.value = weightValueState.value.copy(error = null)
+        _weightValueState.value = weightValueState.value.copy(text = value)
+    }
+
+    private val _heightValueState = mutableStateOf(FieldState())
+    val heightValueState: State<FieldState> = _heightValueState
+
+    fun setHeightValue(value: String) {
+        _heightValueState.value = heightValueState.value.copy(error = null)
+        _heightValueState.value = heightValueState.value.copy(text = value)
+    }
+
+    private val _birthValueState = mutableStateOf(FieldState())
+    val birthValueState: State<FieldState> = _birthValueState
+
+    fun setBirthValue(value: String) {
+        _birthValueState.value = birthValueState.value.copy(error = null)
+        _birthValueState.value = birthValueState.value.copy(text = value)
+    }
+
+    private val _hypertensionValueState = mutableStateOf(FieldState())
+    val hypertensionValueState: State<FieldState> = _hypertensionValueState
+
+    fun setHypertensionValue(value: String) {
+        _hypertensionValueState.value = hypertensionValueState.value.copy(error = null)
+        _hypertensionValueState.value = hypertensionValueState.value.copy(text = value)
     }
 
     @SuppressLint("NewApi")

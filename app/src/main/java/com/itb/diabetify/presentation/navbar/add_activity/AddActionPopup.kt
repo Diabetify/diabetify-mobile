@@ -55,14 +55,18 @@ fun AddActionPopup(
 ) {
     val smokeValueState = viewModel.smokeValueState.value
     val workoutValueState = viewModel.workoutValueState.value
+    val weightValueState = viewModel.weightValueState.value
+    val heightValueState = viewModel.heightValueState.value
+    val birthValueState = viewModel.birthValueState.value
+    val hypertensionValueState = viewModel.hypertensionValueState.value
 
     val currentValues = mapOf(
-        "weight" to "68.5",
-        "height" to "175",
+        "weight" to weightValueState.text,
+        "height" to heightValueState.text,
         "cigarette" to smokeValueState.text,
         "activity" to workoutValueState.text,
-        "birth" to "no",
-        "hypertension" to "yes"
+        "birth" to birthValueState.text,
+        "hypertension" to hypertensionValueState.text
     )
 
     var showBottomSheet by remember { mutableStateOf(false) }

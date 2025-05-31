@@ -15,15 +15,15 @@ data class ProfileData(
     @SerializedName("hypertension")
     val hypertension: Boolean,
     @SerializedName("weight")
-    val weight: Double,
+    val weight: Int,
     @SerializedName("height")
-    val height: Double,
+    val height: Int,
     @SerializedName("bmi")
     val bmi: Double,
     @SerializedName("smoking")
     val smoking: Boolean,
     @SerializedName("year_of_smoking")
-    val yearOfSmoking: String,
+    val yearOfSmoking: Int,
     @SerializedName("macrosomic_baby")
     val macrosomicBaby: Boolean
 )

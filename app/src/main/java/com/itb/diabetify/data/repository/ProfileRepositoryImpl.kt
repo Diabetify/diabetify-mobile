@@ -31,7 +31,7 @@ class ProfileRepositoryImpl(
                         height = profile.height.toString(),
                         bmi = profile.bmi.toString(),
                         smoking = profile.smoking,
-                        yearOfSmoking = profile.yearOfSmoking,
+                        yearOfSmoking = profile.yearOfSmoking.toString(),
                         macrosomicBaby = profile.macrosomicBaby
                     )
                 )

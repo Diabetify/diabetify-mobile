@@ -146,7 +146,8 @@ fun BottomSheet(
                                         onSave = {
                                             onSaveResponse(currentQuestion.id)
                                             onDismissRequest()
-                                        }
+                                        },
+                                        viewModel = viewModel
                                     )
                                 }
                             }
@@ -187,6 +188,8 @@ fun NumericInput(
                         when (question.id) {
                             "cigarette" -> viewModel.setSmokeValue(newValue)
                             "activity" -> viewModel.setWorkoutValue(newValue)
+                            "weight" -> viewModel.setWeightValue(newValue)
+                            "height" -> viewModel.setHeightValue(newValue)
                         }
                     }
                 },
@@ -236,9 +239,17 @@ fun NumericInput(
 fun SelectionInput(
     question: DataInputQuestion,
     currentValue: String? = null,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    viewModel: AddActivityViewModel
 ) {
-    var selectedOption by remember { mutableStateOf(currentValue) }
+    // Convert the currentValue string to match our option IDs
+    val initialValue = when (currentValue?.lowercase()) {
+        "true" -> "yes"
+        "false" -> "no"
+        else -> currentValue
+    }
+    
+    var selectedOption by remember { mutableStateOf(initialValue) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -253,11 +264,23 @@ fun SelectionInput(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .clickable { selectedOption = option.id }
+                    .clickable { 
+                        selectedOption = option.id
+                        when (question.id) {
+                            "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
+                            "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                        }
+                    }
             ) {
                 RadioButton(
                     selected = selectedOption == option.id,
-                    onClick = { selectedOption = option.id },
+                    onClick = { 
+                        selectedOption = option.id
+                        when (question.id) {
+                            "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
+                            "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                        }
+                    },
                     colors = RadioButtonDefaults.colors(
                         selectedColor = colorResource(id = R.color.primary)
                     )

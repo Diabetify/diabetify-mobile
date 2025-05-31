@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
+import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
-    private val getActivityTodayUseCase: GetActivityTodayUseCase
+    private val getActivityTodayUseCase: GetActivityTodayUseCase,
+    private val getLatestPredictionUseCase: GetLatestPredictionUseCase
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -26,11 +28,15 @@ class HomeViewModel @Inject constructor(
     private var _activityTodayState = mutableStateOf(DataState())
     val activityTodayState: State<DataState> = _activityTodayState
 
+    private var _latestPredictionState = mutableStateOf(DataState())
+    val latestPredictionState: State<DataState> = _latestPredictionState
+
     private val _errorMessage = mutableStateOf<String?>(null)
 
     init {
         loadUserData()
         loadActivityTodayData()
+//        loadLatestPredictionData()
     }
 
     private fun loadUserData() {
@@ -86,6 +92,35 @@ class HomeViewModel @Inject constructor(
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("HomeViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
+    private fun loadLatestPredictionData() {
+        viewModelScope.launch {
+            _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
+
+            val getLatestPredictionResult = getLatestPredictionUseCase()
+
+            _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
+
+            when (getLatestPredictionResult.result) {
+                is Resource.Success -> {
+                    Log.d("HomeViewModel", "Latest prediction data loaded successfully")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = getLatestPredictionResult.result.message ?: "Unknown error occurred"
+                    getLatestPredictionResult.result.message?.let { Log.d("HomeViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("HomeViewModel", "Loading latest prediction data")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("HomeViewModel", "Unexpected error loading latest prediction data")
                 }
             }
         }

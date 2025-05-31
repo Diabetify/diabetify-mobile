@@ -5,21 +5,26 @@ import android.content.Context
 import com.google.gson.Gson
 import com.itb.diabetify.data.manager.ActivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
+import com.itb.diabetify.data.manager.PredictionManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
 import com.itb.diabetify.data.manager.UserManagerImpl
 import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.interceptor.AuthInterceptor
+import com.itb.diabetify.data.remote.prediction.PredictionApiService
 import com.itb.diabetify.data.remote.user.UserApiService
 import com.itb.diabetify.data.repository.ActivityRepositoryImpl
 import com.itb.diabetify.data.repository.AuthRepositoryImpl
+import com.itb.diabetify.data.repository.PredictionRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
 import com.itb.diabetify.domain.manager.ActivityManager
+import com.itb.diabetify.domain.manager.PredictionManager
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.AuthRepository
+import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
@@ -33,6 +38,7 @@ import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
+import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
@@ -265,5 +271,47 @@ object AppModule {
         repository: ActivityRepository
     ): GetActivityTodayUseCase {
         return GetActivityTodayUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPredictionApiService(okHttpClient: OkHttpClient): PredictionApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(PredictionApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPredictionManager(
+        @ApplicationContext context: Context,
+        gson: Gson
+    ): PredictionManager {
+        return PredictionManagerImpl(context, gson)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPredictionRepository(
+        predictionApiService: PredictionApiService,
+        tokenManager: TokenManager,
+        predictionManager: PredictionManager
+    ): PredictionRepository {
+        return PredictionRepositoryImpl(
+            predictionApiService = predictionApiService,
+            tokenManager = tokenManager,
+            predictionManager = predictionManager
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetLatestPredictionUseCase(
+        repository: PredictionRepository
+    ): GetLatestPredictionUseCase {
+        return GetLatestPredictionUseCase(repository)
     }
 }

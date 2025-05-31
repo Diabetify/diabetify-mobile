@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,6 +41,8 @@ import java.time.format.DateTimeFormatter
 fun HistoryScreen(
     viewModel: HistoryViewModel
 ) {
+    val predictionScores = viewModel.predictionScores.collectAsState(initial = emptyList())
+    val currentDate = LocalDate.now()
     val context = LocalContext.current
 
     Box(
@@ -92,12 +95,8 @@ fun HistoryScreen(
             )
 
             LineGraph(
-                currentDay = 15,
-                improvementData = listOf(
-                    10f, 12f, 11f, 14f, 16f, 15f, 18f, 20f, 19f, 22f,
-                    24f, 23f, 26f, 28f, 27f, 30f, 32f, 31f, 34f, 36f,
-                    35f, 38f, 40f, 39f, 42f, 44f, 43f, 46f, 48f, 47f
-                ),
+                currentDay = LocalDate.parse(viewModel.dateState.value).dayOfMonth,
+                predictionScores = predictionScores.value
             )
 
             // Daily Summary Section

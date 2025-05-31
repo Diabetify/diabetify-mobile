@@ -43,6 +43,24 @@ class AddActivityViewModel @Inject constructor(
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+    private val _smokeValueState = mutableStateOf(FieldState())
+    val smokeValueState: State<FieldState> = _smokeValueState
+
+    private val _workoutValueState = mutableStateOf(FieldState())
+    val workoutValueState: State<FieldState> = _workoutValueState
+
+    private val _weightValueState = mutableStateOf(FieldState())
+    val weightValueState: State<FieldState> = _weightValueState
+
+    private val _heightValueState = mutableStateOf(FieldState())
+    val heightValueState: State<FieldState> = _heightValueState
+
+    private val _birthValueState = mutableStateOf(FieldState())
+    val birthValueState: State<FieldState> = _birthValueState
+
+    private val _hypertensionValueState = mutableStateOf(FieldState())
+    val hypertensionValueState: State<FieldState> = _hypertensionValueState
+
     init {
         loadActivityTodayData()
         loadProfileData()
@@ -98,48 +116,30 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
-    private val _smokeValueState = mutableStateOf(FieldState())
-    val smokeValueState: State<FieldState> = _smokeValueState
-
     fun setSmokeValue(value: String) {
         _smokeValueState.value = smokeValueState.value.copy(error = null)
         _smokeValueState.value = smokeValueState.value.copy(text = value)
     }
-
-    private val _workoutValueState = mutableStateOf(FieldState())
-    val workoutValueState: State<FieldState> = _workoutValueState
 
     fun setWorkoutValue(value: String) {
         _workoutValueState.value = workoutValueState.value.copy(error = null)
         _workoutValueState.value = workoutValueState.value.copy(text = value)
     }
 
-    private val _weightValueState = mutableStateOf(FieldState())
-    val weightValueState: State<FieldState> = _weightValueState
-
     fun setWeightValue(value: String) {
         _weightValueState.value = weightValueState.value.copy(error = null)
         _weightValueState.value = weightValueState.value.copy(text = value)
     }
-
-    private val _heightValueState = mutableStateOf(FieldState())
-    val heightValueState: State<FieldState> = _heightValueState
 
     fun setHeightValue(value: String) {
         _heightValueState.value = heightValueState.value.copy(error = null)
         _heightValueState.value = heightValueState.value.copy(text = value)
     }
 
-    private val _birthValueState = mutableStateOf(FieldState())
-    val birthValueState: State<FieldState> = _birthValueState
-
     fun setBirthValue(value: String) {
         _birthValueState.value = birthValueState.value.copy(error = null)
         _birthValueState.value = birthValueState.value.copy(text = value)
     }
-
-    private val _hypertensionValueState = mutableStateOf(FieldState())
-    val hypertensionValueState: State<FieldState> = _hypertensionValueState
 
     fun setHypertensionValue(value: String) {
         _hypertensionValueState.value = hypertensionValueState.value.copy(error = null)

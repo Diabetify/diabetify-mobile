@@ -8,9 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
+import com.itb.diabetify.presentation.history.components.PredictionScoreEntry
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,7 +27,11 @@ class HistoryViewModel @Inject constructor(
     private var _predictionScoreState = mutableStateOf(DataState())
     val predictionScoreState: State<DataState> = _predictionScoreState
 
+    private val _predictionScores = MutableStateFlow<List<PredictionScoreEntry>>(emptyList())
+    val predictionScores: StateFlow<List<PredictionScoreEntry>> = _predictionScores
+
     private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
 
     private val _dateState = mutableStateOf(
         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -59,6 +66,15 @@ class HistoryViewModel @Inject constructor(
 
             when (getPredictionScoreByDateResult.result) {
                 is Resource.Success -> {
+                    val scores = getPredictionScoreByDateResult.result.data?.let { response ->
+                        response.data.mapIndexed { index, scoreData ->
+                            PredictionScoreEntry(
+                                day = index + 1,
+                                score = (scoreData?.riskScore?.toFloat() ?: 0f) * 100f
+                            )
+                        }
+                    } ?: emptyList()
+                    _predictionScores.value = scores
                     Log.d("HistoryViewModel", "Prediction scores loaded successfully for range: $startDate to $endDate")
                 }
                 is Resource.Error -> {

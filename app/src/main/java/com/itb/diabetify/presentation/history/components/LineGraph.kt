@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.mikephil.charting.charts.LineChart
@@ -20,16 +19,18 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import java.util.Calendar
-import java.util.Random
+
+data class PredictionScoreEntry(
+    val day: Int,
+    val score: Float
+)
 
 @Composable
 fun LineGraph(
     currentDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
-    improvementData: List<Float> = generateSampleData(),
+    predictionScores: List<PredictionScoreEntry> = emptyList(),
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -38,14 +39,14 @@ fun LineGraph(
         AndroidView(
             factory = { context ->
                 LineChart(context).apply {
-                    setupChart(this, improvementData, currentDay)
+                    setupChart(this, predictionScores, currentDay)
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp),
             update = { chart ->
-                setupChart(chart, improvementData, currentDay)
+                setupChart(chart, predictionScores, currentDay)
             }
         )
     }
@@ -53,35 +54,35 @@ fun LineGraph(
 
 private fun setupChart(
     chart: LineChart,
-    data: List<Float>,
+    data: List<PredictionScoreEntry>,
     currentDay: Int
 ) {
-    // Create entries for the chart
-    val entries = data.mapIndexed { index, value ->
-        Entry((index + 1).toFloat(), value)
+    val entries = data.map { entry ->
+        Entry(entry.day.toFloat(), entry.score)
     }
 
-    // Create dataset
-    val dataSet = LineDataSet(entries, "Improvement").apply {
+    val dataSet = LineDataSet(entries, "Risk Score").apply {
         color = Color(0xFF2196F3).toArgb()
         setCircleColor(Color(0xFF2196F3).toArgb())
         lineWidth = 2f
         circleRadius = 4f
         setDrawCircleHole(false)
-        valueTextSize = 0f // Hide value labels on points
+        valueTextSize = 0f
         setDrawFilled(true)
         fillColor = Color(0xFF2196F3).toArgb()
         fillAlpha = 30
     }
 
-    // Highlight current day
-    if (currentDay in 1..data.size) {
-        val currentDayEntry = Entry(currentDay.toFloat(), data[currentDay - 1])
+    val currentDayEntry = data.find { it.day == currentDay }?.let { entry ->
+        Entry(entry.day.toFloat(), entry.score)
+    }
+
+    if (currentDayEntry != null) {
         val highlightDataSet = LineDataSet(listOf(currentDayEntry), "Current Day").apply {
             color = Color(0xFFFF5722).toArgb()
             setCircleColor(Color(0xFFFF5722).toArgb())
             circleRadius = 8f
-            lineWidth = 0f // No line, just the point
+            lineWidth = 0f
             setDrawCircleHole(false)
             valueTextSize = 0f
         }
@@ -92,7 +93,6 @@ private fun setupChart(
         chart.data = LineData(dataSet)
     }
 
-    // Configure chart appearance
     chart.apply {
         description.isEnabled = false
         legend.isEnabled = false
@@ -102,13 +102,12 @@ private fun setupChart(
         setPinchZoom(false)
         setDrawGridBackground(false)
 
-        // Configure X-axis
         xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             setDrawGridLines(true)
             granularity = 1f
-            axisMinimum = 1f
-            axisMaximum = 30f
+            axisMinimum = if (data.isNotEmpty()) data.minOf { it.day }.toFloat() else 1f
+            axisMaximum = if (data.isNotEmpty()) data.maxOf { it.day }.toFloat() else 30f
             textSize = 12f
             textColor = Color.Gray.toArgb()
             valueFormatter = object : ValueFormatter() {
@@ -118,17 +117,16 @@ private fun setupChart(
             }
         }
 
-        // Configure Y-axis
         axisLeft.apply {
             setDrawGridLines(true)
             textSize = 12f
             textColor = Color.Gray.toArgb()
             axisMinimum = 0f
+            axisMaximum = 100f
         }
 
         axisRight.isEnabled = false
 
-        // Add selection listener for interaction
         setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
                 // Handle point selection if needed
@@ -142,18 +140,4 @@ private fun setupChart(
         // Refresh chart
         invalidate()
     }
-}
-
-private fun generateSampleData(): List<Float> {
-    val random = Random()
-    val data = mutableListOf<Float>()
-    var currentValue = 10f
-
-    repeat(30) {
-        // Simulate gradual improvement with some random variation
-        currentValue += random.nextFloat() * 2f + 0.5f
-        data.add(currentValue)
-    }
-
-    return data
 }

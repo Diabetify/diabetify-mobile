@@ -1,6 +1,7 @@
 package com.itb.diabetify.data.repository
 
 import com.itb.diabetify.data.remote.prediction.PredictionApiService
+import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
 import com.itb.diabetify.domain.manager.PredictionManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.model.Prediction
@@ -62,10 +63,10 @@ class PredictionRepositoryImpl (
     override suspend fun fetchPredictionScoreByDate(
         startDate: String,
         endDate: String
-    ): Resource<Unit> {
+    ): Resource<GetPredictionScoreResponse> {
         return try {
             val response = predictionApiService.getPredictionScoreByDate(startDate, endDate)
-            Resource.Success(Unit)
+            Resource.Success(response)
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {

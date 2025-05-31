@@ -26,6 +26,7 @@ class ActivityRepositoryImpl(
     ): Resource<Unit> {
         return try {
             val response = activityApiService.addActivity(addActivityRequest)
+            fetchActivityToday()
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

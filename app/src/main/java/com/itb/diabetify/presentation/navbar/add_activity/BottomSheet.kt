@@ -54,7 +54,8 @@ fun BottomSheet(
     questionType: String = "weight",
     currentNumericValue: String? = null,
     currentSelectionValue: String? = null,
-    onSaveResponse: (String, String) -> Unit = { _, _ -> }
+    onSaveResponse: (String) -> Unit = { _ -> },
+    viewModel: AddActivityViewModel
 ) {
     val surveyQuestions = questions
     val currentQuestion = surveyQuestions.find { it.id == questionType } ?: surveyQuestions.first()
@@ -133,16 +134,17 @@ fun BottomSheet(
                                     DataInputQuestionType.Numeric -> NumericInput(
                                         question = currentQuestion,
                                         currentValue = currentNumericValue,
-                                        onSave = { value ->
-                                            onSaveResponse(currentQuestion.id, value)
+                                        onSave = {
+                                            onSaveResponse(currentQuestion.id)
                                             onDismissRequest()
-                                        }
+                                        },
+                                        viewModel = viewModel
                                     )
                                     DataInputQuestionType.Selection -> SelectionInput(
                                         question = currentQuestion,
                                         currentValue = currentSelectionValue,
-                                        onSave = { value ->
-                                            onSaveResponse(currentQuestion.id, value)
+                                        onSave = {
+                                            onSaveResponse(currentQuestion.id)
                                             onDismissRequest()
                                         }
                                     )
@@ -160,7 +162,8 @@ fun BottomSheet(
 fun NumericInput(
     question: DataInputQuestion,
     currentValue: String? = null,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    viewModel: AddActivityViewModel
 ) {
     var inputValue by remember { mutableStateOf(currentValue ?: "") }
 
@@ -178,9 +181,13 @@ fun NumericInput(
         ) {
             OutlinedTextField(
                 value = inputValue,
-                onValueChange = {
-                    if (it.isEmpty() || it.all { char -> char.isDigit() || char == '.' }) {
-                        inputValue = it
+                onValueChange = { newValue ->
+                    if (newValue.isEmpty() || newValue.all { char -> char.isDigit() || char == '.' }) {
+                        inputValue = newValue
+                        when (question.id) {
+                            "cigarette" -> viewModel.setSmokeValue(newValue)
+                            "activity" -> viewModel.setWorkoutValue(newValue)
+                        }
                     }
                 },
                 textStyle = TextStyle(

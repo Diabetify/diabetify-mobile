@@ -77,12 +77,13 @@ fun AddActionPopup(
             questionType = currentQuestionType,
             currentNumericValue = if (isNumericQuestion) currentValues[currentQuestionType] else null,
             currentSelectionValue = if (!isNumericQuestion) currentValues[currentQuestionType] else null,
-            onSaveResponse = { type, value ->
+            onSaveResponse = { type ->
                 when (type) {
-                    "cigarette" -> viewModel.setSmokeValue(value)
-                    "activity" -> viewModel.setWorkoutValue(value)
+                    "cigarette" -> viewModel.addActivity("smoke")
+                    "activity" -> viewModel.addActivity("workout")
                 }
-            }
+            },
+            viewModel = viewModel
         )
     }
 

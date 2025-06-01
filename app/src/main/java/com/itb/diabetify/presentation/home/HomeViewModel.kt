@@ -45,12 +45,6 @@ class HomeViewModel @Inject constructor(
     private val _latestPredictionScoreState = mutableStateOf(String())
     val latestPredictionScoreState: State<String> = _latestPredictionScoreState
 
-    private val _latestAgeValueState = mutableStateOf(String())
-    val latestAgeValueState: State<String> = _latestAgeValueState
-
-    private val _latestAgeContributionState = mutableStateOf(String())
-    val latestAgeContributionState: State<String> = _latestAgeContributionState
-
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0f),
         RiskFactor("Hipertensi", "HTN", 0f),
@@ -60,6 +54,9 @@ class HomeViewModel @Inject constructor(
         RiskFactor("Indeks Merokok", "IM", 0f)
     ))
     val riskFactors: State<List<RiskFactor>> = _riskFactors
+
+    private val _bmiValueState = mutableStateOf(String())
+    val bmiValueState: State<String> = _bmiValueState
 
     private val _riskFactorDetails = mutableStateOf(listOf(
         RiskFactorDetails(
@@ -118,18 +115,7 @@ class HomeViewModel @Inject constructor(
         loadUserData()
         loadActivityTodayData()
         loadProfileData()
-        
-        viewModelScope.launch {
-            _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
-            
-            val result = predictionRepository.fetchLatestPrediction()
-            if (result is Resource.Success) {
-                collectLatestPrediction()
-            } else {
-                _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
-                _errorMessage.value = (result as? Resource.Error)?.message ?: "Unknown error occurred"
-            }
-        }
+        loadLatestPredictionData()
     }
 
     private fun loadUserData() {
@@ -201,6 +187,7 @@ class HomeViewModel @Inject constructor(
             when (getLatestPredictionResult.result) {
                 is Resource.Success -> {
                     Log.d("HomeViewModel", "Latest prediction data loaded successfully")
+                    collectLatestPrediction()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getLatestPredictionResult.result.message ?: "Unknown error occurred"
@@ -258,8 +245,7 @@ class HomeViewModel @Inject constructor(
 
                 prediction?.let { latestPrediction ->
                     _latestPredictionScoreState.value = latestPrediction.riskScore ?: "0.0"
-                    _latestAgeValueState.value = latestPrediction.age ?: "0"
-                    
+
                     _riskFactors.value = listOf(
                         RiskFactor("Indeks Massa Tubuh", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Hipertensi", "HTN", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),

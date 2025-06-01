@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -40,7 +42,7 @@ fun RiskFactorDetailScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    val sortedRiskFactorDetails = viewModel.riskFactorDetails
+    val sortedRiskFactorDetails = viewModel.riskFactorDetails.value
         .sortedByDescending { abs(it.impactPercentage) }
 
     Column(
@@ -81,14 +83,26 @@ fun RiskFactorDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
         ) {
-            SummarySection(viewModel.riskFactors)
+            if (viewModel.latestPredictionState.value.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(50.dp),
+                        color = colorResource(id = R.color.primary)
+                    )
+                }
+            } else {
+                SummarySection(viewModel.riskFactors.value)
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-            sortedRiskFactorDetails.forEach { factor ->
-                RiskFactorCard(
-                    riskFactor = factor,
-                )
+                sortedRiskFactorDetails.forEach { factor ->
+                    RiskFactorCard(
+                        riskFactor = factor,
+                    )
+                }
             }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -290,11 +291,18 @@ fun HomeScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        PieChart(
-                            riskFactors = viewModel.riskFactors,
-                            centerText = "Faktor\nRisiko",
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        if (viewModel.latestPredictionState.value.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(50.dp),
+                                color = colorResource(id = R.color.primary)
+                            )
+                        } else {
+                            PieChart(
+                                riskFactors = viewModel.riskFactors.value,
+                                centerText = "Faktor\nRisiko",
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
 
                         PrimaryButton(
                             text = "Lihat Detail",

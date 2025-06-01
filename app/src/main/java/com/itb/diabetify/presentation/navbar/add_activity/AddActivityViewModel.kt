@@ -43,6 +43,7 @@ class AddActivityViewModel @Inject constructor(
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+
     private val _smokeValueState = mutableStateOf(FieldState())
     val smokeValueState: State<FieldState> = _smokeValueState
 
@@ -62,11 +63,11 @@ class AddActivityViewModel @Inject constructor(
     val hypertensionValueState: State<FieldState> = _hypertensionValueState
 
     init {
-        loadActivityTodayData()
-        loadProfileData()
+        collectActivityTodayData()
+        collectProfileData()
     }
 
-    private fun loadActivityTodayData() {
+    private fun collectActivityTodayData() {
         viewModelScope.launch {
             _activityTodayState.value = DataState(isLoading = true)
 
@@ -87,7 +88,7 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
-    private fun loadProfileData() {
+    private fun collectProfileData() {
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 

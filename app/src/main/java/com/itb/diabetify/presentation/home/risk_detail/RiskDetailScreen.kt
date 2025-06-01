@@ -41,8 +41,8 @@ fun RiskDetailScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
-    val riskScore = 50
     val scrollState = rememberScrollState()
+    val score = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100)?.toInt() ?: 0
 
     Column(
         modifier = Modifier
@@ -83,7 +83,7 @@ fun RiskDetailScreen(
                 .padding(horizontal = 16.dp)
         ) {
             RiskScoreGauge(
-                score = riskScore,
+                score = score,
                 lowRiskColor = viewModel.lowRiskColor,
                 mediumRiskColor = viewModel.mediumRiskColor,
                 highRiskColor = viewModel.highRiskColor,
@@ -103,26 +103,30 @@ fun RiskDetailScreen(
             // Risk categories
             RiskCategory(
                 color = viewModel.lowRiskColor,
-                title = "0 - 0.3: Rendah",
-                description = "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                title = "0 - 30: Rendah",
+                description = "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score <= 30
             )
 
             RiskCategory(
                 color = viewModel.mediumRiskColor,
-                title = "0.3 - 0.5: Sedang",
-                description = "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                title = "30 - 50: Sedang",
+                description = "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score in 31..50
             )
 
             RiskCategory(
                 color = viewModel.highRiskColor,
-                title = "0.5 - 0.65: Tinggi",
-                description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                title = "50 - 65: Tinggi",
+                description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score in 51..65
             )
 
             RiskCategory(
                 color = viewModel.veryHighRiskColor,
-                title = "0.65 - 1: Sangat Tinggi",
-                description = "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                title = "65 - 100: Sangat Tinggi",
+                description = "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score > 65
             )
         }
     }

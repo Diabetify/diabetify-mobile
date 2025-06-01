@@ -19,9 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
@@ -228,7 +226,8 @@ fun HomeScreen(
             ) {
                 HomeCard(
                     title = "Persentase Resiko",
-                    hasWarning = true
+                    hasWarning = true,
+                    riskPercentage = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100) ?: 0f
                 ) {
                     Column(
                         modifier = Modifier
@@ -236,16 +235,33 @@ fun HomeScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(8.dp))
-
                         RiskIndicator(
-                            percentage = 63
+                            percentage = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100)?.toInt() ?: 0,
                         )
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         RiskCategory(
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            color = viewModel.highRiskColor,
-                            description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            modifier = Modifier.padding(vertical = 5.dp),
+                            color = when {
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 30 -> viewModel.lowRiskColor
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 50 -> viewModel.mediumRiskColor
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 65 -> viewModel.highRiskColor
+                                else -> viewModel.veryHighRiskColor
+                            },
+                            description = when {
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 30 -> "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 50 -> "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
+                                    ?.times(100)?.toInt() ?: 0) <= 65 -> "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                else -> "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            },
+                            isHighlighted = true
                         )
 
                         PrimaryButton(

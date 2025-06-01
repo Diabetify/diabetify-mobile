@@ -25,12 +25,18 @@ fun RiskCategory(
     modifier: Modifier = Modifier,
     color: Color,
     title: String? = null,
-    description: String
+    description: String,
+    isHighlighted: Boolean = false
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .background(
+                color = if (isHighlighted) color.copy(alpha = 0.1f) else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(8.dp)
             .then(modifier),
         verticalAlignment = Alignment.Top
     ) {

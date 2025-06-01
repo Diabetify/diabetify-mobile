@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun RiskIndicator(
@@ -27,9 +28,7 @@ fun RiskIndicator(
     strokeWidth: Dp = 16.dp,
     animationDuration: Int = 1000,
     backgroundColor: Color = Color(0xFFE0E0E0),
-    percentageColor: Color = Color(0xFFEA5555),
-    textColor: Color = Color.Black,
-    labelColor: Color = Color(0xFFEA5555)
+    textColor: Color = Color.Black
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
     val currentPercentage by animateFloatAsState(
@@ -62,6 +61,13 @@ fun RiskIndicator(
                 topLeft = Offset(strokeWidthPx / 2, strokeWidthPx / 2)
             )
 
+            val percentageColor = when {
+                currentPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
+                currentPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
+                currentPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                else -> Color(0xFFF44336) // Very high risk - Red
+            }
+
             drawArc(
                 color = percentageColor,
                 startAngle = -90f,
@@ -82,14 +88,32 @@ fun RiskIndicator(
                 text = "${currentPercentage.toInt()}%",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = poppinsFontFamily,
                 color = textColor,
                 textAlign = TextAlign.Center
             )
 
+            val riskLevel = when {
+                currentPercentage <= 30f -> "Rendah"
+                currentPercentage <= 50f -> "Sedang"
+                currentPercentage <= 65f -> "Tinggi"
+                else -> "Sangat\nTinggi"
+            }
+
+            val riskColor = when {
+                currentPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
+                currentPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
+                currentPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                else -> Color(0xFFF44336) // Very high risk - Red
+            }
+
             Text(
-                text = "High Risk",
+                text = riskLevel,
                 fontSize = 14.sp,
-                color = labelColor,
+                color = riskColor,
+                lineHeight = 18.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = poppinsFontFamily,
                 textAlign = TextAlign.Center,
             )
         }

@@ -33,6 +33,7 @@ class HistoryViewModel @Inject constructor(
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+
     private val _dateState = mutableStateOf(
         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     )

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
@@ -14,6 +15,7 @@ import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +24,8 @@ class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
     private val getLatestPredictionUseCase: GetLatestPredictionUseCase,
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    private val predictionRepository: PredictionRepository
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -38,11 +41,17 @@ class HomeViewModel @Inject constructor(
 
     private val _errorMessage = mutableStateOf<String?>(null)
 
+
+    private val _latestPredictionScoreState = mutableStateOf(String())
+    val latestPredictionScoreState: State<String> = _latestPredictionScoreState
+
     init {
         loadUserData()
         loadActivityTodayData()
-//        loadLatestPredictionData()
+        loadLatestPredictionData()
         loadProfileData()
+
+        collectLatestPrediction()
     }
 
     private fun loadUserData() {
@@ -156,6 +165,21 @@ class HomeViewModel @Inject constructor(
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("HomeViewModel", "Unexpected error loading profile data")
+                }
+            }
+        }
+    }
+
+
+    private fun collectLatestPrediction() {
+        viewModelScope.launch {
+            _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
+            
+            predictionRepository.getLatestPrediction().collect { prediction ->
+                _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
+
+                prediction?.let { latestPrediction ->
+                    _latestPredictionScoreState.value = latestPrediction.riskScore ?: "0.0"
                 }
             }
         }

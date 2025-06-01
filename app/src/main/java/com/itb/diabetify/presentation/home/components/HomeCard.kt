@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -35,6 +34,7 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun HomeCard(
     title: String,
     hasWarning: Boolean = false,
+    riskPercentage: Float? = null,
     content: @Composable () -> Unit
 ) {
     Card(
@@ -74,31 +74,25 @@ fun HomeCard(
                         color = Color.White
                     )
 
-                    if (hasWarning) {
+                    if (hasWarning && riskPercentage != null && riskPercentage > 30f) {
+                        val warningColor = when {
+                            riskPercentage <= 50f -> Color(0xFFFFC107)
+                            riskPercentage <= 65f -> Color(0xFFFA821F)
+                            else -> Color(0xFFF44336)
+                        }
+
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color.White.copy(alpha = 0.2f))
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(warningColor.copy(alpha = 0.2f))
+                                .padding(4.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Warning,
-                                    contentDescription = "Warning",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Tinggi",
-                                    fontFamily = poppinsFontFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 12.sp,
-                                    color = Color.White
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Outlined.Warning,
+                                contentDescription = "Warning",
+                                tint = warningColor,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
                     }
                 }

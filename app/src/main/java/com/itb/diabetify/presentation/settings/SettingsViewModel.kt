@@ -39,11 +39,24 @@ class SettingsViewModel @Inject constructor(
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+
+    private val _nameState = mutableStateOf(FieldState())
+    val nameState: State<FieldState> = _nameState
+
+    private val _emailState = mutableStateOf(FieldState())
+    val emailState: State<FieldState> = _emailState
+
+    private val _genderState = mutableStateOf(FieldState())
+    val genderState: State<FieldState> = _genderState
+
+    private val _dobState = mutableStateOf(FieldState())
+    val dobState: State<FieldState> = _dobState
+
     init {
-        loadUserData()
+        collectUserData()
     }
 
-    private fun loadUserData() {
+    private fun collectUserData() {
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
 
@@ -72,32 +85,20 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private val _nameState = mutableStateOf(FieldState())
-    val nameState: State<FieldState> = _nameState
-
     fun setName(value: String) {
         _nameState.value = nameState.value.copy(error = null)
         _nameState.value = nameState.value.copy(text = value)
     }
-
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
 
     fun setEmail(value: String) {
         _emailState.value = emailState.value.copy(error = null)
         _emailState.value = emailState.value.copy(text = value)
     }
 
-    private val _genderState = mutableStateOf(FieldState())
-    val genderState: State<FieldState> = _genderState
-
     fun setGender(value: String) {
         _genderState.value = genderState.value.copy(error = null)
         _genderState.value = genderState.value.copy(text = value)
     }
-
-    private val _dobState = mutableStateOf(FieldState())
-    val dobState: State<FieldState> = _dobState
 
     fun setDob(value: String) {
         _dobState.value = dobState.value.copy(error = null)

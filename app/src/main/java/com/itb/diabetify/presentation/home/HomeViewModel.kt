@@ -6,16 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
+import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
-import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +25,9 @@ class HomeViewModel @Inject constructor(
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
     private val getLatestPredictionUseCase: GetLatestPredictionUseCase,
     private val getProfileUseCase: GetProfileUseCase,
-    private val predictionRepository: PredictionRepository
+    private val predictionRepository: PredictionRepository,
+    private val profileRepository: ProfileRepository,
+    private val activityRepository: ActivityRepository
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -54,9 +56,6 @@ class HomeViewModel @Inject constructor(
         RiskFactor("Indeks Merokok", "IM", 0f)
     ))
     val riskFactors: State<List<RiskFactor>> = _riskFactors
-
-    private val _bmiValueState = mutableStateOf(String())
-    val bmiValueState: State<String> = _bmiValueState
 
     private val _riskFactorDetails = mutableStateOf(listOf(
         RiskFactorDetails(
@@ -111,11 +110,32 @@ class HomeViewModel @Inject constructor(
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
 
+    private val _bmiValueState = mutableStateOf(String())
+    val bmiValueState: State<String> = _bmiValueState
+
+    private val _weightValueState = mutableStateOf(String())
+    val weightValueState: State<String> = _weightValueState
+
+    private val _heightValueState = mutableStateOf(String())
+    val heightValueState: State<String> = _heightValueState
+
+    private val _isHypertensionState = mutableStateOf(String())
+    val isHypertensionState: State<String> = _isHypertensionState
+
+    private val _isMacrosomicBabyState = mutableStateOf(String())
+    val isMacrosomicBabyState: State<String> = _isMacrosomicBabyState
+
+    private val _smokeValueState = mutableStateOf(String())
+    val smokeValueState: State<String> = _smokeValueState
+
+    private val _physicalActivityValueState = mutableStateOf(String())
+    val physicalActivityValueState: State<String> = _physicalActivityValueState
+
     init {
         loadUserData()
+        loadLatestPredictionData()
         loadActivityTodayData()
         loadProfileData()
-        loadLatestPredictionData()
     }
 
     private fun loadUserData() {
@@ -133,35 +153,6 @@ class HomeViewModel @Inject constructor(
                 is Resource.Error -> {
                     _errorMessage.value = getUserResult.result.message ?: "Unknown error occurred"
                     getUserResult.result.message?.let { Log.d("HomeViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("HomeViewModel", "Loading")
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HomeViewModel", "Unexpected error")
-                }
-            }
-        }
-    }
-
-    private fun loadActivityTodayData() {
-        viewModelScope.launch {
-            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
-
-            val getActivityTodayResult = getActivityTodayUseCase()
-
-            _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
-
-            when (getActivityTodayResult.result) {
-                is Resource.Success -> {
-                    Log.d("HomeViewModel", "Activity data loaded successfully")
-                }
-                is Resource.Error -> {
-                    _errorMessage.value = getActivityTodayResult.result.message ?: "Unknown error occurred"
-                    getActivityTodayResult.result.message?.let { Log.d("HomeViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("HomeViewModel", "Loading")
@@ -206,6 +197,36 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun loadActivityTodayData() {
+        viewModelScope.launch {
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
+
+            val getActivityTodayResult = getActivityTodayUseCase()
+
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
+
+            when (getActivityTodayResult.result) {
+                is Resource.Success -> {
+                    Log.d("HomeViewModel", "Activity data loaded successfully")
+                    collectActivityToday()
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = getActivityTodayResult.result.message ?: "Unknown error occurred"
+                    getActivityTodayResult.result.message?.let { Log.d("HomeViewModel", it) }
+                }
+                is Resource.Loading -> {
+                    Log.d("HomeViewModel", "Loading")
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.d("HomeViewModel", "Unexpected error")
+                }
+            }
+        }
+    }
+
     private fun loadProfileData() {
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
@@ -217,6 +238,7 @@ class HomeViewModel @Inject constructor(
             when (getProfileResult.result) {
                 is Resource.Success -> {
                     Log.d("HomeViewModel", "Profile data loaded successfully")
+                    collectProfile()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getProfileResult.result.message ?: "Unknown error occurred"
@@ -306,6 +328,39 @@ class HomeViewModel @Inject constructor(
                             currentValue = "${latestPrediction.brinkmanScore ?: "0"} batang per hari"
                         )
                     )
+                }
+            }
+        }
+    }
+
+    private fun collectProfile() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            profileRepository.getProfile().collect { profile ->
+                _profileState.value = profileState.value.copy(isLoading = false)
+
+                profile?.let { userProfile ->
+                    _bmiValueState.value = userProfile.bmi ?: "0.0"
+                    _weightValueState.value = userProfile.weight ?: "0"
+                    _heightValueState.value = userProfile.height ?: "0"
+                    _isHypertensionState.value = userProfile.hypertension.toString() ?: "false"
+                    _isMacrosomicBabyState.value = userProfile.macrosomicBaby.toString() ?: "false"
+                }
+            }
+        }
+    }
+
+    private fun collectActivityToday() {
+        viewModelScope.launch {
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
+
+            activityRepository.getActivityToday().collect { activity ->
+                _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
+
+                activity?.let { todayActivity ->
+                    _smokeValueState.value = todayActivity.smokingValue ?: "0"
+                    _physicalActivityValueState.value = todayActivity.workoutValue ?: "0"
                 }
             }
         }

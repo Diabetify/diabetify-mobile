@@ -55,11 +55,13 @@ import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
-import com.itb.diabetify.presentation.home.components.formatHipertensi
-import com.itb.diabetify.presentation.home.components.formatRiwayatKehamilan
+import com.itb.diabetify.presentation.home.components.formatHypertension
+import com.itb.diabetify.presentation.home.components.formatMacrosomicBaby
 import com.itb.diabetify.presentation.home.components.getActivityLevelColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
+import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
+import com.itb.diabetify.presentation.home.components.getSmokingTextColor
 import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
@@ -438,11 +440,10 @@ fun HomeScreen(
                     containerColor = colorResource(id = R.color.white)
                 )
             ) {
-                val heightInMeters = 165 / 100.0
-                val bmiValue = 70 / (heightInMeters * heightInMeters)
-                val bmi = String.format("%.1f", bmiValue)
-                val bmiCategory = getBmiCategory(bmi.toDouble())
-                val bmiColor = getBmiCategoryColor(bmi.toDouble())
+                val bmi = viewModel.bmiValueState.value
+                val bmiValue = bmi.toDoubleOrNull() ?: 0.0
+                val bmiCategory = getBmiCategory(bmiValue)
+                val bmiColor = getBmiCategoryColor(bmiValue)
 
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -471,7 +472,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = bmi,
+                            text = String.format("%.1f", bmiValue),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp,
@@ -562,7 +563,7 @@ fun HomeScreen(
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Berat",
-                    value = "70",
+                    value = viewModel.weightValueState.value,
                     unit = "kg",
                     changeIndicator = "+0.5",
                     trend = "up"
@@ -571,7 +572,7 @@ fun HomeScreen(
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Tinggi",
-                    value = "165",
+                    value = viewModel.heightValueState.value,
                     unit = "cm",
                     changeIndicator = "0",
                     trend = "stable"
@@ -629,10 +630,10 @@ fun HomeScreen(
                             )
                         }
 
-                        val hipertensi = "ya"
+                        val isHypertension = viewModel.isHypertensionState.value
                         Text(
-                            text = formatHipertensi(hipertensi),
-                            color = if (hipertensi != "tidak") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                            text = formatHypertension(isHypertension),
+                            color = if (isHypertension != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
@@ -670,8 +671,9 @@ fun HomeScreen(
                             )
                         }
 
+                        val isMacrosomicBaby = viewModel.isMacrosomicBabyState.value
                         Text(
-                            text = formatRiwayatKehamilan("tidak"),
+                            text = formatMacrosomicBaby(isMacrosomicBaby),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
@@ -724,17 +726,17 @@ fun HomeScreen(
                             )
                         }
 
-                        val jumlahRokok = 2
+                        val smokingValue = viewModel.smokeValueState.value
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFFEF2F2)
+                                containerColor = getSmokingBackgroundColor(smokingValue.toIntOrNull() ?: 0)
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.padding(start = 8.dp)
                         ) {
                             Text(
-                                text = "${jumlahRokok} batang",
-                                color = Color(0xFFDC2626),
+                                text = "$smokingValue batang",
+                                color = getSmokingTextColor(smokingValue.toIntOrNull() ?: 0),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -750,6 +752,7 @@ fun HomeScreen(
                         color = Color(0xFFE5E7EB)
                     )
 
+                    val workoutValue = viewModel.physicalActivityValueState.value
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -767,11 +770,11 @@ fun HomeScreen(
                             )
 
                             Text(
-                                text = "45 menit",
+                                text = workoutValue,
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp,
-                                color = getActivityLevelColor(45),
+                                color = getActivityLevelColor(workoutValue.toIntOrNull() ?: 0),
                             )
                         }
 
@@ -787,7 +790,7 @@ fun HomeScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth(0.45f)
+                                    .fillMaxWidth(workoutValue.toIntOrNull()?.div(100f) ?: 0f)
                                     .height(8.dp)
                                     .clip(RoundedCornerShape(4.dp))
                                     .background(getActivityLevelColor(45))

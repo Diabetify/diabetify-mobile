@@ -4,19 +4,18 @@ import androidx.compose.ui.graphics.Color
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import kotlin.math.abs
 
-fun formatRiwayatKehamilan(status: String): String {
+fun formatMacrosomicBaby(status: String): String {
     return when(status) {
-        "ya" -> "Ya"
-        "tidak" -> "Tidak"
-        "sedang" -> "Sedang Hamil"
+        "true" -> "Ya"
+        "false" -> "Tidak"
         else -> status
     }
 }
 
-fun formatHipertensi(status: String): String {
+fun formatHypertension(status: String): String {
     return when(status) {
-        "ya" -> "Ya"
-        "tidak" -> "Tidak"
+        "true" -> "Ya"
+        "false" -> "Tidak"
         else -> status
     }
 }
@@ -145,5 +144,23 @@ fun calculateProgress(riskFactor: RiskFactorDetails): Float {
 
             return (ratio * 100f).coerceIn(0f, 100f)
         }
+    }
+}
+
+fun getSmokingBackgroundColor(smokingValue: Int): Color {
+    return when {
+        smokingValue == 0 -> Color(0xFFF0FDF4)
+        smokingValue < 5 -> Color(0xFFFEF3C7)
+        smokingValue < 10 -> Color(0xFFFEE2E2)
+        else -> Color(0xFFFEF2F2)
+    }
+}
+
+fun getSmokingTextColor(smokingValue: Int): Color {
+    return when {
+        smokingValue == 0 -> Color(0xFF059669)
+        smokingValue < 5 -> Color(0xFFD97706)
+        smokingValue < 10 -> Color(0xFFEF4444)
+        else -> Color(0xFFDC2626)
     }
 }

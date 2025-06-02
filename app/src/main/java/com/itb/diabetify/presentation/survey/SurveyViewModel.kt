@@ -1,23 +1,31 @@
 package com.itb.diabetify.presentation.survey
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
-    private val addProfileUseCase: AddProfileUseCase
+    private val addProfileUseCase: AddProfileUseCase,
+    private val addActivityUseCase: AddActivityUseCase
 ) : ViewModel() {
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
+
+    private var _activityState = mutableStateOf(DataState())
+    val activityState: State<DataState> = _activityState
 
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
@@ -89,22 +97,99 @@ class SurveyViewModel @Inject constructor(
 
             when (addProfileResult.result) {
                 is Resource.Success -> {
-                    Log.d("SurveyViewModel", "Survey submission successful")
-                    _navigationEvent.value = "SUCCESS_SCREEN"
+                    Log.d("SurveyViewModel", "Profile submission successful, proceeding with activity submission")
+                    submitSmokingValue()
                 }
                 is Resource.Error -> {
-                    Log.d("SurveyViewModel", "Survey submission error: ${addProfileResult.result.message}")
-                    showSnackbar(addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan survei")
+                    Log.d("SurveyViewModel", "Profile submission error: ${addProfileResult.result.message}")
+                    showSnackbar(addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan profil")
                     _errorMessage.value = addProfileResult.result.message ?: "Unknown error occurred"
-                    addProfileResult.result.message?.let { Log.d("SurveyViewModel", it) }
                 }
                 is Resource.Loading -> {
-                    Log.d("SurveyViewModel", "Loading")
+                    Log.d("SurveyViewModel", "Profile submission loading")
                 }
                 else -> {
                     // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error state")
-                    showSnackbar("Terjadi kesalahan saat mengirimkan survei")
+                    Log.e("SurveyViewModel", "Unexpected error in profile submission")
+                    showSnackbar("Terjadi kesalahan saat mengirimkan profil")
+                    _errorMessage.value = "Unknown error occurred"
+                }
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun submitSmokingValue() {
+        viewModelScope.launch {
+            _activityState.value = activityState.value.copy(isLoading = true)
+
+            val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
+            val smokingAmount = _state.value.answers["smoking_amount"]?.toIntOrNull() ?: 0
+
+            val addActivityResult = addActivityUseCase(
+                activityDate = activityDate,
+                activityType = "smoke",
+                value = smokingAmount,
+            )
+
+            _activityState.value = activityState.value.copy(isLoading = false)
+
+            when (addActivityResult.result) {
+                is Resource.Success -> {
+                    Log.d("SurveyViewModel", "Smoking Activity submission successful")
+                    submitWorkoutValue()
+                }
+                is Resource.Error -> {
+                    Log.d("SurveyViewModel", "Smoking Activity submission error: ${addActivityResult.result.message}")
+                    showSnackbar(addActivityResult.result.message ?: "Terjadi kesalahan saat mengirimkan aktivitas")
+                    _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
+                }
+                is Resource.Loading -> {
+                    Log.d("SurveyViewModel", "Smoking Activity submission loading")
+                }
+                else -> {
+                    // Handle unexpected error
+                    Log.e("SurveyViewModel", "Unexpected error in activity submission")
+                    showSnackbar("Terjadi kesalahan saat mengirimkan aktivitas")
+                    _errorMessage.value = "Unknown error occurred"
+                }
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun submitWorkoutValue() {
+        viewModelScope.launch {
+            _activityState.value = activityState.value.copy(isLoading = true)
+
+            val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
+            val activityAmount = _state.value.answers["activity"]?.toIntOrNull() ?: 0
+
+            val addActivityResult = addActivityUseCase(
+                activityDate = activityDate,
+                activityType = "workout",
+                value = activityAmount,
+            )
+
+            _activityState.value = activityState.value.copy(isLoading = false)
+
+            when (addActivityResult.result) {
+                is Resource.Success -> {
+                    Log.d("SurveyViewModel", "Workout Activity submission successful")
+                    _navigationEvent.value = "SUCCESS_SCREEN"
+                }
+                is Resource.Error -> {
+                    Log.d("SurveyViewModel", "Workout Activity submission error: ${addActivityResult.result.message}")
+                    showSnackbar(addActivityResult.result.message ?: "Terjadi kesalahan saat mengirimkan aktivitas")
+                    _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
+                }
+                is Resource.Loading -> {
+                    Log.d("SurveyViewModel", "Workout Activity submission loading")
+                }
+                else -> {
+                    // Handle unexpected error
+                    Log.e("SurveyViewModel", "Unexpected error in activity submission")
+                    showSnackbar("Terjadi kesalahan saat mengirimkan aktivitas")
                     _errorMessage.value = "Unknown error occurred"
                 }
             }

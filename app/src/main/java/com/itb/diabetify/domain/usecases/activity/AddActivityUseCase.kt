@@ -14,7 +14,7 @@ class AddActivityUseCase(
     ): AddActivityResult {
         val activityDateError: String? = if (activityDate.isEmpty()) "Tanggal aktivitas tidak boleh kosong" else null
         val activityTypeError: String? = if (activityType.isEmpty()) "Jenis aktivitas tidak boleh kosong" else null
-        val valueError: String? = if (value <= 0) "Nilai aktivitas harus lebih dari 0" else null
+        val valueError: String? = if (value < 0) "Nilai aktivitas harus lebih dari 0" else null
 
         if (activityDateError != null) {
             return AddActivityResult(

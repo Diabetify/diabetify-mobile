@@ -15,8 +15,6 @@ class UpdateProfileUseCase(
     ): UpdateProfileResult {
         val weightError = if (weight.isBlank()) "Weight cannot be empty" else null
         val heightError = if (height.isBlank()) "Height cannot be empty" else null
-        val hypertensionError = if (weight.isBlank()) "Hypertension cannot be empty" else null
-        val macrosomicBabyError = if (weight.isBlank()) "Macrosomic baby cannot be empty" else null
 
         if (weightError != null) {
             return UpdateProfileResult(
@@ -27,18 +25,6 @@ class UpdateProfileUseCase(
         if (heightError != null) {
             return UpdateProfileResult(
                 heightError = heightError
-            )
-        }
-
-        if (hypertensionError != null) {
-            return UpdateProfileResult(
-                hypertensionError = hypertensionError
-            )
-        }
-
-        if (macrosomicBabyError != null) {
-            return UpdateProfileResult(
-                macrosomicBabyError = macrosomicBabyError
             )
         }
 

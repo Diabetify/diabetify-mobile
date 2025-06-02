@@ -17,7 +17,6 @@ class AddProfileUseCase(
     ): AddProfileResult {
         val weightError = if (weight.isBlank()) "Weight cannot be empty" else null
         val heightError = if (height.isBlank()) "Height cannot be empty" else null
-        val yearOfSmokingError = if (yearOfSmoking == null) "Year of smoking cannot be empty" else null
 
         if (weightError != null) {
             return AddProfileResult(
@@ -28,12 +27,6 @@ class AddProfileUseCase(
         if (heightError != null) {
             return AddProfileResult(
                 heightError = heightError
-            )
-        }
-
-        if (yearOfSmokingError != null) {
-            return AddProfileResult(
-                yearOfSmokingError = yearOfSmokingError
             )
         }
 

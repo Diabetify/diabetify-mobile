@@ -49,8 +49,8 @@ val questions = listOf(
         questionText = "Apakah Anda pernah melahirkan bayi dengan berat 4 kg atau lebih?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
-            SurveyOption("yes", "Pernah"),
-            SurveyOption("no", "Tidak")
+            SurveyOption("true", "Pernah"),
+            SurveyOption("false", "Tidak")
         )
     ),
     SurveyQuestion(
@@ -59,9 +59,9 @@ val questions = listOf(
         questionText = "Apa status merokok Anda saat ini?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
-            SurveyOption("never", "Tidak Pernah"),
-            SurveyOption("quit", "Sudah Berhenti"),
-            SurveyOption("active", "Masih Merokok")
+            SurveyOption("false", "Tidak Pernah"),
+            SurveyOption("false", "Sudah Berhenti"),
+            SurveyOption("true", "Masih Merokok")
         )
     ),
     SurveyQuestion(
@@ -84,24 +84,16 @@ val questions = listOf(
         questionText = "Apakah Anda pernah didiagnosis memiliki tekanan darah tinggi (hipertensi)?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
-            SurveyOption("yes", "Ya"),
-            SurveyOption("no", "Tidak")
+            SurveyOption("true", "Ya"),
+            SurveyOption("false", "Tidak")
         )
     ),
     SurveyQuestion(
-        id = "moderate_activity",
+        id = "activity",
         category = "Aktivitas Fisik Mingguan",
-        questionText = "Dalam seminggu terakhir, berapa menit total Anda melakukan aktivitas fisik tingkat sedang?",
+        questionText = "Dalam seminggu terakhir, berapa menit total Anda melakukan aktivitas fisik?",
         questionType = SurveyQuestionType.Numeric,
         numericUnit = "menit",
         additionalInfo = "Contoh: jalan cepat, menyapu, berkebun"
     ),
-    SurveyQuestion(
-        id = "intense_activity",
-        category = "Aktivitas Fisik Mingguan",
-        questionText = "Dalam seminggu terakhir, berapa menit total Anda melakukan aktivitas fisik tingkat berat?",
-        questionType = SurveyQuestionType.Numeric,
-        numericUnit = "menit",
-        additionalInfo = "Contoh: naik tangga cepat, mengangkat barang berat"
-    )
 )

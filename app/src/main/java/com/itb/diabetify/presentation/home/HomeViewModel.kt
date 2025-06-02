@@ -13,6 +13,7 @@ import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
+import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,8 +44,10 @@ class HomeViewModel @Inject constructor(
 
     private val _errorMessage = mutableStateOf<String?>(null)
 
+    private val _navigationEvent = mutableStateOf<String?>(null)
+    val navigationEvent: State<String?> = _navigationEvent
 
-    private val _latestPredictionScoreState = mutableStateOf(String())
+    private val _latestPredictionScoreState = mutableStateOf("0.0")
     val latestPredictionScoreState: State<String> = _latestPredictionScoreState
 
     private val _riskFactors = mutableStateOf(listOf(
@@ -64,7 +67,7 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
             idealValue = "18.5 - 24.9 kg/m²",
-            currentValue = "28.4 kg/m²"
+            currentValue = "0 kg/m²"
         ),
         RiskFactorDetails(
             name = "HTN",
@@ -72,7 +75,7 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
             idealValue = "< 120/80 mmHg",
-            currentValue = "145/90 mmHg"
+            currentValue = "0/0 mmHg"
         ),
         RiskFactorDetails(
             name = "RK",
@@ -80,7 +83,7 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
             idealValue = "Berat lahir normal, kelahiran cukup bulan",
-            currentValue = "Riwayat kelahiran prematur"
+            currentValue = "-"
         ),
         RiskFactorDetails(
             name = "AF",
@@ -88,7 +91,7 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
             idealValue = "Min. 150 menit aktivitas sedang per minggu",
-            currentValue = "60 menit per minggu"
+            currentValue = "0 menit"
         ),
         RiskFactorDetails(
             name = "U",
@@ -96,7 +99,7 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
             idealValue = "-",
-            currentValue = "58 tahun",
+            currentValue = "0 tahun",
             isModifiable = false
         ),
         RiskFactorDetails(
@@ -105,30 +108,30 @@ class HomeViewModel @Inject constructor(
             impactPercentage = 0f,
             description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
             idealValue = "0 (tidak merokok)",
-            currentValue = "10 batang per hari"
+            currentValue = "0 batang per hari"
         )
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
 
-    private val _bmiValueState = mutableStateOf(String())
+    private val _bmiValueState = mutableStateOf("0.0")
     val bmiValueState: State<String> = _bmiValueState
 
-    private val _weightValueState = mutableStateOf(String())
+    private val _weightValueState = mutableStateOf("0")
     val weightValueState: State<String> = _weightValueState
 
-    private val _heightValueState = mutableStateOf(String())
+    private val _heightValueState = mutableStateOf("0")
     val heightValueState: State<String> = _heightValueState
 
-    private val _isHypertensionState = mutableStateOf(String())
+    private val _isHypertensionState = mutableStateOf("false")
     val isHypertensionState: State<String> = _isHypertensionState
 
-    private val _isMacrosomicBabyState = mutableStateOf(String())
+    private val _isMacrosomicBabyState = mutableStateOf("false")
     val isMacrosomicBabyState: State<String> = _isMacrosomicBabyState
 
-    private val _smokeValueState = mutableStateOf(String())
+    private val _smokeValueState = mutableStateOf("0")
     val smokeValueState: State<String> = _smokeValueState
 
-    private val _physicalActivityValueState = mutableStateOf(String())
+    private val _physicalActivityValueState = mutableStateOf("0")
     val physicalActivityValueState: State<String> = _physicalActivityValueState
 
     init {
@@ -241,13 +244,18 @@ class HomeViewModel @Inject constructor(
                     collectProfile()
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = getProfileResult.result.message ?: "Unknown error occurred"
-                    getProfileResult.result.message?.let { Log.d("HomeViewModel", it) }
+                    if (getProfileResult.result.message?.contains("404") == true) {
+                        Log.d("HomeViewModel", "Profile not found, navigating to survey screen")
+                        resetToDefaultValues()
+                        _navigationEvent.value = "SURVEY_SCREEN"
+                    } else {
+                        _errorMessage.value = getProfileResult.result.message ?: "Unknown error occurred"
+                        getProfileResult.result.message?.let { Log.d("HomeViewModel", it) }
+                    }
                 }
                 is Resource.Loading -> {
                     Log.d("HomeViewModel", "Loading profile data")
                 }
-
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Unknown error occurred"
@@ -257,6 +265,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun resetToDefaultValues() {
+        _latestPredictionScoreState.value = "0.0"
+        _bmiValueState.value = "0.0"
+        _weightValueState.value = "0"
+        _heightValueState.value = "0"
+        _isHypertensionState.value = "false"
+        _isMacrosomicBabyState.value = "false"
+        _smokeValueState.value = "0"
+        _physicalActivityValueState.value = "0"
+        
+        _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0f) }
+        
+        _riskFactorDetails.value = _riskFactorDetails.value.map {
+            it.copy(impactPercentage = 0f, currentValue = when(it.name) {
+                "IMT" -> "0 kg/m²"
+                "HTN" -> "0/0 mmHg"
+                "RK" -> "-"
+                "AF" -> "0 menit"
+                "U" -> "0 tahun"
+                "IM" -> "0 batang per hari"
+                else -> "0"
+            })
+        }
+    }
 
     private fun collectLatestPrediction() {
         viewModelScope.launch {
@@ -364,6 +396,10 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onNavigationHandled() {
+        _navigationEvent.value = null
     }
 
     val lowRiskColor = Color(0xFF8BC34A)    // Green

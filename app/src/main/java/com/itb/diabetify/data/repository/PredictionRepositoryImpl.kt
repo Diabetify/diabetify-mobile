@@ -23,31 +23,61 @@ class PredictionRepositoryImpl (
     override suspend fun fetchLatestPrediction(): Resource<Unit> {
         return try {
             val response = predictionApiService.getPrediction(1)
-            response.data?.let { prediction ->
+            if (response.data.isEmpty()) {
                 predictionManager.savePrediction(
                     Prediction(
-                        riskScore = prediction[0]?.riskScore.toString(),
-                        age = prediction[0]?.age.toString(),
-                        ageContribution = prediction[0]?.ageContribution.toString(),
-                        ageImpact = prediction[0]?.ageImpact.toString(),
-                        bmi = prediction[0]?.bmi.toString(),
-                        bmiContribution = prediction[0]?.bmiContribution.toString(),
-                        bmiImpact = prediction[0]?.bmiImpact.toString(),
-                        brinkmanScore = prediction[0]?.brinkmanScore.toString(),
-                        brinkmanScoreContribution = prediction[0]?.brinkmanScoreContribution.toString(),
-                        brinkmanScoreImpact = prediction[0]?.brinkmanScoreImpact.toString(),
-                        isHypertension = prediction[0]?.isHypertension.toString(),
-                        isHypertensionContribution = prediction[0]?.isHypertensionContribution.toString(),
-                        isHypertensionImpact = prediction[0]?.isHypertensionImpact.toString(),
-                        isMacrosomicBaby = prediction[0]?.isMacrosomicBaby.toString(),
-                        isMacrosomicBabyContribution = prediction[0]?.isMacrosomicBabyContribution.toString(),
-                        isMacrosomicBabyImpact = prediction[0]?.isMacrosomicBabyImpact.toString(),
-                        smokingStatus = prediction[0]?.smokingStatus.toString(),
-                        smokingStatusContribution = prediction[0]?.smokingStatusContribution.toString(),
-                        smokingStatusImpact = prediction[0]?.smokingStatusImpact.toString(),
-                        physicalActivityMinutes = prediction[0]?.physicalActivityMinutes.toString(),
-                        physicalActivityMinutesContribution = prediction[0]?.physicalActivityMinutesContribution.toString(),
-                        physicalActivityMinutesImpact = prediction[0]?.physicalActivityMinutesImpact.toString()
+                        riskScore = "0.0",
+                        age = "0",
+                        ageContribution = "0.0",
+                        ageImpact = "0",
+                        bmi = "0.0",
+                        bmiContribution = "0.0",
+                        bmiImpact = "0",
+                        brinkmanScore = "0.0",
+                        brinkmanScoreContribution = "0.0",
+                        brinkmanScoreImpact = "0",
+                        isHypertension = "false",
+                        isHypertensionContribution = "0.0",
+                        isHypertensionImpact = "0",
+                        isMacrosomicBaby = "false",
+                        isMacrosomicBabyContribution = "0.0",
+                        isMacrosomicBabyImpact = "0",
+                        smokingStatus = "never",
+                        smokingStatusContribution = "0.0",
+                        smokingStatusImpact = "0",
+                        physicalActivityMinutes = "0",
+                        physicalActivityMinutesContribution = "0.0",
+                        physicalActivityMinutesImpact = "0"
+                    )
+                )
+                return Resource.Success(Unit)
+            }
+
+            response.data.firstOrNull()?.let { prediction ->
+                predictionManager.savePrediction(
+                    Prediction(
+                        riskScore = prediction.riskScore.toString(),
+                        age = prediction.age.toString(),
+                        ageContribution = prediction.ageContribution.toString(),
+                        ageImpact = prediction.ageImpact.toString(),
+                        bmi = prediction.bmi.toString(),
+                        bmiContribution = prediction.bmiContribution.toString(),
+                        bmiImpact = prediction.bmiImpact.toString(),
+                        brinkmanScore = prediction.brinkmanScore.toString(),
+                        brinkmanScoreContribution = prediction.brinkmanScoreContribution.toString(),
+                        brinkmanScoreImpact = prediction.brinkmanScoreImpact.toString(),
+                        isHypertension = prediction.isHypertension.toString(),
+                        isHypertensionContribution = prediction.isHypertensionContribution.toString(),
+                        isHypertensionImpact = prediction.isHypertensionImpact.toString(),
+                        isMacrosomicBaby = prediction.isMacrosomicBaby.toString(),
+                        isMacrosomicBabyContribution = prediction.isMacrosomicBabyContribution.toString(),
+                        isMacrosomicBabyImpact = prediction.isMacrosomicBabyImpact.toString(),
+                        smokingStatus = prediction.smokingStatus.toString(),
+                        smokingStatusContribution = prediction.smokingStatusContribution.toString(),
+                        smokingStatusImpact = prediction.smokingStatusImpact.toString(),
+                        physicalActivityMinutes = prediction.physicalActivityMinutes.toString(),
+                        physicalActivityMinutesContribution = prediction.physicalActivityMinutesContribution.toString(),
+                        physicalActivityMinutesImpact = prediction.physicalActivityMinutesImpact.toString()
                     )
                 )
             }

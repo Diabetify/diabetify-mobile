@@ -29,6 +29,10 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun SuccessScreen(
     navController: NavController
 ) {
+    BackHandler {
+        // Do nothing to disable back navigation
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +73,7 @@ fun SuccessScreen(
         PrimaryButton(
             text = "Beranda",
             onClick = {
-                navController.navigate(Route.MainNavigation.route)
+                navController.navigate(Route.HomeScreen.route)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,9 +82,5 @@ fun SuccessScreen(
                 .offset(y = (-30).dp),
             enabled = true
         )
-    }
-
-    BackHandler {
-        navController.navigate(Route.MainNavigation.route) {}
     }
 }

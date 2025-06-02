@@ -39,6 +39,8 @@ import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
 import com.itb.diabetify.presentation.settings.edit_survey.EditSurveyScreen
 import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
+import com.itb.diabetify.presentation.survey.SurveyScreen
+import com.itb.diabetify.presentation.survey.SurveyViewModel
 
 @Composable
 fun MainNavGraph(
@@ -76,14 +78,20 @@ fun MainNavGraph(
 
     val homeRoute = Route.HomeScreen.route
     BackHandler {
-        if (currentRoute != homeRoute) {
-            navigationViewModel.onNavigationItemSelected(homeRoute)
-
-            mainNavController.navigate(homeRoute) {
-                popUpTo(mainNavController.graph.findStartDestination().id) {
-                    inclusive = true
+        when (currentRoute) {
+            Route.SurveyScreen.route -> {
+                // Do nothing to prevent back navigation
+            }
+            homeRoute -> {
+                // Do nothing when already at home
+            }
+            else -> {
+                navigationViewModel.onNavigationItemSelected(homeRoute)
+                mainNavController.navigate(homeRoute) {
+                    popUpTo(mainNavController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
                 }
-                launchSingleTop = true
             }
         }
     }
@@ -98,23 +106,27 @@ fun MainNavGraph(
         }
     }
 
+    val shouldShowBottomBar = currentRoute !in listOf(Route.SurveyScreen.route, Route.SurveySuccessScreen.route)
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            BottomNavigationBar(
-                modifier = Modifier.fillMaxWidth(),
-                viewModel = navigationViewModel,
-                addActivityViewModel = addActivityViewModel,
-                onItemSelected = { route ->
-                    mainNavController.navigate(route) {
-                        popUpTo(mainNavController.graph.findStartDestination().id) {
-                            saveState = true
+            if (shouldShowBottomBar) {
+                BottomNavigationBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    viewModel = navigationViewModel,
+                    addActivityViewModel = addActivityViewModel,
+                    onItemSelected = { route ->
+                        mainNavController.navigate(route) {
+                            popUpTo(mainNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         NavHost(
@@ -127,6 +139,24 @@ fun MainNavGraph(
                 HomeScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
+                )
+            }
+
+            composable(
+                route = Route.SurveyScreen.route
+            ) {
+                val surveyViewModel: SurveyViewModel = hiltViewModel()
+                SurveyScreen(
+                    navController = mainNavController,
+                    viewModel = surveyViewModel,
+                )
+            }
+
+            composable(
+                route = Route.SurveySuccessScreen.route
+            ) {
+                com.itb.diabetify.presentation.survey.SuccessScreen(
+                    navController = mainNavController
                 )
             }
 

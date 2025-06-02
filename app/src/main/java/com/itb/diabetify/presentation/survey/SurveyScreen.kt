@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.activity.compose.BackHandler
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
@@ -42,6 +43,10 @@ fun SurveyScreen(
     navController: NavController,
     viewModel: SurveyViewModel = hiltViewModel()
 ) {
+    BackHandler {
+        // Do nothing to disable back navigation
+    }
+
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -60,7 +65,11 @@ fun SurveyScreen(
         navigationEvent?.let {
             when (it) {
                 "SUCCESS_SCREEN" -> {
-                    navController.navigate(Route.SurveySuccessScreen.route)
+                    navController.navigate(Route.SurveySuccessScreen.route) {
+                        popUpTo(Route.SurveyScreen.route) {
+                            inclusive = true
+                        }
+                    }
                     viewModel.onNavigationHandled()
                 }
             }

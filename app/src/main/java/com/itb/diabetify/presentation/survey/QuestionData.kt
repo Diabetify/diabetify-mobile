@@ -59,9 +59,9 @@ val questions = listOf(
         questionText = "Apa status merokok Anda saat ini?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
-            SurveyOption("false", "Tidak Pernah"),
-            SurveyOption("false", "Sudah Berhenti"),
-            SurveyOption("true", "Masih Merokok")
+            SurveyOption("0", "Tidak Pernah"),
+            SurveyOption("1", "Sudah Berhenti"),
+            SurveyOption("2", "Masih Merokok")
         )
     ),
     SurveyQuestion(

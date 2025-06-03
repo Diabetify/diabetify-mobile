@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
+import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,11 +16,14 @@ import kotlinx.coroutines.launch
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
     private val addProfileUseCase: AddProfileUseCase,
-    private val addActivityUseCase: AddActivityUseCase
+    private val addActivityUseCase: AddActivityUseCase,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
@@ -40,11 +44,18 @@ class SurveyViewModel @Inject constructor(
     private val surveyQuestions = questions
 
     val displayedSurveyQuestions: List<SurveyQuestion>
-        get() = surveyQuestions.filter { question ->
-            when (question.id) {
-                "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "active"
-                else -> true
+        get() {
+            var filteredQuestions = surveyQuestions.filter { question ->
+                when (question.id) {
+                    "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "1" || _state.value.answers["smoking_status"] == "2"
+                    "pregnancy" -> {
+                        val user = runBlocking { userRepository.getUser().first() }
+                        user?.gender?.lowercase() != "laki-laki" && user?.gender?.lowercase() != "male"
+                    }
+                    else -> true
+                }
             }
+            return filteredQuestions
         }
 
     fun nextPage() {

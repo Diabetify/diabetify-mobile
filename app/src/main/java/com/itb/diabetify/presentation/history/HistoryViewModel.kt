@@ -67,14 +67,17 @@ class HistoryViewModel @Inject constructor(
 
             when (getPredictionScoreByDateResult.result) {
                 is Resource.Success -> {
-                    val scores = getPredictionScoreByDateResult.result.data?.let { response ->
-                        response.data.mapIndexed { index, scoreData ->
+                    val scores = if (getPredictionScoreByDateResult.result.data?.data != null) {
+                        getPredictionScoreByDateResult.result.data.data.mapIndexed { index, scoreData ->
                             PredictionScoreEntry(
                                 day = index + 1,
                                 score = (scoreData?.riskScore?.toFloat() ?: 0f) * 100f
                             )
                         }
-                    } ?: emptyList()
+                    } else {
+                        Log.d("HistoryViewModel", "No prediction scores data available")
+                        emptyList()
+                    }
                     _predictionScores.value = scores
                     Log.d("HistoryViewModel", "Prediction scores loaded successfully for range: $startDate to $endDate")
                 }

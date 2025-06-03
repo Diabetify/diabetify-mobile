@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import com.itb.diabetify.presentation.home.components.calculateProgress
 import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
@@ -33,8 +34,12 @@ import kotlin.math.abs
 @Composable
 fun RiskFactorCard(
     riskFactor: RiskFactorDetails,
+    riskFactors: List<HomeViewModel.RiskFactor>
 ) {
-    val color = calculateRiskFactorColor(riskFactor.impactPercentage)
+    val color = calculateRiskFactorColor(
+        percentage = riskFactor.impactPercentage,
+        riskFactors = riskFactors
+    )
 
     Card(
         modifier = Modifier

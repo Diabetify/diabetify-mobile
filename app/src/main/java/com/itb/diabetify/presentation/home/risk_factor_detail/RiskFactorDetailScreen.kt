@@ -101,6 +101,7 @@ fun RiskFactorDetailScreen(
                 sortedRiskFactorDetails.forEach { factor ->
                     RiskFactorCard(
                         riskFactor = factor,
+                        riskFactors = viewModel.riskFactors.value
                     )
                 }
             }
@@ -140,8 +141,9 @@ fun SummarySection(riskFactors: List<HomeViewModel.RiskFactor>) {
                 color = colorResource(id = R.color.primary)
             )
 
+
             Text(
-                text = "Faktor dengan persentase tertinggi memiliki kontribusi terbesar terhadap risiko Anda.",
+                text = "🟢 Hijau = Menurunkan risiko (faktor pelindung)\n🔴 Merah = Meningkatkan risiko (faktor berbahaya)",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,

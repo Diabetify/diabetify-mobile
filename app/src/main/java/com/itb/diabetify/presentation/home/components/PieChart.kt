@@ -70,15 +70,15 @@ fun PieChart(
         when {
             percentage >= 0 -> {
                 val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
-                val red = (255 * (0.5f + 0.5f * intensity)).toInt()
-                val green = (128 * (1 - intensity)).toInt()
+                val red = (200 * (0.6f + 0.4f * intensity)).toInt()
+                val green = (80 * (1 - intensity)).toInt()
                 Color(red, green, green).toArgb()
             }
             else -> {
                 val intensity = abs(percentage) / maxNegativeValue
-                val blue = (255 * (0.5f + 0.5f * intensity)).toInt()
-                val red = (128 * (1 - intensity)).toInt()
-                Color(red, red, blue).toArgb()
+                val green = (180 * (0.6f + 0.4f * intensity)).toInt()
+                val red = (80 * (1 - intensity)).toInt()
+                Color(red, green, red).toArgb()
             }
         }
     }
@@ -216,11 +216,19 @@ fun LegendItem(
 
         // Value with sign
         Text(
-            text = if (value >= 0) "+${String.format("%.1f", value)}%" else "${String.format("%.1f", value)}%",
+            text = when {
+                abs(value) < 0.000001 -> "${String.format("%.1f", value)}%" // Handle effectively zero values
+                value > 0 -> "+${String.format("%.1f", value)}%"
+                else -> "${String.format("%.1f", value)}%"
+            },
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = if (value >= 0) Color(0xFFC62828) else Color(0xFF2E7D32)
+            color = when {
+                abs(value) < 0.000001 -> Color(0xFF2E7D32) // Handle effectively zero values
+                value > 0 -> Color(0xFFC62828)
+                else -> Color(0xFF2E7D32)
+            }
         )
     }
 }

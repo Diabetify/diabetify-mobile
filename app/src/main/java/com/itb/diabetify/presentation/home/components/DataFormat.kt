@@ -1,6 +1,7 @@
 package com.itb.diabetify.presentation.home.components
 
 import androidx.compose.ui.graphics.Color
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import kotlin.math.abs
 
@@ -46,19 +47,28 @@ fun getActivityLevelColor(minutes: Int): Color {
     }
 }
 
-fun calculateRiskFactorColor(percentage: Float): Color {
+
+fun calculateRiskFactorColor(
+    percentage: Float,
+    riskFactors: List<HomeViewModel.RiskFactor>
+): Color {
+    val dataPercentages = riskFactors.map { it.percentage }
+
+    val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
+    val maxNegativeValue = dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
+
     return when {
         percentage >= 0 -> {
-            val intensity = percentage / 25f
-            val red = (255 * (0.5f + 0.5f * intensity)).coerceIn(0f, 255f).toInt()
-            val green = (128 * (1 - intensity)).coerceIn(0f, 128f).toInt()
+            val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
+            val red = (200 * (0.6f + 0.4f * intensity)).toInt()
+            val green = (80 * (1 - intensity)).toInt()
             Color(red, green, green)
         }
         else -> {
-            val intensity = abs(percentage) / 15f
-            val blue = (255 * (0.5f + 0.5f * intensity)).coerceIn(0f, 255f).toInt()
-            val red = (128 * (1 - intensity)).coerceIn(0f, 128f).toInt()
-            Color(red, red, blue)
+            val intensity = abs(percentage) / maxNegativeValue
+            val green = (180 * (0.6f + 0.4f * intensity)).toInt()
+            val red = (80 * (1 - intensity)).toInt()
+            Color(red, green, red)
         }
     }
 }

@@ -298,37 +298,55 @@ class HomeViewModel @Inject constructor(
                 _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
 
                 prediction?.let { latestPrediction ->
-                    _latestPredictionScoreState.value = latestPrediction.riskScore ?: "0.0"
+                    _latestPredictionScoreState.value = latestPrediction.riskScore.toString()
 
                     _riskFactors.value = listOf(
-                        RiskFactor("Indeks Massa Tubuh", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Hipertensi", "HTN", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Riwayat Kelahiran", "RK", (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Aktivitas Fisik", "AF", (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Indeks Massa Tubuh (BMI)", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Usia", "U", (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Indeks Merokok", "IM", (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f)
+                        RiskFactor("Indeks Brinkman", "IB", (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Riwayat Hipertensi", "RW", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Riwayat Bayi Makrosomia", "RBM", (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Aktivitas Fisik", "AF", (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Status Merokok", "SM", (latestPrediction.smokingStatusContribution?.toFloatOrNull() ?: 0f) * 100f)
                     )
 
                     _riskFactorDetails.value = listOf(
                         RiskFactorDetails(
                             name = "IMT",
-                            fullName = "Indeks Massa Tubuh",
+                            fullName = "Indeks Massa Tubuh (BMI)",
                             impactPercentage = (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f,
                             description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
                             idealValue = "18.5 - 24.9 kg/m²",
-                            currentValue = "${latestPrediction.bmi ?: "0"} kg/m²"
+                            currentValue = "${latestPrediction.bmi} kg/m²"
                         ),
                         RiskFactorDetails(
-                            name = "HTN",
-                            fullName = "Hipertensi",
+                            name = "U",
+                            fullName = "Usia",
+                            impactPercentage = (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+                            idealValue = "-",
+                            currentValue = "${latestPrediction.age} tahun",
+                            isModifiable = false
+                        ),
+                        RiskFactorDetails(
+                            name = "IB",
+                            fullName = "Indeks Brinkman",
+                            impactPercentage = (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            description = "Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
+                            idealValue = "0 (tidak merokok)",
+                            currentValue = "${latestPrediction.brinkmanScore} batang per hari"
+                        ),
+                        RiskFactorDetails(
+                            name = "RW",
+                            fullName = "Riwayat Hipertensi",
                             impactPercentage = (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f,
                             description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
                             idealValue = "< 120/80 mmHg",
                             currentValue = if (latestPrediction.isHypertension == "1") "Ya" else "Tidak"
                         ),
                         RiskFactorDetails(
-                            name = "RK",
-                            fullName = "Riwayat Kelahiran",
+                            name = "RBM",
+                            fullName = "Riwayat Bayi Makrosomia",
                             impactPercentage = (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f,
                             description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
                             idealValue = "Berat lahir normal, kelahiran cukup bulan",
@@ -340,24 +358,15 @@ class HomeViewModel @Inject constructor(
                             impactPercentage = (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f,
                             description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
                             idealValue = "Min. 150 menit aktivitas sedang per minggu",
-                            currentValue = "${latestPrediction.physicalActivityMinutes ?: "0"} menit per minggu"
+                            currentValue = "${latestPrediction.physicalActivityMinutes} menit per minggu"
                         ),
                         RiskFactorDetails(
-                            name = "U",
-                            fullName = "Usia",
-                            impactPercentage = (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
-                            idealValue = "-",
-                            currentValue = "${latestPrediction.age ?: "0"} tahun",
-                            isModifiable = false
-                        ),
-                        RiskFactorDetails(
-                            name = "IM",
-                            fullName = "Indeks Merokok",
-                            impactPercentage = (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            name = "SM",
+                            fullName = "Status Merokok",
+                            impactPercentage = (latestPrediction.smokingStatusContribution?.toFloatOrNull() ?: 0f) * 100f,
                             description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
                             idealValue = "0 (tidak merokok)",
-                            currentValue = "${latestPrediction.brinkmanScore ?: "0"} batang per hari"
+                            currentValue = "${latestPrediction.smokingStatus} batang per hari"
                         )
                     )
                 }

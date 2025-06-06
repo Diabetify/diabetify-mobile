@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.recommendation
+package com.itb.diabetify.presentation.guide
 
 import com.itb.diabetify.R
 

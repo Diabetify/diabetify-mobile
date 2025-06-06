@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.recommendation.components
+package com.itb.diabetify.presentation.guide.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,13 +21,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.itb.diabetify.presentation.recommendation.GuideCardData
+import com.itb.diabetify.presentation.guide.GuideCardData
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun GuideCard(
     guideCardData: GuideCardData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onGuideClick: (String) -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -38,7 +39,7 @@ fun GuideCard(
         colors = CardDefaults.cardColors(
             containerColor = guideCardData.backgroundColor
         ),
-        onClick = {}
+        onClick = { onGuideClick(guideCardData.guideId) }
     ) {
         Column(
             modifier = Modifier

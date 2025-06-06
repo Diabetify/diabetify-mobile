@@ -19,7 +19,10 @@ sealed class Route(
     object RiskDetailScreen: Route(route = "riskDetailScreen")
     object RiskFactorDetailScreen: Route(route = "riskFactorDetailScreen")
     object HistoryScreen: Route(route = "historyScreen")
-    object RecommendationScreen: Route(route = "recommendationScreen")
+    object GuideScreen: Route(route = "guideScreen")
+    object GuideDetailScreen: Route(route = "guideDetail/{guideId}") {
+        fun createRoute(guideId: String) = "guideDetail/$guideId"
+    }
     object SettingsScreen: Route(route = "settingsScreen")
     object EditProfileScreen: Route(route = "editProfileScreen")
     object EditSurveyScreen: Route(route = "editSurveyScreen")

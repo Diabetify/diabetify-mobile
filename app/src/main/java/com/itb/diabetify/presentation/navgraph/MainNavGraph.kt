@@ -31,7 +31,7 @@ import com.itb.diabetify.presentation.home.HomeScreen
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.navbar.BottomNavigationBar
 import com.itb.diabetify.presentation.navbar.NavigationViewModel
-import com.itb.diabetify.presentation.recommendation.RecommendationScreen
+import com.itb.diabetify.presentation.guide.GuideScreen
 import com.itb.diabetify.presentation.home.risk_detail.RiskDetailScreen
 import com.itb.diabetify.presentation.home.risk_factor_detail.RiskFactorDetailScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
@@ -183,8 +183,10 @@ fun MainNavGraph(
                 )
             }
 
-            composable(route = Route.RecommendationScreen.route) {
-                RecommendationScreen()
+            composable(route = Route.GuideScreen.route) {
+                GuideScreen(
+                    navController = mainNavController,
+                )
             }
 
             composable(route = Route.SettingsScreen.route) {

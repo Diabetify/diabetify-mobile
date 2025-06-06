@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.recommendation
+package com.itb.diabetify.presentation.guide
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,18 +30,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
-import com.itb.diabetify.presentation.recommendation.components.FAQCard
-import com.itb.diabetify.presentation.recommendation.components.GuideCard
-import com.itb.diabetify.presentation.recommendation.components.SectionHeader
-import com.itb.diabetify.presentation.recommendation.components.TipsCard
+import com.itb.diabetify.presentation.guide.components.FAQCard
+import com.itb.diabetify.presentation.guide.components.GuideCard
+import com.itb.diabetify.presentation.guide.components.SectionHeader
+import com.itb.diabetify.presentation.guide.components.TipsCard
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
-
+import androidx.navigation.NavController
+import com.itb.diabetify.presentation.navgraph.Route
 
 @Composable
-fun RecommendationScreen() {
+fun GuideScreen(
+    navController: NavController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -106,7 +109,10 @@ fun RecommendationScreen() {
                             rowCards.forEach { cardData ->
                                 GuideCard(
                                     guideCardData = cardData,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    onGuideClick = { guideId ->
+                                        navController.navigate(Route.GuideDetailScreen.createRoute(guideId))
+                                    }
                                 )
                             }
 

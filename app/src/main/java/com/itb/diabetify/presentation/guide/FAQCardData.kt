@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.recommendation
+package com.itb.diabetify.presentation.guide
 
 data class FAQCardData(
     val question: String = "",

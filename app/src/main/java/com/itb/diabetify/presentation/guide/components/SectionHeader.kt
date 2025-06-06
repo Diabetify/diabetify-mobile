@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.recommendation.components
+package com.itb.diabetify.presentation.guide.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

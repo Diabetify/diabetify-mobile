@@ -23,7 +23,7 @@ val items = listOf(
         contentDescription = "Navigate to history screen"
     ),
     NavigationItem(
-        route = Route.RecommendationScreen.route,
+        route = Route.GuideScreen.route,
         title = "Recommendation",
         icon = R.drawable.ic_thumbs,
         contentDescription = "Navigate to recommendation screen"

@@ -19,10 +19,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.history.HistoryScreen
@@ -32,6 +34,7 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.navbar.BottomNavigationBar
 import com.itb.diabetify.presentation.navbar.NavigationViewModel
 import com.itb.diabetify.presentation.guide.GuideScreen
+import com.itb.diabetify.presentation.guide.guide_detail.GuideDetailScreen
 import com.itb.diabetify.presentation.home.risk_detail.RiskDetailScreen
 import com.itb.diabetify.presentation.home.risk_factor_detail.RiskFactorDetailScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
@@ -186,6 +189,21 @@ fun MainNavGraph(
             composable(route = Route.GuideScreen.route) {
                 GuideScreen(
                     navController = mainNavController,
+                )
+            }
+
+            composable(
+                route = Route.GuideDetailScreen.route,
+                arguments = listOf(
+                    navArgument("guideId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val guideId = backStackEntry.arguments?.getString("guideId") ?: return@composable
+                GuideDetailScreen(
+                    guideId = guideId,
+                    onBackClick = {
+                        mainNavController.popBackStack()
+                    }
                 )
             }
 

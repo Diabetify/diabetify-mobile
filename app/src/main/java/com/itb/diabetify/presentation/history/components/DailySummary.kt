@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.time.LocalDate
+import kotlin.math.abs
 
 data class DailySummaryData(
     val date: LocalDate,
@@ -44,14 +45,13 @@ data class DailySummaryData(
 
 data class RiskFactorContribution(
     val name: String,
-    val percentage: Float,
+    val percentage: String,
     val isPositive: Boolean
 )
 
 data class DailyInput(
     val name: String,
     val value: String,
-    val isCompleted: Boolean
 )
 
 @SuppressLint("NewApi")
@@ -109,8 +109,9 @@ private fun RiskPercentageCard(
                     .clip(CircleShape)
                     .background(
                         when {
-                            riskPercentage < 30 -> Color(0xFF4CAF50).copy(alpha = 0.1f)
-                            riskPercentage < 70 -> Color(0xFFFF9800).copy(alpha = 0.1f)
+                            riskPercentage <= 30 -> Color(0xFF8BC34A).copy(alpha = 0.1f)
+                            riskPercentage <= 50 -> Color(0xFFFFC107).copy(alpha = 0.1f)
+                            riskPercentage <= 65 -> Color(0xFFFA821F).copy(alpha = 0.1f)
                             else -> Color(0xFFF44336).copy(alpha = 0.1f)
                         }
                     ),
@@ -120,8 +121,9 @@ private fun RiskPercentageCard(
                     imageVector = Icons.Outlined.Favorite,
                     contentDescription = "Risk Assessment",
                     tint = when {
-                        riskPercentage < 30 -> Color(0xFF4CAF50)
-                        riskPercentage < 70 -> Color(0xFFFF9800)
+                        riskPercentage <= 30 -> Color(0xFF8BC34A)
+                        riskPercentage <= 50 -> Color(0xFFFFC107)
+                        riskPercentage <= 65 -> Color(0xFFFA821F)
                         else -> Color(0xFFF44336)
                     },
                     modifier = Modifier.size(24.dp)
@@ -141,29 +143,32 @@ private fun RiskPercentageCard(
                     color = Color.Gray
                 )
                 Text(
-                    text = "${riskPercentage.toInt()}%",
+                    text = "${String.format("%.1f", riskPercentage)}%",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     color = when {
-                        riskPercentage < 30 -> Color(0xFF4CAF50)
-                        riskPercentage < 70 -> Color(0xFFFF9800)
-                        else -> Color(0xFFF44336)
+                        riskPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
+                        riskPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
+                        riskPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                        else -> Color(0xFFF44336) // Very high risk - Red
                     }
                 )
                 Text(
                     text = when {
-                        riskPercentage < 30 -> "Risiko Rendah"
-                        riskPercentage < 70 -> "Risiko Sedang"
-                        else -> "Risiko Tinggi"
+                        riskPercentage <= 30 -> "Risiko Rendah"
+                        riskPercentage <= 50 -> "Risiko Sedang"
+                        riskPercentage <= 65 -> "Risiko Tinggi"
+                        else -> "Risiko Sangat Tinggi"
                     },
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
                     color = when {
-                        riskPercentage < 30 -> Color(0xFF4CAF50)
-                        riskPercentage < 70 -> Color(0xFFFF9800)
-                        else -> Color(0xFFF44336)
+                        riskPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
+                        riskPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
+                        riskPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                        else -> Color(0xFFF44336) // Very high risk - Red
                     }
                 )
             }
@@ -176,6 +181,10 @@ private fun RiskFactorContributionsCard(
     contributions: List<RiskFactorContribution>,
     modifier: Modifier = Modifier
 ) {
+    val sortedContributions = contributions.sortedByDescending { contribution ->
+        abs(contribution.percentage.replace("%", "").replace("+", "").replace("-", "").toFloatOrNull() ?: 0f)
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -217,7 +226,7 @@ private fun RiskFactorContributionsCard(
                 )
             }
 
-            contributions.forEach { contribution ->
+            sortedContributions.forEach { contribution ->
                 RiskFactorItem(contribution = contribution)
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -242,9 +251,9 @@ private fun RiskFactorItem(
             color = Color.Black,
             modifier = Modifier.weight(1f)
         )
-        
+
         Text(
-            text = "${if (contribution.isPositive) "+" else ""}${contribution.percentage.toInt()}%",
+            text = "${if (contribution.isPositive) "+" else "-"}${contribution.percentage}%",
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
@@ -291,7 +300,7 @@ private fun DailyInputsCard(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Data Input Harian",
+                    text = "Data Prediksi",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
@@ -320,12 +329,6 @@ private fun DailyInputItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            Icon(
-                imageVector = if (input.isCompleted) Icons.Filled.CheckCircle else Icons.Filled.Warning,
-                contentDescription = if (input.isCompleted) "Completed" else "Not completed",
-                tint = if (input.isCompleted) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                modifier = Modifier.size(16.dp)
-            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = input.name,
@@ -335,13 +338,13 @@ private fun DailyInputItem(
                 color = Color.Black
             )
         }
-        
+
         Text(
             text = input.value,
             fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            color = if (input.isCompleted) Color(0xFF4CAF50) else Color.Gray
+            color = colorResource(R.color.primary)
         )
     }
-} 
+}

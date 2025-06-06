@@ -9,6 +9,14 @@ interface PredictionApiService {
     @GET("prediction/me")
     suspend fun getPrediction(
         @Query("limit") limit: Int = 1,
+        @Query("start_date") startDate: String? = null,
+        @Query("end_date") endDate: String? = null
+    ): GetPredictionResponse
+
+    @GET("prediction/me/date-range")
+    suspend fun getPredictionByDate(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String
     ): GetPredictionResponse
 
     @GET("prediction/me/score")

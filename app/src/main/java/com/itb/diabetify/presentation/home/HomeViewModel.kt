@@ -297,7 +297,12 @@ class HomeViewModel @Inject constructor(
             predictionRepository.getLatestPrediction().collect { prediction ->
                 _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
 
-                prediction?.let { latestPrediction ->
+                if (prediction == null) {
+                    resetToDefaultValues()
+                    return@collect
+                }
+
+                prediction.let { latestPrediction ->
                     _latestPredictionScoreState.value = latestPrediction.riskScore.toString()
 
                     _riskFactors.value = listOf(

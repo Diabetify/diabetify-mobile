@@ -1,6 +1,7 @@
 package com.itb.diabetify.data.repository
 
 import com.itb.diabetify.data.remote.prediction.PredictionApiService
+import com.itb.diabetify.data.remote.prediction.response.GetPredictionResponse
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
 import com.itb.diabetify.domain.manager.PredictionManager
 import com.itb.diabetify.domain.manager.TokenManager
@@ -82,6 +83,24 @@ class PredictionRepositoryImpl (
             }
 
             Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun fetchPredictionByDate(
+        startDate: String,
+        endDate: String
+    ): Resource<GetPredictionResponse> {
+        return try {
+            val response = predictionApiService.getPredictionByDate(startDate, endDate)
+            if (response.data.isEmpty()) {
+                Resource.Success(GetPredictionResponse(emptyList(), "No predictions found", "success"))
+            } else {
+                Resource.Success(response)
+            }
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {

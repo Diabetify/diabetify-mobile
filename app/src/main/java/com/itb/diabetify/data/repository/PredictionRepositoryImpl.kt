@@ -30,18 +30,25 @@ class PredictionRepositoryImpl (
                         riskScore = "0.0",
                         age = "0",
                         ageContribution = "0.0",
+                        ageExplanation = "",
                         bmi = "0.0",
                         bmiContribution = "0.0",
+                        bmiExplanation = "",
                         brinkmanScore = "0.0",
                         brinkmanScoreContribution = "0.0",
+                        brinkmanScoreExplanation = "",
                         isHypertension = "false",
                         isHypertensionContribution = "0.0",
+                        isHypertensionExplanation = "",
                         isMacrosomicBaby = "false",
                         isMacrosomicBabyContribution = "0.0",
+                        isMacrosomicBabyExplanation = "",
                         smokingStatus = "never",
                         smokingStatusContribution = "0.0",
+                        smokingStatusExplanation = "",
                         physicalActivityMinutes = "0",
                         physicalActivityMinutesContribution = "0.0",
+                        physicalActivityMinutesExplanation = ""
                     )
                 )
                 return Resource.Success(Unit)
@@ -66,18 +73,25 @@ class PredictionRepositoryImpl (
                         riskScore = prediction.riskScore.toString(),
                         age = prediction.age.toString(),
                         ageContribution = ageContribution.toString(),
+                        ageExplanation = prediction.ageExplanation,
                         bmi = prediction.bmi.toString(),
                         bmiContribution = bmiContribution.toString(),
+                        bmiExplanation = prediction.bmiExplanation,
                         brinkmanScore = prediction.brinkmanScore.toString(),
                         brinkmanScoreContribution = brinkmanContribution.toString(),
+                        brinkmanScoreExplanation = prediction.brinkmanScoreExplanation,
                         isHypertension = prediction.isHypertension.toString(),
                         isHypertensionContribution = isHypertensionContribution.toString(),
+                        isHypertensionExplanation = prediction.isHypertensionExplanation,
                         isMacrosomicBaby = prediction.isMacrosomicBaby.toString(),
                         isMacrosomicBabyContribution = isMacrosomicBabyContribution.toString(),
+                        isMacrosomicBabyExplanation = prediction.isMacrosomicBabyExplanation,
                         smokingStatus = prediction.smokingStatus.toString(),
                         smokingStatusContribution = smokingStatusContribution.toString(),
+                        smokingStatusExplanation = prediction.smokingStatusExplanation,
                         physicalActivityMinutes = prediction.physicalActivityMinutes.toString(),
                         physicalActivityMinutesContribution = physicalActivityContribution.toString(),
+                        physicalActivityMinutesExplanation = prediction.physicalActivityMinutesExplanation
                     )
                 )
             }

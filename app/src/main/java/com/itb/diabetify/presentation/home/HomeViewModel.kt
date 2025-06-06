@@ -13,7 +13,6 @@ import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
-import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,7 +64,7 @@ class HomeViewModel @Inject constructor(
             name = "IMT",
             fullName = "Indeks Massa Tubuh",
             impactPercentage = 0f,
-            description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
+            explanation = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
             idealValue = "18.5 - 24.9 kg/m²",
             currentValue = "0 kg/m²"
         ),
@@ -73,7 +72,7 @@ class HomeViewModel @Inject constructor(
             name = "HTN",
             fullName = "Hipertensi",
             impactPercentage = 0f,
-            description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
+            explanation = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
             idealValue = "< 120/80 mmHg",
             currentValue = "0/0 mmHg"
         ),
@@ -81,7 +80,7 @@ class HomeViewModel @Inject constructor(
             name = "RK",
             fullName = "Riwayat Kelahiran",
             impactPercentage = 0f,
-            description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
+            explanation = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
             idealValue = "Berat lahir normal, kelahiran cukup bulan",
             currentValue = "-"
         ),
@@ -89,7 +88,7 @@ class HomeViewModel @Inject constructor(
             name = "AF",
             fullName = "Aktivitas Fisik",
             impactPercentage = 0f,
-            description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
+            explanation = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
             idealValue = "Min. 150 menit aktivitas sedang per minggu",
             currentValue = "0 menit"
         ),
@@ -97,7 +96,7 @@ class HomeViewModel @Inject constructor(
             name = "U",
             fullName = "Usia",
             impactPercentage = 0f,
-            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+            explanation = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
             idealValue = "-",
             currentValue = "0 tahun",
             isModifiable = false
@@ -106,7 +105,7 @@ class HomeViewModel @Inject constructor(
             name = "IM",
             fullName = "Indeks Merokok",
             impactPercentage = 0f,
-            description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
+            explanation = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
             idealValue = "0 (tidak merokok)",
             currentValue = "0 batang per hari"
         )
@@ -320,7 +319,7 @@ class HomeViewModel @Inject constructor(
                             name = "IMT",
                             fullName = "Indeks Massa Tubuh (BMI)",
                             impactPercentage = (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
+                            explanation = latestPrediction.bmiExplanation ?: "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
                             idealValue = "18.5 - 24.9 kg/m²",
                             currentValue = "${latestPrediction.bmi} kg/m²"
                         ),
@@ -328,7 +327,7 @@ class HomeViewModel @Inject constructor(
                             name = "U",
                             fullName = "Usia",
                             impactPercentage = (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+                            explanation = latestPrediction.ageExplanation ?:"Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
                             idealValue = "-",
                             currentValue = "${latestPrediction.age} tahun",
                             isModifiable = false
@@ -337,7 +336,7 @@ class HomeViewModel @Inject constructor(
                             name = "IB",
                             fullName = "Indeks Brinkman",
                             impactPercentage = (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
+                            explanation = latestPrediction.brinkmanScoreExplanation ?:"Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
                             idealValue = "0 (tidak merokok)",
                             currentValue = "${latestPrediction.brinkmanScore} batang per hari"
                         ),
@@ -345,7 +344,7 @@ class HomeViewModel @Inject constructor(
                             name = "RW",
                             fullName = "Riwayat Hipertensi",
                             impactPercentage = (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
+                            explanation = latestPrediction.isHypertensionExplanation ?:"Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
                             idealValue = "< 120/80 mmHg",
                             currentValue = if (latestPrediction.isHypertension == "1") "Ya" else "Tidak"
                         ),
@@ -353,7 +352,7 @@ class HomeViewModel @Inject constructor(
                             name = "RBM",
                             fullName = "Riwayat Bayi Makrosomia",
                             impactPercentage = (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
+                            explanation = latestPrediction.isMacrosomicBabyExplanation ?:"Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
                             idealValue = "Berat lahir normal, kelahiran cukup bulan",
                             currentValue = if (latestPrediction.isMacrosomicBaby == "1") "Ya" else "Tidak"
                         ),
@@ -361,7 +360,7 @@ class HomeViewModel @Inject constructor(
                             name = "AF",
                             fullName = "Aktivitas Fisik",
                             impactPercentage = (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
+                            explanation = latestPrediction.physicalActivityMinutesExplanation ?:"Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
                             idealValue = "Min. 150 menit aktivitas sedang per minggu",
                             currentValue = "${latestPrediction.physicalActivityMinutes} menit per minggu"
                         ),
@@ -369,7 +368,7 @@ class HomeViewModel @Inject constructor(
                             name = "SM",
                             fullName = "Status Merokok",
                             impactPercentage = (latestPrediction.smokingStatusContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            description = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
+                            explanation = latestPrediction.smokingStatusExplanation ?:"Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
                             idealValue = "0 (tidak merokok)",
                             currentValue = "${latestPrediction.smokingStatus} batang per hari"
                         )
@@ -431,7 +430,7 @@ class HomeViewModel @Inject constructor(
         val name: String,
         val fullName: String,
         val impactPercentage: Float,
-        val description: String,
+        val explanation: String,
         val idealValue: String,
         val currentValue: String,
         val isModifiable: Boolean = true

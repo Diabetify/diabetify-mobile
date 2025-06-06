@@ -101,7 +101,7 @@ fun RiskFactorCard(
             }
 
             Text(
-                text = riskFactor.description,
+                text = riskFactor.explanation,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,

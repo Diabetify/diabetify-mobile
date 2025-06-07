@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
+import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
@@ -27,7 +28,8 @@ class HomeViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
-    private val activityRepository: ActivityRepository
+    private val activityRepository: ActivityRepository,
+    private val userRepository: UserRepository
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -133,6 +135,12 @@ class HomeViewModel @Inject constructor(
     private val _physicalActivityValueState = mutableStateOf("0")
     val physicalActivityValueState: State<String> = _physicalActivityValueState
 
+    private val _userNameState = mutableStateOf("")
+    val userNameState: State<String> = _userNameState
+
+    private val _lastPredictionAtState = mutableStateOf("")
+    val lastPredictionAtState: State<String> = _lastPredictionAtState
+
     init {
         loadUserData()
         loadLatestPredictionData()
@@ -151,6 +159,7 @@ class HomeViewModel @Inject constructor(
             when (getUserResult.result) {
                 is Resource.Success -> {
                     Log.d("HomeViewModel", "User data loaded successfully")
+                    collectUser()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getUserResult.result.message ?: "Unknown error occurred"
@@ -406,6 +415,21 @@ class HomeViewModel @Inject constructor(
                 activity?.let { todayActivity ->
                     _smokeValueState.value = todayActivity.smokingValue ?: "0"
                     _physicalActivityValueState.value = todayActivity.workoutValue ?: "0"
+                }
+            }
+        }
+    }
+
+    private fun collectUser() {
+        viewModelScope.launch {
+            _userState.value = userState.value.copy(isLoading = true)
+
+            userRepository.getUser().collect { user ->
+                _userState.value = userState.value.copy(isLoading = false)
+
+                user?.let {
+                    _userNameState.value = it.name ?: ""
+                    _lastPredictionAtState.value = it.lastPredictionAt ?: "Belum ada prediksi"
                 }
             }
         }

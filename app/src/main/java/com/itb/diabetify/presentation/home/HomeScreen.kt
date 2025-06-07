@@ -118,7 +118,7 @@ fun HomeScreen(
                         color = colorResource(id = R.color.primary)
                     )
                     Text(
-                        text = "Bernardus",
+                        text = viewModel.userNameState.value.split(" ").firstOrNull() ?: "Pengguna",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -220,15 +220,8 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = "Last Update",
-                    tint = colorResource(id = R.color.gray),
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Terakhir diperbarui: Hari ini, 08:30",
+                    text = "Terakhir diperbarui: ${viewModel.lastPredictionAtState.value}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,

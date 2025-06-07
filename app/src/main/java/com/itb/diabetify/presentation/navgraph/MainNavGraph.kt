@@ -200,10 +200,8 @@ fun MainNavGraph(
             ) { backStackEntry ->
                 val guideId = backStackEntry.arguments?.getString("guideId") ?: return@composable
                 GuideDetailScreen(
+                    navController = mainNavController,
                     guideId = guideId,
-                    onBackClick = {
-                        mainNavController.popBackStack()
-                    }
                 )
             }
 

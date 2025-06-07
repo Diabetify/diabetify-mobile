@@ -6,25 +6,24 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuideDetailScreen(
+    navController: NavController,
     guideId: String,
-    onBackClick: () -> Unit
 ) {
     val guideDetail = guideDetails[guideId]
 
@@ -38,29 +37,31 @@ fun GuideDetailScreen(
                 .fillMaxSize()
         ) {
             // Header
-            TopAppBar(
-                title = {
-                    Text(
-                        text = guideDetail?.title ?: "Detail Panduan",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color.White
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
+            ) {
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    onClick = { navController.popBackStack() }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = colorResource(id = R.color.primary)
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.primary)
+                }
+
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = guideDetail?.title ?: "Panduan",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = colorResource(id = R.color.primary)
                 )
-            )
+            }
 
             // Content
             if (guideDetail != null) {

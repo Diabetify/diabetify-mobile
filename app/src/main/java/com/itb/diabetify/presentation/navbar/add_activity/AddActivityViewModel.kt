@@ -62,6 +62,12 @@ class AddActivityViewModel @Inject constructor(
     private val _hypertensionValueState = mutableStateOf(FieldState())
     val hypertensionValueState: State<FieldState> = _hypertensionValueState
 
+    private val _systolicValueState = mutableStateOf(FieldState())
+    val systolicValueState: State<FieldState> = _systolicValueState
+
+    private val _diastolicValueState = mutableStateOf(FieldState())
+    val diastolicValueState: State<FieldState> = _diastolicValueState
+
     init {
         collectActivityTodayData()
         collectProfileData()
@@ -145,6 +151,16 @@ class AddActivityViewModel @Inject constructor(
     fun setHypertensionValue(value: String) {
         _hypertensionValueState.value = hypertensionValueState.value.copy(error = null)
         _hypertensionValueState.value = hypertensionValueState.value.copy(text = value)
+    }
+
+    fun setSystolicValue(value: String) {
+        _systolicValueState.value = systolicValueState.value.copy(error = null)
+        _systolicValueState.value = systolicValueState.value.copy(text = value)
+    }
+
+    fun setDiastolicValue(value: String) {
+        _diastolicValueState.value = diastolicValueState.value.copy(error = null)
+        _diastolicValueState.value = diastolicValueState.value.copy(text = value)
     }
 
     @SuppressLint("NewApi")

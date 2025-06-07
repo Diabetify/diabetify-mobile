@@ -2,7 +2,8 @@ package com.itb.diabetify.presentation.navbar.add_activity
 
 enum class DataInputQuestionType {
     Numeric,
-    Selection
+    Selection,
+    Hypertension
 }
 
 data class InputOption(
@@ -47,8 +48,8 @@ val questions = listOf(
     DataInputQuestion(
         id = "hypertension",
         category = "Kesehatan",
-        questionText = "Apakah Anda didiagnosis memiliki tekanan darah tinggi (hipertensi)?",
-        questionType = DataInputQuestionType.Selection,
+        questionText = "Apakah Anda mengetahui nilai tekanan darah Anda?",
+        questionType = DataInputQuestionType.Hypertension,
         options = listOf(
             InputOption("yes", "Ya"),
             InputOption("no", "Tidak")

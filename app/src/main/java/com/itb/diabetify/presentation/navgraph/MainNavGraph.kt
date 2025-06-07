@@ -35,6 +35,7 @@ import com.itb.diabetify.presentation.navbar.BottomNavigationBar
 import com.itb.diabetify.presentation.navbar.NavigationViewModel
 import com.itb.diabetify.presentation.guide.GuideScreen
 import com.itb.diabetify.presentation.guide.guide_detail.GuideDetailScreen
+import com.itb.diabetify.presentation.guide.tips_detail.TipsDetailScreen
 import com.itb.diabetify.presentation.home.risk_detail.RiskDetailScreen
 import com.itb.diabetify.presentation.home.risk_factor_detail.RiskFactorDetailScreen
 import com.itb.diabetify.presentation.settings.SettingsScreen
@@ -195,13 +196,30 @@ fun MainNavGraph(
             composable(
                 route = Route.GuideDetailScreen.route,
                 arguments = listOf(
-                    navArgument("guideId") { type = NavType.StringType }
+                    navArgument("guideId") {
+                        type = NavType.StringType
+                    }
                 )
             ) { backStackEntry ->
                 val guideId = backStackEntry.arguments?.getString("guideId") ?: return@composable
                 GuideDetailScreen(
                     navController = mainNavController,
-                    guideId = guideId,
+                    guideId = guideId
+                )
+            }
+
+            composable(
+                route = Route.TipsDetailScreen.route,
+                arguments = listOf(
+                    navArgument("tipsId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val tipsId = backStackEntry.arguments?.getString("tipsId") ?: return@composable
+                TipsDetailScreen(
+                    navController = mainNavController,
+                    tipsId = tipsId
                 )
             }
 

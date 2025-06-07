@@ -184,13 +184,23 @@ fun GuideScreen(
                         ) {
                             if (startIndex < tipsCard.size) {
                                 Box(modifier = Modifier.weight(1f)) {
-                                    TipsCard(tipsCardData = tipsCard[startIndex])
+                                    TipsCard(
+                                        tipsCardData = tipsCard[startIndex],
+                                        onTipsClick = { tipsId ->
+                                            navController.navigate(Route.TipsDetailScreen.createRoute(tipsId))
+                                        }
+                                    )
                                 }
                             }
 
                             if (startIndex + 1 < tipsCard.size) {
                                 Box(modifier = Modifier.weight(1f)) {
-                                    TipsCard(tipsCardData = tipsCard[startIndex + 1])
+                                    TipsCard(
+                                        tipsCardData = tipsCard[startIndex + 1],
+                                        onTipsClick = { tipsId ->
+                                            navController.navigate(Route.TipsDetailScreen.createRoute(tipsId))
+                                        }
+                                    )
                                 }
                             } else if (startIndex < tipsCard.size) {
                                 Spacer(modifier = Modifier.weight(1f))

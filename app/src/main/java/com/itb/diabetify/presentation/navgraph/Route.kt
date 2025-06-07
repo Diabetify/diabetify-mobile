@@ -29,4 +29,8 @@ sealed class Route(
     object AppStartNavigation : Route(route = "appStartNavigation")
     object AuthNavigation : Route(route = "authNavigation")
     object MainNavigation : Route(route = "mainNavigation")
+    object TipsDetailScreen {
+        const val route = "tipsDetail/{tipsId}"
+        fun createRoute(tipsId: String) = "tipsDetail/$tipsId"
+    }
 }

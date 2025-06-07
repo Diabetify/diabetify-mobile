@@ -1,6 +1,7 @@
 package com.itb.diabetify.presentation.guide.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -19,12 +20,15 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun TipsCard(
-    tipsCardData: TipsCardData
+    tipsCardData: TipsCardData,
+    modifier: Modifier = Modifier,
+    onTipsClick: (String) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .width(180.dp)
-            .height(230.dp),
+            .height(230.dp)
+            .clickable { onTipsClick(tipsCardData.tipsId) },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -32,7 +36,6 @@ fun TipsCard(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        onClick = {}
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

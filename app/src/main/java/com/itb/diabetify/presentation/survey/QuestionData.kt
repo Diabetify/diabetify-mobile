@@ -79,6 +79,32 @@ val questions = listOf(
         numericUnit = "batang"
     ),
     SurveyQuestion(
+        id = "bp_unknown",
+        category = "Kesehatan",
+        questionText = "Apakah Anda mengetahui nilai tekanan darah Anda?",
+        questionType = SurveyQuestionType.Selection,
+        options = listOf(
+            SurveyOption("yes", "Ya"),
+            SurveyOption("no", "Tidak")
+        )
+    ),
+    SurveyQuestion(
+        id = "systolic",
+        category = "Kesehatan",
+        questionText = "Berapa nilai tekanan darah sistolik Anda?",
+        questionType = SurveyQuestionType.Numeric,
+        numericUnit = "mmHg",
+        additionalInfo = "Nilai tekanan darah yang lebih tinggi"
+    ),
+    SurveyQuestion(
+        id = "diastolic",
+        category = "Kesehatan",
+        questionText = "Berapa nilai tekanan darah diastolik Anda?",
+        questionType = SurveyQuestionType.Numeric,
+        numericUnit = "mmHg",
+        additionalInfo = "Nilai tekanan darah yang lebih rendah"
+    ),
+    SurveyQuestion(
         id = "hypertension",
         category = "Kesehatan",
         questionText = "Apakah Anda pernah didiagnosis memiliki tekanan darah tinggi (hipertensi)?",

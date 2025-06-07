@@ -52,6 +52,8 @@ class SurveyViewModel @Inject constructor(
                         val user = runBlocking { userRepository.getUser().first() }
                         user?.gender?.lowercase() != "laki-laki" && user?.gender?.lowercase() != "male"
                     }
+                    "systolic", "diastolic" -> _state.value.answers["bp_unknown"] == "yes"
+                    "hypertension" -> _state.value.answers["bp_unknown"] == "no"
                     else -> true
                 }
             }
@@ -65,6 +67,16 @@ class SurveyViewModel @Inject constructor(
         if (answer.isNullOrBlank()) {
             showSnackbar("Mohon jawab pertanyaan ini dahulu")
             return
+        }
+
+        if (currentQuestion.id == "diastolic" && _state.value.answers["bp_unknown"] == "yes") {
+            val systolic = _state.value.answers["systolic"]?.toIntOrNull()
+            val diastolic = _state.value.answers["diastolic"]?.toIntOrNull()
+            
+            if (systolic != null && diastolic != null) {
+                val hasHypertension = systolic >= 140 || diastolic >= 90
+                setAnswer("hypertension", hasHypertension.toString())
+            }
         }
 
         if (_state.value.currentPageIndex < displayedSurveyQuestions.size - 1) {

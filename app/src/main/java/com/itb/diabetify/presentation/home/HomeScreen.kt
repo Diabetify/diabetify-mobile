@@ -58,6 +58,7 @@ import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
 import com.itb.diabetify.presentation.home.components.formatHypertension
 import com.itb.diabetify.presentation.home.components.formatMacrosomicBaby
+import com.itb.diabetify.presentation.home.components.formatRelativeTime
 import com.itb.diabetify.presentation.home.components.getActivityLevelColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
@@ -189,22 +190,8 @@ fun HomeScreen(
                 ) {
                     StatItem(
                         label = "Pemeriksaan Terakhir",
-                        value = "2 hari lalu",
+                        value = formatRelativeTime(viewModel.lastPredictionAtState.value),
                         icon = Icons.Outlined.Info
-                    )
-
-                    // Vertical Divider
-                    Box(
-                        modifier = Modifier
-                            .height(60.dp)
-                            .width(1.dp)
-                            .background(Color.Gray.copy(alpha = 0.3f))
-                    )
-
-                    StatItem(
-                        label = "Data harian terisi",
-                        value = "1 dari 2",
-                        icon = Icons.Outlined.CheckCircle
                     )
                 }
             }

@@ -157,20 +157,44 @@ fun calculateProgress(riskFactor: RiskFactorDetails): Float {
     }
 }
 
-fun getSmokingBackgroundColor(smokingValue: Int): Color {
+fun getSmokingBackgroundColor(count: Int): Color {
     return when {
-        smokingValue == 0 -> Color(0xFFF0FDF4)
-        smokingValue < 5 -> Color(0xFFFEF3C7)
-        smokingValue < 10 -> Color(0xFFFEE2E2)
-        else -> Color(0xFFFEF2F2)
+        count == 0 -> Color(0xFFDCFCE7)
+        count < 10 -> Color(0xFFFEF9C3)
+        else -> Color(0xFFFEE2E2)
     }
 }
 
-fun getSmokingTextColor(smokingValue: Int): Color {
+fun getSmokingTextColor(count: Int): Color {
     return when {
-        smokingValue == 0 -> Color(0xFF059669)
-        smokingValue < 5 -> Color(0xFFD97706)
-        smokingValue < 10 -> Color(0xFFEF4444)
+        count == 0 -> Color(0xFF059669)
+        count < 10 -> Color(0xFFCA8A04)
         else -> Color(0xFFDC2626)
+    }
+}
+
+fun formatRelativeTime(timestamp: String): String {
+    if (timestamp.isEmpty() || timestamp == "Belum ada prediksi") return "Belum ada pemeriksaan"
+    
+    try {
+        val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+        val date = dateFormat.parse(timestamp) ?: return "Format waktu tidak valid"
+        
+        val now = System.currentTimeMillis()
+        val diffInMillis = now - date.time
+        
+        val seconds = diffInMillis / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+        
+        return when {
+            days > 0 -> "$days hari lalu"
+            hours > 0 -> "$hours jam lalu"
+            minutes > 0 -> "$minutes menit lalu"
+            else -> "$seconds detik lalu"
+        }
+    } catch (e: Exception) {
+        return "Waktu tidak valid"
     }
 }

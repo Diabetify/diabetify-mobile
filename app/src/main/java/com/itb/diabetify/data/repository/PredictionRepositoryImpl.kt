@@ -21,6 +21,29 @@ class PredictionRepositoryImpl (
         return tokenManager.getToken()
     }
 
+    override suspend fun predict(): Resource<Unit> {
+        return try {
+            val response = predictionApiService.predict()
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun explainPrediction(): Resource<Unit> {
+        return try {
+            val response = predictionApiService.explainPrediction()
+            fetchLatestPrediction()
+            Resource.Success(Unit)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
     override suspend fun fetchLatestPrediction(): Resource<Unit> {
         return try {
             val response = predictionApiService.getPrediction(1)

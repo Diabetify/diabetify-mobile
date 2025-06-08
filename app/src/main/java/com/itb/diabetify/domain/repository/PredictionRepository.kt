@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface PredictionRepository {
     suspend fun getToken(): String?
+    suspend fun predict(): Resource<Unit>
+    suspend fun explainPrediction(): Resource<Unit>
     suspend fun fetchLatestPrediction(): Resource<Unit>
     suspend fun fetchPredictionByDate(startDate: String, endDate: String): Resource<GetPredictionResponse>
     suspend fun fetchPredictionScoreByDate(startDate: String, endDate: String): Resource<GetPredictionScoreResponse>

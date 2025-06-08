@@ -51,6 +51,7 @@ import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -333,6 +334,14 @@ object AppModule {
         repository: PredictionRepository
     ): GetPredictionScoreByDateUseCase {
         return GetPredictionScoreByDateUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPredictionUseCase(
+        repository: PredictionRepository
+    ): PredictionUseCase {
+        return PredictionUseCase(repository)
     }
 
     @Provides

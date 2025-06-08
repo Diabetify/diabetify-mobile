@@ -18,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,32 +60,42 @@ fun PieChart(
         Typeface.DEFAULT_BOLD
     }
 
-    val sortedRiskFactors = riskFactors.sortedByDescending { abs(it.percentage) }
-
-    val dataPercentages = sortedRiskFactors.map { it.percentage }
-
-    val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
-    val maxNegativeValue = dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
-
-    val chartColors = dataPercentages.map { percentage ->
-        when {
-            percentage >= 0 -> {
-                val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
-                val red = (200 * (0.6f + 0.4f * intensity)).toInt()
-                val green = (80 * (1 - intensity)).toInt()
-                Color(red, green, green).toArgb()
-            }
-            else -> {
-                val intensity = abs(percentage) / maxNegativeValue
-                val green = (180 * (0.6f + 0.4f * intensity)).toInt()
-                val red = (80 * (1 - intensity)).toInt()
-                Color(red, green, red).toArgb()
+    val sortedRiskFactors = remember(riskFactors) {
+        riskFactors.sortedByDescending { abs(it.percentage) }
+    }
+    
+    val dataPercentages = remember(sortedRiskFactors) {
+        sortedRiskFactors.map { it.percentage }
+    }
+    
+    val maxPositiveValue = remember(dataPercentages) {
+        dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
+    }
+    
+    val maxNegativeValue = remember(dataPercentages) {
+        dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
+    }
+    
+    val chartColors = remember(dataPercentages, maxPositiveValue, maxNegativeValue) {
+        dataPercentages.map { percentage ->
+            when {
+                percentage >= 0 -> {
+                    val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
+                    val red = (200 * (0.6f + 0.4f * intensity)).toInt()
+                    val green = (80 * (1 - intensity)).toInt()
+                    Color(red, green, green).toArgb()
+                }
+                else -> {
+                    val intensity = abs(percentage) / maxNegativeValue
+                    val green = (180 * (0.6f + 0.4f * intensity)).toInt()
+                    val red = (80 * (1 - intensity)).toInt()
+                    Color(red, green, red).toArgb()
+                }
             }
         }
     }
 
     Column(modifier = modifier.wrapContentHeight()) {
-        // PieChart
         AndroidView(
             factory = { context ->
                 PieChart(context).apply {
@@ -93,60 +104,65 @@ fun PieChart(
                     setHoleColor(Color.Transparent.toArgb())
                     this.holeRadius = holeRadius
                     transparentCircleRadius = holeRadius + 5f
-
-                    if (centerText != null) {
-                        setDrawCenterText(true)
-                        this.centerText = centerText
-                        setCenterTextSize(16f)
-                        setCenterTextColor(Color.Black.toArgb())
-                        setCenterTextTypeface(poppinsBoldTypeface)
-                    } else {
-                        setDrawCenterText(false)
-                    }
-
                     legend.isEnabled = false
-
                     rotationAngle = 0f
                     isRotationEnabled = true
                     isHighlightPerTapEnabled = true
-
                     setDrawEntryLabels(false)
                     setEntryLabelColor(Color.Transparent.toArgb())
                     setEntryLabelTextSize(0f)
+                }
+            },
+            update = { chart ->
+                // Update center text
+                if (centerText != null) {
+                    chart.setDrawCenterText(true)
+                    chart.centerText = centerText
+                    chart.setCenterTextSize(16f)
+                    chart.setCenterTextColor(Color.Black.toArgb())
+                    chart.setCenterTextTypeface(poppinsBoldTypeface)
+                } else {
+                    chart.setDrawCenterText(false)
+                }
 
-                    val entries = sortedRiskFactors.map { riskFactor ->
-                        PieEntry(abs(riskFactor.percentage), riskFactor.name)
-                    }
+                // Create entries and dataset
+                val entries = sortedRiskFactors.map { riskFactor ->
+                    PieEntry(abs(riskFactor.percentage), riskFactor.name)
+                }
 
-                    val dataSet = PieDataSet(entries, "").apply {
-                        this.colors = chartColors
+                val dataSet = PieDataSet(entries, "").apply {
+                    colors = chartColors
+                    valueTextSize = 12f
+                    valueTextColor = Color.White.toArgb()
+                    valueTypeface = poppinsBoldTypeface
+                    sliceSpace = 2f
+                    selectionShift = 5f
+                    valueFormatter = object : ValueFormatter() {
+                        @SuppressLint("DefaultLocale")
+                        override fun getFormattedValue(value: Float): String {
+                            val index = entries.indexOfFirst { it.value == value }
+                            val originalValue = sortedRiskFactors[index].percentage
+                            return String.format("%.1f", originalValue)
+                        }
 
-                        valueTextSize = 12f
-                        valueTextColor = Color.White.toArgb()
-                        valueTypeface = poppinsBoldTypeface
-
-                        sliceSpace = 2f
-                        selectionShift = 5f
-
-                        valueFormatter = object : ValueFormatter() {
-                            @SuppressLint("DefaultLocale")
-                            override fun getFormattedValue(value: Float): String {
-                                val index = entries.indexOfFirst { it.value == value }
-                                val originalValue = sortedRiskFactors[index].percentage
-                                return String.format("%.1f", originalValue)
-                            }
-
-                            override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-                                val fullName = pieEntry?.label ?: ""
-                                return sortedRiskFactors.find { it.name == fullName }?.abbreviation ?: ""
-                            }
+                        override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
+                            val fullName = pieEntry?.label ?: ""
+                            return sortedRiskFactors.find { it.name == fullName }?.abbreviation ?: ""
                         }
                     }
+                }
 
-                    this.data = PieData(dataSet)
-                    this.data.setDrawValues(true)
+                val hasDataChanged = chart.data?.let { currentData ->
+                    val currentValues = (currentData.dataSet as? PieDataSet)?.values?.map { it.value }
+                    val newValues = entries.map { it.value }
+                    currentValues != newValues
+                } ?: true
 
-                    animateY(animationDuration)
+                if (hasDataChanged) {
+                    chart.data = PieData(dataSet)
+                    chart.data.setDrawValues(true)
+                    chart.invalidate() // Refresh the chart
+                    chart.animateY(animationDuration)
                 }
             },
             modifier = Modifier
@@ -157,8 +173,7 @@ fun PieChart(
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFFF9FAFB)
             ),

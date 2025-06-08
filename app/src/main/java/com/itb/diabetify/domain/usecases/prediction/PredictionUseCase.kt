@@ -8,15 +8,16 @@ class PredictionUseCase(
     private val repository: PredictionRepository
 ) {
     suspend operator fun invoke(): PredictionResult {
-        val predict = repository.predict()
-        val explain = repository.explainPrediction()
-
-        return PredictionResult(
-            result = if (predict is Resource.Success && explain is Resource.Success) {
-                Resource.Success(Unit)
-            } else {
-                Resource.Error("Prediction or explanation failed")
+        return when (val predict = repository.predict()) {
+            is Resource.Success -> {
+                when (val explain = repository.explainPrediction()) {
+                    is Resource.Success -> PredictionResult(Resource.Success(Unit))
+                    is Resource.Error -> PredictionResult(Resource.Error(explain.message ?: "Explanation failed"))
+                    else -> PredictionResult(Resource.Error("Unexpected error during explanation"))
+                }
             }
-        )
+            is Resource.Error -> PredictionResult(Resource.Error(predict.message ?: "Prediction failed"))
+            else -> PredictionResult(Resource.Error("Unexpected error during prediction"))
+        }
     }
 }

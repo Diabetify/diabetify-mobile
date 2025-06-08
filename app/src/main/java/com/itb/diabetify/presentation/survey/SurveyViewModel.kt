@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.domain.repository.UserRepository
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import kotlinx.coroutines.runBlocking
 class SurveyViewModel @Inject constructor(
     private val addProfileUseCase: AddProfileUseCase,
     private val addActivityUseCase: AddActivityUseCase,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val predictionUseCase: PredictionUseCase
 ) : ViewModel() {
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
@@ -199,7 +201,21 @@ class SurveyViewModel @Inject constructor(
             when (addActivityResult.result) {
                 is Resource.Success -> {
                     Log.d("SurveyViewModel", "Workout Activity submission successful")
-                    _navigationEvent.value = "SUCCESS_SCREEN"
+                    val predictionResult = predictionUseCase()
+                    when (predictionResult.result) {
+                        is Resource.Success -> {
+                            Log.d("AddActivityViewModel", "Prediction updated successfully")
+                            _navigationEvent.value = "SUCCESS_SCREEN"
+                        }
+                        is Resource.Error -> {
+                            _errorMessage.value = predictionResult.result.message ?: "Failed to update prediction"
+                            Log.d("AddActivityViewModel", "Failed to update prediction: ${predictionResult.result.message}")
+                        }
+                        else -> {
+                            _errorMessage.value = "Unknown error occurred during prediction"
+                            Log.d("AddActivityViewModel", "Unknown error during prediction")
+                        }
+                    }
                 }
                 is Resource.Error -> {
                     Log.d("SurveyViewModel", "Workout Activity submission error: ${addActivityResult.result.message}")

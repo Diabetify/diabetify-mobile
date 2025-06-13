@@ -51,6 +51,9 @@ import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.home.components.BarChart
+import com.itb.diabetify.presentation.home.components.BarChartEntry
+import com.itb.diabetify.presentation.home.components.BarChartV2
 import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.PieChart
@@ -292,10 +295,21 @@ fun HomeScreen(
                                 color = colorResource(id = R.color.primary)
                             )
                         } else {
-                            PieChart(
-                                riskFactors = viewModel.riskFactors.value,
-                                centerText = "Faktor\nRisiko",
-                                modifier = Modifier.fillMaxWidth()
+//                            PieChart(
+//                                riskFactors = viewModel.riskFactors.value,
+//                                centerText = "Faktor\nRisiko",
+//                                modifier = Modifier.fillMaxWidth()
+//                            )
+
+                            BarChartV2(
+                                entries = viewModel.riskFactors.value.mapIndexed { index, riskFactor ->
+                                    BarChartEntry(
+                                        label = riskFactor.name,
+                                        abbreviation = riskFactor.abbreviation,
+                                        value = riskFactor.percentage.toFloat(),
+                                        isNegative = riskFactor.percentage < 0
+                                    )
+                                }
                             )
                         }
 

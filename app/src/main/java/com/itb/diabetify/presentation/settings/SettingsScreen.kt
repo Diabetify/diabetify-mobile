@@ -126,8 +126,8 @@ fun SettingsScreen(
 
                 // User profile card
                 ProfileCard(
-                    name = "Bernardus",
-                    email = "bernardus@gmail.com",
+                    name = viewModel.nameState.value.text,
+                    email = viewModel.emailState.value.text,
                     onEditClick = {
                         navController.navigate(Route.EditProfileScreen.route) {
                             launchSingleTop = true

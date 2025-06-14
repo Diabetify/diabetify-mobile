@@ -1,6 +1,6 @@
 package com.itb.diabetify.domain.model
 
-data class Profile (
+data class Profile(
     val hypertension: Boolean? = null,
     val weight: String? = null,
     val height: String? = null,
@@ -8,4 +8,6 @@ data class Profile (
     val smoking: Boolean? = null,
     val yearOfSmoking: String? = null,
     val macrosomicBaby: Boolean? = null,
+    val cholesterol: Boolean,
+    val bloodline: Boolean,
 )

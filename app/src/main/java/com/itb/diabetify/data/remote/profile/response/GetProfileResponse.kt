@@ -25,5 +25,9 @@ data class ProfileData(
     @SerializedName("year_of_smoking")
     val yearOfSmoking: Int,
     @SerializedName("macrosomic_baby")
-    val macrosomicBaby: Boolean
+    val macrosomicBaby: Boolean,
+    @SerializedName("cholesterol")
+    val cholesterol: Boolean,
+    @SerializedName("bloodline")
+    val bloodline: Boolean
 )

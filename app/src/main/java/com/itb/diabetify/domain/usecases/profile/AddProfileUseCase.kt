@@ -13,7 +13,9 @@ class AddProfileUseCase(
         hypertension: Boolean,
         macrosomicBaby: Boolean,
         smoking: Boolean,
-        yearOfSmoking: Int?
+        yearOfSmoking: Int?,
+        cholesterol: Boolean,
+        bloodline: Boolean
     ): AddProfileResult {
         val weightError = if (weight.isBlank()) "Weight cannot be empty" else null
         val heightError = if (height.isBlank()) "Height cannot be empty" else null
@@ -36,7 +38,9 @@ class AddProfileUseCase(
             hypertension = hypertension,
             macrosomicBaby = macrosomicBaby,
             smoking = smoking,
-            yearOfSmoking = yearOfSmoking
+            yearOfSmoking = yearOfSmoking,
+            cholesterol = cholesterol,
+            bloodline = bloodline
         )
 
         return AddProfileResult(

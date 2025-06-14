@@ -108,6 +108,8 @@ class SurveyViewModel @Inject constructor(
             val macrosomicBaby = _state.value.answers["pregnancy"]?.toBoolean() ?: false
             val smoking = _state.value.answers["smoking_status"]?.toBoolean() ?: false
             val yearOfSmoking = _state.value.answers["smoking_age"]?.toIntOrNull()
+            val cholesterol = _state.value.answers["cholesterol"]?.toBoolean() ?: false
+            val bloodline = _state.value.answers["bloodline"]?.toBoolean() ?: false
 
             val addProfileResult = addProfileUseCase(
                 weight = weight.toString(),
@@ -115,7 +117,9 @@ class SurveyViewModel @Inject constructor(
                 hypertension = hypertension,
                 macrosomicBaby = macrosomicBaby,
                 smoking = smoking,
-                yearOfSmoking = yearOfSmoking
+                yearOfSmoking = yearOfSmoking,
+                cholesterol = cholesterol,
+                bloodline = bloodline
             )
 
             _profileState.value = profileState.value.copy(isLoading = false)

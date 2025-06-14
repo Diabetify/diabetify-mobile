@@ -115,6 +115,26 @@ val questions = listOf(
         )
     ),
     SurveyQuestion(
+        id = "cholesterol",
+        category = "Kesehatan",
+        questionText = "Apakah Anda memiliki kolesterol tinggi?",
+        questionType = SurveyQuestionType.Selection,
+        options = listOf(
+            SurveyOption("true", "Ya"),
+            SurveyOption("false", "Tidak")
+        )
+    ),
+    SurveyQuestion(
+        id = "bloodline",
+        category = "Riwayat Keluarga",
+        questionText = "Apakah ayah atau ibu Anda meninggal dunia akibat komplikasi diabetes?",
+        questionType = SurveyQuestionType.Selection,
+        options = listOf(
+            SurveyOption("true", "Ya"),
+            SurveyOption("false", "Tidak")
+        )
+    ),
+    SurveyQuestion(
         id = "activity",
         category = "Aktivitas Fisik Mingguan",
         questionText = "Dalam seminggu terakhir, berapa menit total Anda melakukan aktivitas fisik?",

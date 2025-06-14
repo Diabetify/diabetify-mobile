@@ -1,6 +1,5 @@
 package com.itb.diabetify.data.repository
 
-import com.itb.diabetify.data.remote.activity.ActivityApiService
 import com.itb.diabetify.data.remote.profile.ProfileApiService
 import com.itb.diabetify.data.remote.profile.request.AddProfileRequest
 import com.itb.diabetify.data.remote.profile.request.UpdateProfileRequest
@@ -12,6 +11,7 @@ import com.itb.diabetify.util.Resource
 import kotlinx.coroutines.flow.Flow
 import okio.IOException
 import retrofit2.HttpException
+import android.util.Log
 
 class ProfileRepositoryImpl(
     private val profileApiService: ProfileApiService,
@@ -25,8 +25,10 @@ class ProfileRepositoryImpl(
     override suspend fun addProfile(
         addProfileRequest: AddProfileRequest
     ): Resource<Unit> {
+        Log.d("INFO",addProfileRequest.toString())
         return try {
             val response = profileApiService.addProfile(addProfileRequest)
+            Log.d("INFO",response.toString())
             fetchProfile()
             Resource.Success(Unit)
         } catch (e: IOException) {
@@ -56,6 +58,8 @@ class ProfileRepositoryImpl(
             response.data?.let { profile ->
                 profileManager.saveProfile(
                     Profile(
+                        cholesterol = profile.cholesterol,
+                        bloodline = profile.bloodline,
                         hypertension = profile.hypertension,
                         weight = profile.weight.toString(),
                         height = profile.height.toString(),

@@ -46,6 +46,22 @@ data class PredictionData(
     val isHypertensionImpact: Int,
     @SerializedName("is_hypertension_explanation")
     val isHypertensionExplanation: String,
+    @SerializedName("is_cholesterol")
+    val isCholesterol: Boolean,
+    @SerializedName("is_cholesterol_contribution")
+    val isCholesterolContribution: Double,
+    @SerializedName("is_cholesterol_impact")
+    val isCholesterolImpact: Int,
+    @SerializedName("is_cholesterol_explanation")
+    val isCholesterolExplanation: String,
+    @SerializedName("is_bloodline")
+    val isBloodline: Boolean,
+    @SerializedName("is_bloodline_contribution")
+    val isBloodlineContribution: Double,
+    @SerializedName("is_bloodline_impact")
+    val isBloodlineImpact: Int,
+    @SerializedName("is_bloodline_explanation")
+    val isBloodlineExplanation: String,
     @SerializedName("is_macrosomic_baby")
     val isMacrosomicBaby: Boolean,
     @SerializedName("is_macrosomic_baby_contribution")
@@ -62,12 +78,12 @@ data class PredictionData(
     val smokingStatusImpact: Int,
     @SerializedName("smoking_status_explanation")
     val smokingStatusExplanation: String,
-    @SerializedName("physical_activity_minutes")
-    val physicalActivityMinutes: Int,
-    @SerializedName("physical_activity_minutes_contribution")
-    val physicalActivityMinutesContribution: Double,
-    @SerializedName("physical_activity_minutes_impact")
-    val physicalActivityMinutesImpact: Int,
-    @SerializedName("physical_activity_minutes_explanation")
-    val physicalActivityMinutesExplanation: String,
+    @SerializedName("physical_activity_frequency")
+    val physicalActivityFrequency: Int,
+    @SerializedName("physical_activity_frequency_contribution")
+    val physicalActivityFrequencyContribution: Double,
+    @SerializedName("physical_activity_frequency_impact")
+    val physicalActivityFrequencyImpact: Int,
+    @SerializedName("physical_activity_frequency_explanation")
+    val physicalActivityFrequencyExplanation: String,
 )

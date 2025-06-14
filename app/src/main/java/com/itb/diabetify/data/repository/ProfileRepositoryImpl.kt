@@ -25,10 +25,8 @@ class ProfileRepositoryImpl(
     override suspend fun addProfile(
         addProfileRequest: AddProfileRequest
     ): Resource<Unit> {
-        Log.d("INFO",addProfileRequest.toString())
         return try {
             val response = profileApiService.addProfile(addProfileRequest)
-            Log.d("INFO",response.toString())
             fetchProfile()
             Resource.Success(Unit)
         } catch (e: IOException) {

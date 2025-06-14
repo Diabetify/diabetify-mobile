@@ -62,6 +62,12 @@ class PredictionRepositoryImpl (
                         brinkmanScoreExplanation = "",
                         isHypertension = "false",
                         isHypertensionContribution = "0.0",
+                        isCholesterol = "false",
+                        isCholesterolContribution = "0.0",
+                        isCholesterolExplanation = "",
+                        isBloodline = "false",
+                        isBloodlineContribution = "0.0",
+                        isBloodlineExplanation = "",
                         isHypertensionExplanation = "",
                         isMacrosomicBaby = "false",
                         isMacrosomicBabyContribution = "0.0",
@@ -69,9 +75,9 @@ class PredictionRepositoryImpl (
                         smokingStatus = "never",
                         smokingStatusContribution = "0.0",
                         smokingStatusExplanation = "",
-                        physicalActivityMinutes = "0",
-                        physicalActivityMinutesContribution = "0.0",
-                        physicalActivityMinutesExplanation = ""
+                        physicalActivityFrequency = "0",
+                        physicalActivityFrequencyContribution = "0.0",
+                        physicalActivityFrequencyExplanation = ""
                     )
                 )
                 return Resource.Success(Unit)
@@ -84,12 +90,16 @@ class PredictionRepositoryImpl (
                     prediction.brinkmanScoreContribution else -prediction.brinkmanScoreContribution
                 val isHypertensionContribution = if (prediction.isHypertensionImpact == 1)
                     prediction.isHypertensionContribution else -prediction.isHypertensionContribution
+                val isCholesterolContribution = if (prediction.isCholesterolImpact == 1)
+                    prediction.isCholesterolContribution else -prediction.isCholesterolContribution
+                val isBloodlineContribution = if (prediction.isBloodlineImpact == 1)
+                    prediction.isBloodlineContribution else -prediction.isBloodlineContribution
                 val isMacrosomicBabyContribution = if (prediction.isMacrosomicBabyImpact == 1)
                     prediction.isMacrosomicBabyContribution else -prediction.isMacrosomicBabyContribution
                 val smokingStatusContribution = if (prediction.smokingStatusImpact == 1)
                     prediction.smokingStatusContribution else -prediction.smokingStatusContribution
-                val physicalActivityContribution = if (prediction.physicalActivityMinutesImpact == 1)
-                    prediction.physicalActivityMinutesContribution else -prediction.physicalActivityMinutesContribution
+                val physicalActivityContribution = if (prediction.physicalActivityFrequencyImpact == 1)
+                    prediction.physicalActivityFrequencyContribution else -prediction.physicalActivityFrequencyContribution
 
                 predictionManager.savePrediction(
                     Prediction(
@@ -106,15 +116,21 @@ class PredictionRepositoryImpl (
                         isHypertension = prediction.isHypertension.toString(),
                         isHypertensionContribution = isHypertensionContribution.toString(),
                         isHypertensionExplanation = prediction.isHypertensionExplanation,
+                        isCholesterol = prediction.isCholesterol.toString(),
+                        isCholesterolContribution = isCholesterolContribution.toString(),
+                        isCholesterolExplanation = prediction.isCholesterolExplanation,
+                        isBloodline = prediction.isBloodline.toString(),
+                        isBloodlineContribution = isBloodlineContribution.toString(),
+                        isBloodlineExplanation = prediction.isBloodlineExplanation,
                         isMacrosomicBaby = prediction.isMacrosomicBaby.toString(),
                         isMacrosomicBabyContribution = isMacrosomicBabyContribution.toString(),
                         isMacrosomicBabyExplanation = prediction.isMacrosomicBabyExplanation,
                         smokingStatus = prediction.smokingStatus.toString(),
                         smokingStatusContribution = smokingStatusContribution.toString(),
                         smokingStatusExplanation = prediction.smokingStatusExplanation,
-                        physicalActivityMinutes = prediction.physicalActivityMinutes.toString(),
-                        physicalActivityMinutesContribution = physicalActivityContribution.toString(),
-                        physicalActivityMinutesExplanation = prediction.physicalActivityMinutesExplanation
+                        physicalActivityFrequency = prediction.physicalActivityFrequency.toString(),
+                        physicalActivityFrequencyContribution = physicalActivityContribution.toString(),
+                        physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation
                     )
                 )
             }

@@ -107,7 +107,7 @@ val questions = listOf(
     SurveyQuestion(
         id = "hypertension",
         category = "Kesehatan",
-        questionText = "Apakah Anda pernah didiagnosis memiliki tekanan darah tinggi (hipertensi)?",
+        questionText = "Apakah Anda didiagnosis memiliki tekanan darah tinggi (hipertensi)?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
             SurveyOption("true", "Ya"),
@@ -137,9 +137,9 @@ val questions = listOf(
     SurveyQuestion(
         id = "activity",
         category = "Aktivitas Fisik Mingguan",
-        questionText = "Dalam seminggu terakhir, berapa menit total Anda melakukan aktivitas fisik?",
+        questionText = "Dalam seminggu terakhir, berapa frekuensi Anda melakukan aktivitas fisik?",
         questionType = SurveyQuestionType.Numeric,
-        numericUnit = "menit",
+        numericUnit = "kali",
         additionalInfo = "Contoh: jalan cepat, menyapu, berkebun"
     ),
 )

@@ -14,13 +14,19 @@ data class Prediction (
     val isHypertension: String? = null,
     val isHypertensionContribution: String? = null,
     val isHypertensionExplanation: String? = null,
+    val isCholesterol: String? = null,
+    val isCholesterolContribution: String? = null,
+    val isCholesterolExplanation: String? = null,
+    val isBloodline: String? = null,
+    val isBloodlineContribution: String? = null,
+    val isBloodlineExplanation: String? = null,
     val isMacrosomicBaby: String? = null,
     val isMacrosomicBabyContribution: String? = null,
     val isMacrosomicBabyExplanation: String? = null,
     val smokingStatus: String? = null,
     val smokingStatusContribution: String? = null,
     val smokingStatusExplanation: String? = null,
-    val physicalActivityMinutes: String? = null,
-    val physicalActivityMinutesContribution: String? = null,
-    val physicalActivityMinutesExplanation: String? = null
+    val physicalActivityFrequency: String? = null,
+    val physicalActivityFrequencyContribution: String? = null,
+    val physicalActivityFrequencyExplanation: String? = null
 )

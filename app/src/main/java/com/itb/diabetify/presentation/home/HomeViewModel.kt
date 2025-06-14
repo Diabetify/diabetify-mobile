@@ -53,11 +53,14 @@ class HomeViewModel @Inject constructor(
 
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0f),
-        RiskFactor("Hipertensi", "HTN", 0f),
-        RiskFactor("Riwayat Kelahiran", "RK", 0f),
+        RiskFactor("Hipertensi", "H", 0f),
+        RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0f),
         RiskFactor("Aktivitas Fisik", "AF", 0f),
         RiskFactor("Usia", "U", 0f),
-        RiskFactor("Indeks Merokok", "IM", 0f)
+        RiskFactor("Status Merokok", "SM", 0f),
+        RiskFactor("Indeks Brinkman", "IB", 0f),
+        RiskFactor("Riwayat Keluarga", "RK", 0f),
+        RiskFactor("Kolesterol", "K", 0f),
     ))
     val riskFactors: State<List<RiskFactor>> = _riskFactors
 
@@ -71,7 +74,7 @@ class HomeViewModel @Inject constructor(
             currentValue = "0 kg/m²"
         ),
         RiskFactorDetails(
-            name = "HTN",
+            name = "H",
             fullName = "Hipertensi",
             impactPercentage = 0f,
             explanation = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
@@ -79,8 +82,8 @@ class HomeViewModel @Inject constructor(
             currentValue = "0/0 mmHg"
         ),
         RiskFactorDetails(
-            name = "RK",
-            fullName = "Riwayat Kelahiran",
+            name = "RBM",
+            fullName = "Riwayat Bayi Makrosomia",
             impactPercentage = 0f,
             explanation = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
             idealValue = "Berat lahir normal, kelahiran cukup bulan",
@@ -104,12 +107,36 @@ class HomeViewModel @Inject constructor(
             isModifiable = false
         ),
         RiskFactorDetails(
-            name = "IM",
-            fullName = "Indeks Merokok",
+            name = "SM",
+            fullName = "Status Merokok",
             impactPercentage = 0f,
-            explanation = "Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
+            explanation = "Status Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
             idealValue = "0 (tidak merokok)",
             currentValue = "0 batang per hari"
+        ),
+        RiskFactorDetails(
+            name = "IB",
+            fullName = "Indeks Brinkman",
+            impactPercentage = 0f,
+            explanation = "Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
+            idealValue = "0 (tidak merokok)",
+            currentValue = "0 batang per hari"
+        ),
+        RiskFactorDetails(
+            name = "RK",
+            fullName = "Riwayat Keluarga",
+            impactPercentage = 0f,
+            explanation = "Riwayat keluarga penyakit tertentu dapat meningkatkan risiko seseorang terhadap kondisi kesehatan tersebut.",
+            idealValue = "Tidak ada riwayat penyakit serius",
+            currentValue = "-"
+        ),
+        RiskFactorDetails(
+            name = "K",
+            fullName = "Kolesterol",
+            impactPercentage = 0f,
+            explanation = "Tingkat kolesterol yang tinggi dalam darah dapat meningkatkan risiko penyakit jantung dan stroke.",
+            idealValue = "< 200 mg/dL",
+            currentValue = "0 mg/dL"
         )
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
@@ -134,6 +161,12 @@ class HomeViewModel @Inject constructor(
 
     private val _physicalActivityValueState = mutableStateOf("0")
     val physicalActivityValueState: State<String> = _physicalActivityValueState
+
+    private val _isBloodlineValueState = mutableStateOf("false")
+    val isBloodlineValueState: State<String> = _isBloodlineValueState
+
+    private val _isCholesterolValueState = mutableStateOf("false")
+    val isCholesterolValueState: State<String> = _isCholesterolValueState
 
     private val _userNameState = mutableStateOf("")
     val userNameState: State<String> = _userNameState
@@ -282,17 +315,22 @@ class HomeViewModel @Inject constructor(
         _isMacrosomicBabyState.value = "false"
         _smokeValueState.value = "0"
         _physicalActivityValueState.value = "0"
+        _isBloodlineValueState.value = "false"
+        _isCholesterolValueState.value = "false"
         
         _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0f) }
         
         _riskFactorDetails.value = _riskFactorDetails.value.map {
             it.copy(impactPercentage = 0f, currentValue = when(it.name) {
                 "IMT" -> "0 kg/m²"
-                "HTN" -> "0/0 mmHg"
-                "RK" -> "-"
+                "H" -> "0/0 mmHg"
+                "RBM" -> "-"
                 "AF" -> "0 menit"
                 "U" -> "0 tahun"
-                "IM" -> "0 batang per hari"
+                "SM" -> "0 batang per hari"
+                "IB" -> "0 batang per hari"
+                "RK" -> "-"
+                "K" -> "0 mg/dL"
                 else -> "0"
             })
         }
@@ -314,44 +352,29 @@ class HomeViewModel @Inject constructor(
                     _latestPredictionScoreState.value = latestPrediction.riskScore.toString()
 
                     _riskFactors.value = listOf(
-                        RiskFactor("Indeks Massa Tubuh (BMI)", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Usia", "U", (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Indeks Brinkman", "IB", (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Riwayat Hipertensi", "RW", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Indeks Massa Tubuh", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Hipertensi", "RW", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Riwayat Bayi Makrosomia", "RBM", (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Aktivitas Fisik", "AF", (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Status Merokok", "SM", (latestPrediction.smokingStatusContribution?.toFloatOrNull() ?: 0f) * 100f)
+                        RiskFactor("Aktivitas Fisik", "AF", (latestPrediction.physicalActivityFrequencyContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Usia", "U", (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Status Merokok", "SM", (latestPrediction.smokingStatusContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Indeks Brinkman", "IB", (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Riwayat Keluarga", "RK", (latestPrediction.isBloodlineContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Kolesterol", "K", (latestPrediction.isCholesterolContribution?.toFloatOrNull() ?: 0f) * 100f)
                     )
 
                     _riskFactorDetails.value = listOf(
                         RiskFactorDetails(
                             name = "IMT",
-                            fullName = "Indeks Massa Tubuh (BMI)",
+                            fullName = "Indeks Massa Tubuh",
                             impactPercentage = (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f,
                             explanation = latestPrediction.bmiExplanation ?: "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
                             idealValue = "18.5 - 24.9 kg/m²",
                             currentValue = "${latestPrediction.bmi} kg/m²"
                         ),
                         RiskFactorDetails(
-                            name = "U",
-                            fullName = "Usia",
-                            impactPercentage = (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            explanation = latestPrediction.ageExplanation ?:"Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
-                            idealValue = "-",
-                            currentValue = "${latestPrediction.age} tahun",
-                            isModifiable = false
-                        ),
-                        RiskFactorDetails(
-                            name = "IB",
-                            fullName = "Indeks Brinkman",
-                            impactPercentage = (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            explanation = latestPrediction.brinkmanScoreExplanation ?:"Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
-                            idealValue = "0 (tidak merokok)",
-                            currentValue = "${latestPrediction.brinkmanScore} batang per hari"
-                        ),
-                        RiskFactorDetails(
-                            name = "RW",
-                            fullName = "Riwayat Hipertensi",
+                            name = "H",
+                            fullName = "Hipertensi",
                             impactPercentage = (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f,
                             explanation = latestPrediction.isHypertensionExplanation ?:"Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
                             idealValue = "< 120/80 mmHg",
@@ -368,10 +391,19 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "AF",
                             fullName = "Aktivitas Fisik",
-                            impactPercentage = (latestPrediction.physicalActivityMinutesContribution?.toFloatOrNull() ?: 0f) * 100f,
-                            explanation = latestPrediction.physicalActivityMinutesExplanation ?:"Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
+                            impactPercentage = (latestPrediction.physicalActivityFrequencyContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            explanation = latestPrediction.physicalActivityFrequencyExplanation ?:"Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
                             idealValue = "Min. 150 menit aktivitas sedang per minggu",
-                            currentValue = "${latestPrediction.physicalActivityMinutes} menit per minggu"
+                            currentValue = "${latestPrediction.physicalActivityFrequency} menit per minggu"
+                        ),
+                        RiskFactorDetails(
+                            name = "U",
+                            fullName = "Usia",
+                            impactPercentage = (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            explanation = latestPrediction.ageExplanation ?:"Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+                            idealValue = "-",
+                            currentValue = "${latestPrediction.age} tahun",
+                            isModifiable = false
                         ),
                         RiskFactorDetails(
                             name = "SM",
@@ -380,6 +412,30 @@ class HomeViewModel @Inject constructor(
                             explanation = latestPrediction.smokingStatusExplanation ?:"Indeks Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
                             idealValue = "0 (tidak merokok)",
                             currentValue = "${latestPrediction.smokingStatus} batang per hari"
+                        ),
+                        RiskFactorDetails(
+                            name = "IB",
+                            fullName = "Indeks Brinkman",
+                            impactPercentage = (latestPrediction.brinkmanScoreContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            explanation = latestPrediction.brinkmanScoreExplanation ?:"Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
+                            idealValue = "0 (tidak merokok)",
+                            currentValue = "${latestPrediction.brinkmanScore} batang per hari"
+                        ),
+                        RiskFactorDetails(
+                            name = "RK",
+                            fullName = "Riwayat Keluarga",
+                            impactPercentage = (latestPrediction.isBloodlineContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            explanation = latestPrediction.isBloodlineExplanation ?: "Riwayat keluarga penyakit tertentu dapat meningkatkan risiko seseorang terhadap kondisi kesehatan tersebut.",
+                            idealValue = "Tidak ada riwayat penyakit serius",
+                            currentValue = if (latestPrediction.isBloodline == "1") "Ya" else "Tidak"
+                        ),
+                        RiskFactorDetails(
+                            name = "K",
+                            fullName = "Kolesterol",
+                            impactPercentage = (latestPrediction.isCholesterolContribution?.toFloatOrNull() ?: 0f) * 100f,
+                            explanation = latestPrediction.isCholesterolExplanation ?: "Tingkat kolesterol yang tinggi dalam darah dapat meningkatkan risiko penyakit jantung dan stroke.",
+                            idealValue = "< 200 mg/dL",
+                            currentValue = "${latestPrediction.isCholesterol} mg/dL"
                         )
                     )
                 }
@@ -400,6 +456,8 @@ class HomeViewModel @Inject constructor(
                     _heightValueState.value = userProfile.height ?: "0"
                     _isHypertensionState.value = userProfile.hypertension.toString() ?: "false"
                     _isMacrosomicBabyState.value = userProfile.macrosomicBaby.toString() ?: "false"
+                    _isBloodlineValueState.value = userProfile.bloodline.toString() ?: "false"
+                    _isCholesterolValueState.value = userProfile.cholesterol.toString() ?: "false"
                 }
             }
         }

@@ -8,6 +8,6 @@ data class Profile(
     val smoking: Boolean? = null,
     val yearOfSmoking: String? = null,
     val macrosomicBaby: Boolean? = null,
-    val cholesterol: Boolean,
-    val bloodline: Boolean,
+    val cholesterol: Boolean? = null,
+    val bloodline: Boolean? = null,
 )

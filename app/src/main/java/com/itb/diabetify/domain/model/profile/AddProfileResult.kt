@@ -9,5 +9,7 @@ class AddProfileResult (
     val macrosomicBabyError: String? = null,
     val smokingError: String? = null,
     val yearOfSmokingError: String? = null,
+    val cholesterolError: String? = null,
+    val bloodlineError: String? = null,
     val result: Resource<Unit>? = null
 )

@@ -123,8 +123,8 @@ fun HistoryScreen(
                             ),
                             RiskFactorContribution(
                                 "Aktivitas Fisik",
-                                (String.format("%.1f", prediction.physicalActivityMinutesContribution * 100)),
-                                prediction.physicalActivityMinutesImpact == 1
+                                (String.format("%.1f", prediction.physicalActivityFrequencyContribution * 100)),
+                                prediction.physicalActivityFrequencyImpact == 1
                             ),
                             RiskFactorContribution(
                                 "Riwayat Bayi Makrosomia",
@@ -167,7 +167,7 @@ fun HistoryScreen(
                             ),
                             DailyInput(
                                 "Aktivitas Fisik",
-                                "${prediction.physicalActivityMinutes} menit"
+                                "${prediction.physicalActivityFrequency} menit"
                             )
                         )
                     )

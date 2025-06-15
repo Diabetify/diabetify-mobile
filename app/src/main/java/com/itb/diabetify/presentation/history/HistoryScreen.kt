@@ -112,7 +112,7 @@ fun HistoryScreen(
                         riskPercentage = (prediction.riskScore * 100).toFloat(),
                         riskFactorContributions = listOf(
                             RiskFactorContribution(
-                                "Indeks Massa Tubuh (BMI)",
+                                "Indeks Massa Tubuh",
                                 (String.format("%.1f", prediction.bmiContribution * 100)),
                                 prediction.bmiImpact == 1
                             ),
@@ -122,14 +122,14 @@ fun HistoryScreen(
                                 prediction.isHypertensionImpact == 1
                             ),
                             RiskFactorContribution(
-                                "Aktivitas Fisik",
-                                (String.format("%.1f", prediction.physicalActivityFrequencyContribution * 100)),
-                                prediction.physicalActivityFrequencyImpact == 1
-                            ),
-                            RiskFactorContribution(
                                 "Riwayat Bayi Makrosomia",
                                 (String.format("%.1f", prediction.isMacrosomicBabyContribution * 100)),
                                 prediction.isMacrosomicBabyImpact == 1
+                            ),
+                            RiskFactorContribution(
+                                "Aktivitas Fisik",
+                                (String.format("%.1f", prediction.physicalActivityFrequencyContribution * 100)),
+                                prediction.physicalActivityFrequencyImpact == 1
                             ),
                             RiskFactorContribution(
                                 "Usia",
@@ -137,24 +137,29 @@ fun HistoryScreen(
                                 prediction.ageImpact == 1
                             ),
                             RiskFactorContribution(
+                                "Status Merokok",
+                                (String.format("%.1f", prediction.smokingStatusContribution * 100)),
+                                prediction.smokingStatusImpact == 1
+                            ),
+                            RiskFactorContribution(
                                 "Indeks Brinkman",
                                 (String.format("%.1f", prediction.brinkmanScoreContribution * 100)),
                                 prediction.brinkmanScoreImpact == 1
                             ),
                             RiskFactorContribution(
-                                "Status Merokok",
-                                (String.format("%.1f", prediction.smokingStatusContribution * 100)),
-                                prediction.smokingStatusImpact == 1
+                                "Riwayat Keluarga",
+                                (String.format("%.1f", prediction.isBloodlineContribution * 100)),
+                                prediction.isBloodlineImpact == 1
+                            ),
+                            RiskFactorContribution(
+                                "Kolesterol",
+                                (String.format("%.1f", prediction.isCholesterolContribution * 100)),
+                                prediction.isCholesterolImpact == 1
                             )
                         ),
                         dailyInputs = listOf(
-                            DailyInput("Usia", "${prediction.age} tahun"),
-                            DailyInput("Indeks Massa Tubuh (BMI)", "${prediction.bmi} kg/m²"),
-                            DailyInput(
-                                "Indeks Brinkman",
-                                "${prediction.brinkmanScore}"
-                            ),
-                            DailyInput("Riwayat Hipertensi",
+                            DailyInput("Indeks Massa Tubuh", "${prediction.bmi} kg/m²"),
+                            DailyInput("Hipertensi",
                                 if (prediction.isHypertension) "Ya" else "Tidak"
                             ),
                             DailyInput(
@@ -162,12 +167,25 @@ fun HistoryScreen(
                                 if (prediction.isMacrosomicBaby) "Ya" else "Tidak"
                             ),
                             DailyInput(
+                                "Aktivitas Fisik",
+                                "${prediction.physicalActivityFrequency} menit"
+                            ),
+                            DailyInput("Usia", "${prediction.age} tahun"),
+                            DailyInput(
                                 "Status Merokok",
                                 prediction.smokingStatus
                             ),
                             DailyInput(
-                                "Aktivitas Fisik",
-                                "${prediction.physicalActivityFrequency} menit"
+                                "Indeks Brinkman",
+                                "${prediction.brinkmanScore}"
+                            ),
+                            DailyInput(
+                                "Riwayat Keluarga",
+                                if (prediction.isBloodline) "Ya" else "Tidak"
+                            ),
+                            DailyInput(
+                                "Kolesterol",
+                                if (prediction.isCholesterol) "Ya" else "Tidak"
                             )
                         )
                     )

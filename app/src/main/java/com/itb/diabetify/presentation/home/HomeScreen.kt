@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -51,16 +50,13 @@ import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
-import com.itb.diabetify.presentation.home.components.BarChart
 import com.itb.diabetify.presentation.home.components.BarChartEntry
 import com.itb.diabetify.presentation.home.components.BarChartV2
 import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
-import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
-import com.itb.diabetify.presentation.home.components.formatHypertension
-import com.itb.diabetify.presentation.home.components.formatMacrosomicBaby
+import com.itb.diabetify.presentation.home.components.formatBoolean
 import com.itb.diabetify.presentation.home.components.formatRelativeTime
 import com.itb.diabetify.presentation.home.components.getActivityLevelColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
@@ -618,13 +614,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val isHypertension = viewModel.isHypertensionState.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.Warning,
-                                contentDescription = "Warning",
-                                tint = Color(0xFFD97706),
+                                imageVector = if (isHypertension != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isHypertension != "false") "Warning" else "Check",
+                                tint = if (isHypertension != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -637,9 +634,8 @@ fun HomeScreen(
                             )
                         }
 
-                        val isHypertension = viewModel.isHypertensionState.value
                         Text(
-                            text = formatHypertension(isHypertension),
+                            text = formatBoolean(isHypertension),
                             color = if (isHypertension != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
@@ -659,13 +655,118 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val isCholesterol = viewModel.isCholesterolValueState.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.CheckCircle,
-                                contentDescription = "Check",
-                                tint = colorResource(id = R.color.primary),
+                                imageVector = if (isCholesterol != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isCholesterol != "false") "Warning" else "Check",
+                                tint = if (isCholesterol != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Kolesterol",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+                        }
+
+                        Text(
+                            text = formatBoolean(isCholesterol),
+                            color = if (isCholesterol != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                        )
+                    }
+                }
+            }
+
+            // History Status Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color.Gray.copy(alpha = 0.2f)
+                    ),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Riwayat Kesehatan",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val isBloodline = viewModel.isBloodlineValueState.value
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (isBloodline != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isBloodline != "false") "Warning" else "Check",
+                                tint = if (isBloodline != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Riwayat Keluarga",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary),
+                            )
+                        }
+
+                        Text(
+                            text = formatBoolean(isBloodline),
+                            color = if (isBloodline != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                        )
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        color = Color(0xFFE5E7EB)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val isMacrosomicBaby = viewModel.isMacrosomicBabyState.value
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (isMacrosomicBaby != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isMacrosomicBaby != "false") "Warning" else "Check",
+                                tint = if (isMacrosomicBaby != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -678,13 +779,12 @@ fun HomeScreen(
                             )
                         }
 
-                        val isMacrosomicBaby = viewModel.isMacrosomicBabyState.value
                         Text(
-                            text = formatMacrosomicBaby(isMacrosomicBaby),
+                            text = formatBoolean(isMacrosomicBaby),
+                            color = if (isMacrosomicBaby != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
-                            color = colorResource(id = R.color.primary),
                         )
                     }
                 }

@@ -137,9 +137,9 @@ val questions = listOf(
     SurveyQuestion(
         id = "activity",
         category = "Aktivitas Fisik Mingguan",
-        questionText = "Dalam seminggu terakhir, berapa frekuensi Anda melakukan aktivitas fisik?",
+        questionText = "Dalam seminggu terakhir, berapa hari Anda melakukan aktivitas fisik?",
         questionType = SurveyQuestionType.Numeric,
-        numericUnit = "kali",
+        numericUnit = "hari",
         additionalInfo = "Contoh: jalan cepat, menyapu, berkebun"
     ),
 )

@@ -84,24 +84,24 @@ fun MeasurementCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Change indicator
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val trendColor = when (trend) {
-                    "up" -> Color(0xFFDC2626)
-                    "down" -> Color(0xFF059669)
-                    else -> Color(0xFF6B7280)
-                }
-
-                Text(
-                    text = if (trend == "stable") "Stabil" else "$changeIndicator $unit",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
-                    color = trendColor
-                )
-            }
+//            // Change indicator
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                val trendColor = when (trend) {
+//                    "up" -> Color(0xFFDC2626)
+//                    "down" -> Color(0xFF059669)
+//                    else -> Color(0xFF6B7280)
+//                }
+//
+//                Text(
+//                    text = if (trend == "stable") "Stabil" else "$changeIndicator $unit",
+//                    fontFamily = poppinsFontFamily,
+//                    fontWeight = FontWeight.Medium,
+//                    fontSize = 12.sp,
+//                    color = trendColor
+//                )
+//            }
         }
     }
 }

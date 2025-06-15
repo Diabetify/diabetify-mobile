@@ -5,15 +5,7 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import kotlin.math.abs
 
-fun formatMacrosomicBaby(status: String): String {
-    return when(status) {
-        "true" -> "Ya"
-        "false" -> "Tidak"
-        else -> status
-    }
-}
-
-fun formatHypertension(status: String): String {
+fun formatBoolean(status: String): String {
     return when(status) {
         "true" -> "Ya"
         "false" -> "Tidak"

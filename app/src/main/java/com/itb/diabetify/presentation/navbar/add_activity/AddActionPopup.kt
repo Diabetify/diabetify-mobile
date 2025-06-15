@@ -59,6 +59,8 @@ fun AddActionPopup(
     val heightValueState = viewModel.heightValueState.value
     val birthValueState = viewModel.birthValueState.value
     val hypertensionValueState = viewModel.hypertensionValueState.value
+    val cholesterolValueState = viewModel.cholesterolValueState.value
+    val bloodlineValueState = viewModel.bloodlineValueState.value
 
     val currentValues = mapOf(
         "weight" to weightValueState.text,
@@ -66,7 +68,9 @@ fun AddActionPopup(
         "cigarette" to smokeValueState.text,
         "activity" to workoutValueState.text,
         "birth" to birthValueState.text,
-        "hypertension" to hypertensionValueState.text
+        "hypertension" to hypertensionValueState.text,
+        "cholesterol" to cholesterolValueState.text,
+        "bloodline" to bloodlineValueState.text
     )
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -109,8 +113,8 @@ fun AddActionPopup(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(24.dp),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     ) {
                         // Monthly tracking options
                         AnimatedVisibility(
@@ -171,25 +175,50 @@ fun AddActionPopup(
                         }
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            AnimatedTrackingButton(
-                                icon = R.drawable.ic_baby,
-                                label = "Kehamilan",
-                                delayMillis = 250,
-                                onClick = {
-                                    currentQuestionType = "birth"
-                                    showBottomSheet = true
-                                }
-                            )
-
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_hypertension,
                                 label = "Hipertensi",
                                 delayMillis = 300,
                                 onClick = {
                                     currentQuestionType = "hypertension"
+                                    showBottomSheet = true
+                                }
+                            )
+
+                            AnimatedTrackingButton(
+                                icon = R.drawable.ic_cholesterol,
+                                label = "Kolesterol",
+                                delayMillis = 250,
+                                onClick = {
+                                    currentQuestionType = "cholesterol"
+                                    showBottomSheet = true
+                                }
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            AnimatedTrackingButton(
+                                icon = R.drawable.ic_family,
+                                label = "Keluarga",
+                                delayMillis = 250,
+                                onClick = {
+                                    currentQuestionType = "bloodline"
+                                    showBottomSheet = true
+                                }
+                            )
+
+                            AnimatedTrackingButton(
+                                icon = R.drawable.ic_baby,
+                                label = "Kehamilan",
+                                delayMillis = 300,
+                                onClick = {
+                                    currentQuestionType = "birth"
                                     showBottomSheet = true
                                 }
                             )
@@ -253,8 +282,6 @@ fun AddActionPopup(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         // Close button
                         AnimatedVisibility(
                             visible = true,
@@ -313,7 +340,7 @@ fun AnimatedTrackingButton(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = label,

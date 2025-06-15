@@ -71,6 +71,12 @@ class AddActivityViewModel @Inject constructor(
     private val _diastolicValueState = mutableStateOf(FieldState())
     val diastolicValueState: State<FieldState> = _diastolicValueState
 
+    private val _bloodlineValueState = mutableStateOf(FieldState())
+    val bloodlineValueState: State<FieldState> = _bloodlineValueState
+
+    private val _cholesterolValueState = mutableStateOf(FieldState())
+    val cholesterolValueState: State<FieldState> = _cholesterolValueState
+
     init {
         collectActivityTodayData()
         collectProfileData()
@@ -121,6 +127,14 @@ class AddActivityViewModel @Inject constructor(
                         text = it.hypertension.toString(),
                         error = null
                     )
+                    _bloodlineValueState.value = FieldState(
+                        text = it.bloodline.toString(),
+                        error = null
+                    )
+                    _cholesterolValueState.value = FieldState(
+                        text = it.cholesterol.toString(),
+                        error = null
+                    )
                 }
             }.launchIn(viewModelScope)
         }
@@ -164,6 +178,16 @@ class AddActivityViewModel @Inject constructor(
     fun setDiastolicValue(value: String) {
         _diastolicValueState.value = diastolicValueState.value.copy(error = null)
         _diastolicValueState.value = diastolicValueState.value.copy(text = value)
+    }
+
+    fun setBloodlineValue(value: String) {
+        _bloodlineValueState.value = bloodlineValueState.value.copy(error = null)
+        _bloodlineValueState.value = bloodlineValueState.value.copy(text = value)
+    }
+
+    fun setCholesterolValue(value: String) {
+        _cholesterolValueState.value = cholesterolValueState.value.copy(error = null)
+        _cholesterolValueState.value = cholesterolValueState.value.copy(text = value)
     }
 
     @SuppressLint("NewApi")
@@ -227,14 +251,18 @@ class AddActivityViewModel @Inject constructor(
             val height = heightValueState.value.text
             val hypertension = hypertensionValueState.value.text.toBoolean()
             val macrosomicBaby = birthValueState.value.text.toBoolean()
+            val bloodline = bloodlineValueState.value.text.toBoolean()
+            val cholesterol = cholesterolValueState.value.text.toBoolean()
 
             val updateProfileResult = when (type) {
-                "weight", "height", "hypertension", "birth" -> {
+                "weight", "height", "hypertension", "birth", "bloodline", "cholesterol" -> {
                     updateProfileUseCase(
                         weight = weight,
                         height = height,
                         hypertension = hypertension,
-                        macrosomicBaby = macrosomicBaby
+                        macrosomicBaby = macrosomicBaby,
+                        bloodline = bloodline,
+                        cholesterol = cholesterol
                     )
                 }
                 else -> {

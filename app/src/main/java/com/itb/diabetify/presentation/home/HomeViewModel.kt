@@ -353,7 +353,7 @@ class HomeViewModel @Inject constructor(
 
                     _riskFactors.value = listOf(
                         RiskFactor("Indeks Massa Tubuh", "IMT", (latestPrediction.bmiContribution?.toFloatOrNull() ?: 0f) * 100f),
-                        RiskFactor("Hipertensi", "RW", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
+                        RiskFactor("Hipertensi", "H", (latestPrediction.isHypertensionContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Riwayat Bayi Makrosomia", "RBM", (latestPrediction.isMacrosomicBabyContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Aktivitas Fisik", "AF", (latestPrediction.physicalActivityFrequencyContribution?.toFloatOrNull() ?: 0f) * 100f),
                         RiskFactor("Usia", "U", (latestPrediction.ageContribution?.toFloatOrNull() ?: 0f) * 100f),

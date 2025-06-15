@@ -27,7 +27,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -149,7 +148,7 @@ fun BottomSheet(
                                         currentValue = currentSelectionValue,
                                         onSave = {
                                             when (currentQuestion.id) {
-                                                "birth", "hypertension" -> viewModel.updateProfile(currentQuestion.id)
+                                                "birth", "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(currentQuestion.id)
                                             }
                                             onDismissRequest()
                                         },
@@ -282,6 +281,8 @@ fun SelectionInput(
                         when (question.id) {
                             "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                            "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
+                            "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
                         }
                     }
             ) {
@@ -292,6 +293,8 @@ fun SelectionInput(
                         when (question.id) {
                             "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                            "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
+                            "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
                         }
                     },
                     colors = RadioButtonDefaults.colors(

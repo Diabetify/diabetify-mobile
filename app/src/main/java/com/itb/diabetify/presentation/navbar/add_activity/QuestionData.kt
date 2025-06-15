@@ -47,7 +47,7 @@ val questions = listOf(
     ),
     DataInputQuestion(
         id = "hypertension",
-        category = "Kesehatan",
+        category = "Hipertensi",
         questionText = "Apakah Anda mengetahui nilai tekanan darah Anda?",
         questionType = DataInputQuestionType.Hypertension,
         options = listOf(
@@ -69,4 +69,24 @@ val questions = listOf(
         questionType = DataInputQuestionType.Numeric,
         numericUnit = "menit"
     ),
+    DataInputQuestion(
+        id = "cholesterol",
+        category = "Kolesterol",
+        questionText = "Apakah Anda memiliki kolesterol tinggi?",
+        questionType = DataInputQuestionType.Selection,
+        options = listOf(
+            InputOption("yes", "Ya"),
+            InputOption("no", "Tidak")
+        )
+    ),
+    DataInputQuestion(
+        id = "bloodline",
+        category = "Riwayat Keluarga",
+        questionText = "Apakah ayah atau ibu Anda meninggal dunia akibat komplikasi diabetes?",
+        questionType = DataInputQuestionType.Selection,
+        options = listOf(
+            InputOption("yes", "Ya"),
+            InputOption("no", "Tidak")
+        )
+    )
 )

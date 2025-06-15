@@ -172,3 +172,123 @@ fun SecondaryButton(
         }
     }
 }
+
+@Composable
+fun CustomizableButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean? = true,
+    leftImageResId: Int? = null,
+    rightImageResId: Int? = null,
+    isLoading: Boolean = false,
+    backgroundColor: Color = colorResource(id = R.color.primary),
+    backgroundColorSecondary: Color? = null,
+    textColor: Color = Color.White,
+    loadingIndicatorColor: Color = Color.White,
+    disabledAlpha: Float = 0.5f
+) {
+    val isEnabled = (enabled ?: true) && !isLoading
+
+    val backgroundBrush = when {
+        !isEnabled -> {
+            if (backgroundColorSecondary != null) {
+                Brush.horizontalGradient(
+                    colors = listOf(
+                        backgroundColor.copy(alpha = disabledAlpha),
+                        backgroundColorSecondary.copy(alpha = disabledAlpha * 0.8f)
+                    )
+                )
+            } else {
+                Brush.horizontalGradient(
+                    colors = listOf(
+                        backgroundColor.copy(alpha = disabledAlpha),
+                        backgroundColor.copy(alpha = disabledAlpha * 0.8f)
+                    )
+                )
+            }
+        }
+        backgroundColorSecondary != null -> {
+            Brush.horizontalGradient(
+                colors = listOf(backgroundColor, backgroundColorSecondary)
+            )
+        }
+        else -> {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    backgroundColor,
+                    backgroundColor.copy(alpha = 0.8f)
+                )
+            )
+        }
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .shadow(
+                elevation = if (isEnabled) 6.dp else 2.dp,
+                shape = RoundedCornerShape(28.dp)
+            ),
+        shape = RoundedCornerShape(28.dp),
+        color = Color.Transparent
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(brush = backgroundBrush)
+                .clickable(
+                    enabled = isEnabled,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = loadingIndicatorColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (leftImageResId != null) {
+                        Image(
+                            painter = painterResource(id = leftImageResId),
+                            contentDescription = "Left Image",
+                            modifier = Modifier
+                                .size(15.dp)
+                                .align(Alignment.CenterStart)
+                                .padding(start = 16.dp),
+                            alpha = if (isEnabled) 1f else disabledAlpha
+                        )
+                    }
+
+                    Text(
+                        text = text,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 18.sp,
+                        color = textColor.copy(alpha = if (isEnabled) 1f else disabledAlpha),
+                        textAlign = TextAlign.Center
+                    )
+
+                    if (rightImageResId != null) {
+                        Image(
+                            painter = painterResource(id = rightImageResId),
+                            contentDescription = "Right Image",
+                            modifier = Modifier
+                                .size(15.dp)
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 16.dp),
+                            alpha = if (isEnabled) 1f else disabledAlpha
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

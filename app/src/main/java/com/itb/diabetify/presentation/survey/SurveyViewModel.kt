@@ -33,6 +33,9 @@ class SurveyViewModel @Inject constructor(
     private var _activityState = mutableStateOf(DataState())
     val activityState: State<DataState> = _activityState
 
+    private var _predictionState = mutableStateOf(DataState())
+    val predictionState: State<DataState> = _predictionState
+
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
@@ -86,7 +89,10 @@ class SurveyViewModel @Inject constructor(
                 currentPageIndex = _state.value.currentPageIndex + 1
             )
         } else {
-            submitSurvey()
+            // Show review screen before submitting
+            _state.value = _state.value.copy(
+                showReviewScreen = true
+            )
         }
     }
 
@@ -205,21 +211,7 @@ class SurveyViewModel @Inject constructor(
             when (addActivityResult.result) {
                 is Resource.Success -> {
                     Log.d("SurveyViewModel", "Workout Activity submission successful")
-                    val predictionResult = predictionUseCase()
-                    when (predictionResult.result) {
-                        is Resource.Success -> {
-                            Log.d("AddActivityViewModel", "Prediction updated successfully")
-                            _navigationEvent.value = "SUCCESS_SCREEN"
-                        }
-                        is Resource.Error -> {
-                            _errorMessage.value = predictionResult.result.message ?: "Failed to update prediction"
-                            Log.d("AddActivityViewModel", "Failed to update prediction: ${predictionResult.result.message}")
-                        }
-                        else -> {
-                            _errorMessage.value = "Unknown error occurred during prediction"
-                            Log.d("AddActivityViewModel", "Unknown error during prediction")
-                        }
-                    }
+                    predict()
                 }
                 is Resource.Error -> {
                     Log.d("SurveyViewModel", "Workout Activity submission error: ${addActivityResult.result.message}")
@@ -233,6 +225,37 @@ class SurveyViewModel @Inject constructor(
                     // Handle unexpected error
                     Log.e("SurveyViewModel", "Unexpected error in activity submission")
                     showSnackbar("Terjadi kesalahan saat mengirimkan aktivitas")
+                    _errorMessage.value = "Unknown error occurred"
+                }
+            }
+        }
+    }
+
+    private fun predict() {
+        viewModelScope.launch {
+            _predictionState.value = predictionState.value.copy(isLoading = true)
+
+            val predictionResult = predictionUseCase()
+
+            _predictionState.value = predictionState.value.copy(isLoading = false)
+
+            when (predictionResult.result) {
+                is Resource.Success -> {
+                    Log.d("SurveyViewModel", "Prediction successful")
+                    _navigationEvent.value = "SUCCESS_SCREEN"
+                }
+                is Resource.Error -> {
+                    Log.d("SurveyViewModel", "Prediction error: ${predictionResult.result.message}")
+                    showSnackbar(predictionResult.result.message ?: "Terjadi kesalahan saat memprediksi")
+                    _errorMessage.value = predictionResult.result.message ?: "Unknown error occurred"
+                }
+                is Resource.Loading -> {
+                    Log.d("SurveyViewModel", "Prediction loading")
+                }
+                else -> {
+                    // Handle unexpected error
+                    Log.e("SurveyViewModel", "Unexpected error in prediction")
+                    showSnackbar("Terjadi kesalahan saat memprediksi")
                     _errorMessage.value = "Unknown error occurred"
                 }
             }
@@ -281,5 +304,34 @@ class SurveyViewModel @Inject constructor(
 
     fun onNavigationHandled() {
         _navigationEvent.value = null
+    }
+
+    fun confirmAndSubmit() {
+        submitSurvey()
+    }
+
+    fun backToSurvey() {
+        _state.value = _state.value.copy(
+            showReviewScreen = false
+        )
+    }
+
+    fun getAnsweredQuestions(): List<Pair<SurveyQuestion, String>> {
+        return displayedSurveyQuestions.mapNotNull { question ->
+            _state.value.answers[question.id]?.let { answer ->
+                question to answer
+            }
+        }
+    }
+
+    fun getFormattedAnswer(question: SurveyQuestion, answer: String): String {
+        return when (question.questionType) {
+            SurveyQuestionType.Selection -> {
+                question.options.find { it.id == answer }?.text ?: answer
+            }
+            SurveyQuestionType.Numeric -> {
+                "$answer ${question.numericUnit}"
+            }
+        }
     }
 }

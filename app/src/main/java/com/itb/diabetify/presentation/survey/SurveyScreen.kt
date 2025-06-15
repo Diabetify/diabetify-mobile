@@ -92,74 +92,87 @@ fun SurveyScreen(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                // Survey question page
-                if (viewModel.displayedSurveyQuestions.isNotEmpty()) {
-                    SurveyPage(
-                        question = viewModel.getCurrentQuestion(),
-                        onAnswerSelected = { questionId, answer ->
-                            viewModel.setAnswer(questionId, answer)
-                        },
-                        selectedAnswer = state.answers[viewModel.getCurrentQuestion().id]
+                if (state.showReviewScreen) {
+                    // Review screen
+                    ReviewScreen(
+                        answeredQuestions = viewModel.getAnsweredQuestions(),
+                        onConfirm = { viewModel.confirmAndSubmit() },
+                        onBack = { viewModel.backToSurvey() },
+                        isLoading = viewModel.profileState.value.isLoading || viewModel.activityState.value.isLoading || viewModel.predictionState.value.isLoading,
+                        viewModel = viewModel
                     )
+                } else {
+                    // Survey question page
+                    if (viewModel.displayedSurveyQuestions.isNotEmpty()) {
+                        SurveyPage(
+                            question = viewModel.getCurrentQuestion(),
+                            onAnswerSelected = { questionId, answer ->
+                                viewModel.setAnswer(questionId, answer)
+                            },
+                            selectedAnswer = state.answers[viewModel.getCurrentQuestion().id]
+                        )
+                    }
                 }
             }
 
             // Bottom section with progress
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Current question number
-                Text(
-                    text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                // Progress indicator
-                LinearProgressIndicator(
-                    progress = { viewModel.getProgress() },
+            if (!state.showReviewScreen) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
-                    color = colorResource(R.color.primary),
-                    trackColor = colorResource(R.color.background),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Previous and Next buttons
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    PrimaryButton(
-                        text = "<",
-                        onClick = { viewModel.previousPage() },
-                        enabled = viewModel.canGoPrevious(),
-                        modifier = Modifier
-                            .width(100.dp)
-                            .height(50.dp),
+                    // Current question number
+                    Text(
+                        text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
                     )
 
-                    PrimaryButton(
-                        text = ">",
-                        onClick = { viewModel.nextPage() },
-                        enabled = viewModel.canGoNext(),
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    // Progress indicator
+                    LinearProgressIndicator(
+                        progress = { viewModel.getProgress() },
                         modifier = Modifier
-                            .width(100.dp)
-                            .height(50.dp),
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp),
+                        color = colorResource(R.color.primary),
+                        trackColor = colorResource(R.color.background),
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Previous and Next buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 30.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PrimaryButton(
+                            text = "<",
+                            onClick = { viewModel.previousPage() },
+                            enabled = viewModel.canGoPrevious(),
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(50.dp),
+                        )
+
+                        PrimaryButton(
+                            text = ">",
+                            onClick = { viewModel.nextPage() },
+                            enabled = viewModel.canGoNext(),
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(50.dp),
+                        )
+                    }
                 }
             }
         }

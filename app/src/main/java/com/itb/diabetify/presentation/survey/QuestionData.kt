@@ -25,7 +25,8 @@ data class SurveyState(
     val answers: Map<String, String> = emptyMap(),
     val showSnackbar: Boolean = false,
     val snackbarMessage: String = "",
-    val isComplete: Boolean = false
+    val isComplete: Boolean = false,
+    val showReviewScreen: Boolean = false
 )
 
 val questions = listOf(

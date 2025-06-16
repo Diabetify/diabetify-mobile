@@ -58,9 +58,10 @@ import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
 import com.itb.diabetify.presentation.home.components.formatBoolean
 import com.itb.diabetify.presentation.home.components.formatRelativeTime
-import com.itb.diabetify.presentation.home.components.getActivityLevelColor
+import com.itb.diabetify.presentation.home.components.getActivityAverageColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
+import com.itb.diabetify.presentation.home.components.getBrinkmanIndexColor
 import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
 import com.itb.diabetify.presentation.home.components.getSmokingTextColor
 import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
@@ -634,13 +635,21 @@ fun HomeScreen(
                             )
                         }
 
-                        Text(
-                            text = formatBoolean(isHypertension),
-                            color = if (isHypertension != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                        )
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (!isHypertension.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = if (isHypertension.toBoolean()) "Ya" else "Tidak",
+                                color = if (!isHypertension.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
                     }
 
                     HorizontalDivider(
@@ -675,13 +684,21 @@ fun HomeScreen(
                             )
                         }
 
-                        Text(
-                            text = formatBoolean(isCholesterol),
-                            color = if (isCholesterol != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                        )
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (!isCholesterol.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = if (isCholesterol.toBoolean()) "Ya" else "Tidak",
+                                color = if (!isCholesterol.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -738,13 +755,21 @@ fun HomeScreen(
                             )
                         }
 
-                        Text(
-                            text = formatBoolean(isBloodline),
-                            color = if (isBloodline != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                        )
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (!isBloodline.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = if (isBloodline.toBoolean()) "Ya" else "Tidak",
+                                color = if (!isBloodline.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
                     }
 
                     HorizontalDivider(
@@ -779,13 +804,21 @@ fun HomeScreen(
                             )
                         }
 
-                        Text(
-                            text = formatBoolean(isMacrosomicBaby),
-                            color = if (isMacrosomicBaby != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                        )
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (!isMacrosomicBaby.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = if (isMacrosomicBaby.toBoolean()) "Ya" else "Tidak",
+                                color = if (!isMacrosomicBaby.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -817,6 +850,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
+                    // Smoking Section
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -825,7 +859,7 @@ fun HomeScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = "Jumlah Rokok",
+                                text = "Jumlah Rokok Hari Ini",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp,
@@ -852,6 +886,65 @@ fun HomeScreen(
                         }
                     }
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val smokingStatus = viewModel.smokingStatusValueState.value
+                        val brinkmanIndex = viewModel.brinkmanIndexValueState.value
+
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Status Merokok",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                            Text(
+                                text = when (smokingStatus) {
+                                    "0" -> "Tidak Pernah"
+                                    "1" -> "Berhenti Merokok"
+                                    "2" -> "Aktif Merokok"
+                                    else -> "Tidak Diketahui"
+                                },
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = when (smokingStatus) {
+                                    "0" -> Color(0xFF10B981)
+                                    "1" -> Color(0xFFF59E0B)
+                                    "2" -> Color(0xFFEF4444)
+                                    else -> Color(0xFF6B7280)
+                                }
+                            )
+                        }
+
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = "Indeks Brinkman",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                            Text(
+                                text = String.format("%.1f", brinkmanIndex.toDoubleOrNull() ?: 0.0),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = getBrinkmanIndexColor(brinkmanIndex.toDoubleOrNull() ?: 0.0)
+                            )
+                        }
+                    }
+
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -859,7 +952,43 @@ fun HomeScreen(
                         color = Color(0xFFE5E7EB)
                     )
 
+                    // Physical Activity Section
                     val workoutValue = viewModel.physicalActivityValueState.value
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Aktivitas Fisik Hari Ini",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = colorResource(id = R.color.primary),
+                        )
+
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (workoutValue.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = if (workoutValue.toBoolean()) "Ya" else "Tidak",
+                                color = if (workoutValue.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    val physicalActivityAverage = viewModel.physicalActivityAverageValueState.value
+                    val averageValue = physicalActivityAverage.toIntOrNull() ?: 0
+
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -869,25 +998,24 @@ fun HomeScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Aktivitas Fisik",
+                                text = "Rata-rata Aktivitas Fisik (7 Hari)",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp,
-                                color = colorResource(id = R.color.primary),
+                                fontSize = 12.sp,
+                                color = Color(0xFF6B7280),
                             )
 
                             Text(
-                                text = workoutValue,
+                                text = "$averageValue/7 hari",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp,
-                                color = getActivityLevelColor(workoutValue.toIntOrNull() ?: 0),
+                                fontSize = 14.sp,
+                                color = getActivityAverageColor(averageValue),
                             )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // Progress indicator for activity level
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -897,33 +1025,47 @@ fun HomeScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth(workoutValue.toIntOrNull()?.div(100f) ?: 0f)
+                                    .fillMaxWidth(averageValue / 7f)
                                     .height(8.dp)
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(getActivityLevelColor(45))
+                                    .background(getActivityAverageColor(averageValue))
                             )
                         }
 
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        // Activity level label
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "0 min",
+                                text = "0 hari",
                                 fontSize = 10.sp,
                                 fontFamily = poppinsFontFamily,
                                 color = Color(0xFF6B7280)
                             )
                             Text(
-                                text = "Ideal: 100 min",
+                                text = "Target: 7 hari",
                                 fontSize = 10.sp,
                                 fontFamily = poppinsFontFamily,
                                 color = Color(0xFF6B7280)
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = when {
+                                averageValue >= 5 -> "Sangat Aktif"
+                                averageValue >= 3 -> "Cukup Aktif"
+                                averageValue >= 1 -> "Kurang Aktif"
+                                else -> "Tidak Aktif"
+                            },
+                            fontSize = 12.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            color = getActivityAverageColor(averageValue),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
             }

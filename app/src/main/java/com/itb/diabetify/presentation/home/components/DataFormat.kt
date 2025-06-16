@@ -5,14 +5,6 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import kotlin.math.abs
 
-fun formatBoolean(status: String): String {
-    return when(status) {
-        "true" -> "Ya"
-        "false" -> "Tidak"
-        else -> status
-    }
-}
-
 fun getBmiCategory(bmi: Double): String {
     return when {
         bmi < 18.5 -> "Berat Badan Kurang"
@@ -31,14 +23,23 @@ fun getBmiCategoryColor(bmi: Double): Color {
     }
 }
 
-fun getActivityLevelColor(minutes: Int): Color {
+fun getBrinkmanIndexColor(index: Double): Color {
     return when {
-        minutes < 15 -> Color(0xFFDC2626)
-        minutes < 30 -> Color(0xFFD97706)
-        else -> Color(0xFF059669)
+        index >= 400 -> Color(0xFFDC2626)
+        index >= 200 -> Color(0xFFEA580C)
+        index >= 100 -> Color(0xFFF59E0B)
+        else -> Color(0xFF10B981)
     }
 }
 
+fun getActivityAverageColor(days: Int): Color {
+    return when {
+        days >= 5 -> Color(0xFF10B981)
+        days >= 3 -> Color(0xFF3B82F6)
+        days >= 1 -> Color(0xFFF59E0B)
+        else -> Color(0xFFEF4444)
+    }
+}
 
 fun calculateRiskFactorColor(
     percentage: Float,

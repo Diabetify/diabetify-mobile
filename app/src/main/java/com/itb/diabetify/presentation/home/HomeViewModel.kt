@@ -168,6 +168,15 @@ class HomeViewModel @Inject constructor(
     private val _isCholesterolValueState = mutableStateOf("false")
     val isCholesterolValueState: State<String> = _isCholesterolValueState
 
+    private val _brinkmanIndexValueState = mutableStateOf("0.0")
+    val brinkmanIndexValueState: State<String> = _brinkmanIndexValueState
+
+    private val _smokingStatusValueState = mutableStateOf("0")
+    val smokingStatusValueState: State<String> = _smokingStatusValueState
+
+    private val _physicalActivityAverageValueState = mutableStateOf("0")
+    val physicalActivityAverageValueState: State<String> = _physicalActivityAverageValueState
+
     private val _userNameState = mutableStateOf("")
     val userNameState: State<String> = _userNameState
 
@@ -438,6 +447,10 @@ class HomeViewModel @Inject constructor(
                             currentValue = "${latestPrediction.isCholesterol} mg/dL"
                         )
                     )
+
+                    _brinkmanIndexValueState.value = latestPrediction.brinkmanScore ?: "0.0"
+                    _smokingStatusValueState.value = latestPrediction.smokingStatus ?: "0"
+                    _physicalActivityAverageValueState.value = latestPrediction.physicalActivityFrequency ?: "0"
                 }
             }
         }

@@ -65,9 +65,12 @@ val questions = listOf(
     DataInputQuestion(
         id = "activity",
         category = "Aktivitas Fisik",
-        questionText = "Berapa menit total Anda melakukan aktivitas fisik hari ini?",
-        questionType = DataInputQuestionType.Numeric,
-        numericUnit = "menit"
+        questionText = "Apakah Anda melakukan aktivitas fisik hari ini?",
+        questionType = DataInputQuestionType.Selection,
+        options = listOf(
+            InputOption("yes", "Ya"),
+            InputOption("no", "Tidak")
+        )
     ),
     DataInputQuestion(
         id = "cholesterol",

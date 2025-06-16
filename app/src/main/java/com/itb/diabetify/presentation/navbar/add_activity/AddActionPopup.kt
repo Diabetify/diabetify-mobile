@@ -77,7 +77,7 @@ fun AddActionPopup(
     var currentQuestionType by remember { mutableStateOf("weight") }
 
     if (showBottomSheet) {
-        val isNumericQuestion = listOf("weight", "height", "cigarette", "activity").contains(currentQuestionType)
+        val isNumericQuestion = listOf("weight", "height", "cigarette").contains(currentQuestionType)
 
         BottomSheet(
             isVisible = showBottomSheet,

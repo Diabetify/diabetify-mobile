@@ -95,10 +95,12 @@ class AddActivityViewModel @Inject constructor(
                         error = null
                     )
                     _workoutValueState.value = FieldState(
-                        text = it.workoutValue ?: "0",
+                        text = if ((it.workoutValue ?: "0") == "0") "false" else "true",
                         error = null
                     )
                 }
+
+                Log.d("AddActivityViewModel", "Activity data collected: $activity")
             }.launchIn(viewModelScope)
         }
     }
@@ -201,6 +203,8 @@ class AddActivityViewModel @Inject constructor(
                 "workout" -> workoutValueState.value.text.toIntOrNull() ?: 0
                 else -> 0
             }
+
+            Log.d("AddActivityViewModel", "Adding activity: $type with value: $value at date: $activityDate")
 
             val addActivityResult = addActivityUseCase(
                 activityDate = activityDate,

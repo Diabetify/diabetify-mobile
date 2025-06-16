@@ -136,7 +136,6 @@ fun BottomSheet(
                                         onSave = {
                                             when (currentQuestion.id) {
                                                 "cigarette" -> viewModel.addActivity("smoke")
-                                                "activity" -> viewModel.addActivity("workout")
                                                 "weight", "height" -> viewModel.updateProfile(currentQuestion.id)
                                             }
                                             onDismissRequest()
@@ -149,6 +148,7 @@ fun BottomSheet(
                                         onSave = {
                                             when (currentQuestion.id) {
                                                 "birth", "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(currentQuestion.id)
+                                                "activity" -> viewModel.addActivity("workout")
                                             }
                                             onDismissRequest()
                                         },
@@ -199,7 +199,6 @@ fun NumericInput(
                         inputValue = newValue
                         when (question.id) {
                             "cigarette" -> viewModel.setSmokeValue(newValue)
-                            "activity" -> viewModel.setWorkoutValue(newValue)
                             "weight" -> viewModel.setWeightValue(newValue)
                             "height" -> viewModel.setHeightValue(newValue)
                         }
@@ -254,7 +253,6 @@ fun SelectionInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
-    // Convert the currentValue string to match our option IDs
     val initialValue = when (currentValue?.lowercase()) {
         "true" -> "yes"
         "false" -> "no"
@@ -283,6 +281,7 @@ fun SelectionInput(
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
                             "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
                             "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
+                            "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "1" else "0")
                         }
                     }
             ) {
@@ -295,6 +294,7 @@ fun SelectionInput(
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
                             "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
                             "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
+                            "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "1" else "0")
                         }
                     },
                     colors = RadioButtonDefaults.colors(

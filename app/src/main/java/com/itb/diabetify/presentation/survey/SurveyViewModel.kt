@@ -1,12 +1,10 @@
 package com.itb.diabetify.presentation.survey
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
@@ -14,8 +12,6 @@ import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -23,7 +19,6 @@ import kotlinx.coroutines.runBlocking
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
     private val addProfileUseCase: AddProfileUseCase,
-    private val addActivityUseCase: AddActivityUseCase,
     private val userRepository: UserRepository,
     private val predictionUseCase: PredictionUseCase
 ) : ViewModel() {
@@ -108,24 +103,28 @@ class SurveyViewModel @Inject constructor(
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            val weight = _state.value.answers["weight"]?.toIntOrNull()
-            val height = _state.value.answers["height"]?.toIntOrNull()
+            val weight = _state.value.answers["weight"]?.toIntOrNull() ?: 0
+            val height = _state.value.answers["height"]?.toIntOrNull() ?: 0
             val hypertension = _state.value.answers["hypertension"]?.toBoolean() ?: false
             val macrosomicBaby = _state.value.answers["pregnancy"]?.toBoolean() ?: false
             val smoking = _state.value.answers["smoking_status"]?.toBoolean() ?: false
-            val yearOfSmoking = _state.value.answers["smoking_age"]?.toIntOrNull()
+            val yearOfSmoking = _state.value.answers["smoking_age"]?.toIntOrNull() ?: 0
             val cholesterol = _state.value.answers["cholesterol"]?.toBoolean() ?: false
             val bloodline = _state.value.answers["bloodline"]?.toBoolean() ?: false
+            val physicalActivityFrequency = _state.value.answers["activity"]?.toIntOrNull() ?: 0
+            val smokingAmount = _state.value.answers["smoking_amount"]?.toIntOrNull() ?: 0
 
             val addProfileResult = addProfileUseCase(
-                weight = weight.toString(),
-                height = height.toString(),
+                weight = weight,
+                height = height,
                 hypertension = hypertension,
                 macrosomicBaby = macrosomicBaby,
                 smoking = smoking,
                 yearOfSmoking = yearOfSmoking,
                 cholesterol = cholesterol,
-                bloodline = bloodline
+                bloodline = bloodline,
+                physicalActivityFrequency = physicalActivityFrequency,
+                smokeCount = smokingAmount
             )
 
             _profileState.value = profileState.value.copy(isLoading = false)
@@ -133,7 +132,7 @@ class SurveyViewModel @Inject constructor(
             when (addProfileResult.result) {
                 is Resource.Success -> {
                     Log.d("SurveyViewModel", "Profile submission successful, proceeding with activity submission")
-                    submitSmokingValue()
+                    predict()
                 }
                 is Resource.Error -> {
                     Log.d("SurveyViewModel", "Profile submission error: ${addProfileResult.result.message}")
@@ -147,84 +146,6 @@ class SurveyViewModel @Inject constructor(
                     // Handle unexpected error
                     Log.e("SurveyViewModel", "Unexpected error in profile submission")
                     showSnackbar("Terjadi kesalahan saat mengirimkan profil")
-                    _errorMessage.value = "Unknown error occurred"
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NewApi")
-    private fun submitSmokingValue() {
-        viewModelScope.launch {
-            _activityState.value = activityState.value.copy(isLoading = true)
-
-            val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
-            val smokingAmount = _state.value.answers["smoking_amount"]?.toIntOrNull() ?: 0
-
-            val addActivityResult = addActivityUseCase(
-                activityDate = activityDate,
-                activityType = "smoke",
-                value = smokingAmount,
-            )
-
-            _activityState.value = activityState.value.copy(isLoading = false)
-
-            when (addActivityResult.result) {
-                is Resource.Success -> {
-                    Log.d("SurveyViewModel", "Smoking Activity submission successful")
-                    submitWorkoutValue()
-                }
-                is Resource.Error -> {
-                    Log.d("SurveyViewModel", "Smoking Activity submission error: ${addActivityResult.result.message}")
-                    showSnackbar(addActivityResult.result.message ?: "Terjadi kesalahan saat mengirimkan aktivitas")
-                    _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
-                }
-                is Resource.Loading -> {
-                    Log.d("SurveyViewModel", "Smoking Activity submission loading")
-                }
-                else -> {
-                    // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error in activity submission")
-                    showSnackbar("Terjadi kesalahan saat mengirimkan aktivitas")
-                    _errorMessage.value = "Unknown error occurred"
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NewApi")
-    private fun submitWorkoutValue() {
-        viewModelScope.launch {
-            _activityState.value = activityState.value.copy(isLoading = true)
-
-            val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
-            val activityAmount = _state.value.answers["activity"]?.toIntOrNull() ?: 0
-
-            val addActivityResult = addActivityUseCase(
-                activityDate = activityDate,
-                activityType = "workout",
-                value = activityAmount,
-            )
-
-            _activityState.value = activityState.value.copy(isLoading = false)
-
-            when (addActivityResult.result) {
-                is Resource.Success -> {
-                    Log.d("SurveyViewModel", "Workout Activity submission successful")
-                    predict()
-                }
-                is Resource.Error -> {
-                    Log.d("SurveyViewModel", "Workout Activity submission error: ${addActivityResult.result.message}")
-                    showSnackbar(addActivityResult.result.message ?: "Terjadi kesalahan saat mengirimkan aktivitas")
-                    _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
-                }
-                is Resource.Loading -> {
-                    Log.d("SurveyViewModel", "Workout Activity submission loading")
-                }
-                else -> {
-                    // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error in activity submission")
-                    showSnackbar("Terjadi kesalahan saat mengirimkan aktivitas")
                     _errorMessage.value = "Unknown error occurred"
                 }
             }

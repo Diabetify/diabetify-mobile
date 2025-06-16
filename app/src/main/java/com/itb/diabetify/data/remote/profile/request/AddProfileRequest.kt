@@ -16,7 +16,11 @@ data class AddProfileRequest (
     @SerializedName("year_of_smoking")
     val yearOfSmoking: Int? = null,
     @SerializedName("cholesterol")
-    val cholesterol: Boolean,
+    val cholesterol: Boolean? = null,
     @SerializedName("bloodline")
-    val bloodline: Boolean
+    val bloodline: Boolean? = null,
+    @SerializedName("physical_activity_frequency")
+    val physicalActivityFrequency: Int? = null,
+    @SerializedName("smoke_count")
+    val smokeCount: Int? = null
 )

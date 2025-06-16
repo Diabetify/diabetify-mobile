@@ -8,39 +8,28 @@ class AddProfileUseCase(
     private val repository: ProfileRepository
 ) {
     suspend operator fun invoke(
-        weight: String,
-        height: String,
+        weight: Int,
+        height: Int,
         hypertension: Boolean,
         macrosomicBaby: Boolean,
         smoking: Boolean,
         yearOfSmoking: Int?,
         cholesterol: Boolean,
-        bloodline: Boolean
+        bloodline: Boolean,
+        physicalActivityFrequency: Int,
+        smokeCount: Int?
     ): AddProfileResult {
-        val weightError = if (weight.isBlank()) "Weight cannot be empty" else null
-        val heightError = if (height.isBlank()) "Height cannot be empty" else null
-
-        if (weightError != null) {
-            return AddProfileResult(
-                weightError = weightError
-            )
-        }
-
-        if (heightError != null) {
-            return AddProfileResult(
-                heightError = heightError
-            )
-        }
-
         val addProfileResult = AddProfileRequest(
-            weight = weight.toIntOrNull(),
-            height = height.toIntOrNull(),
+            weight = weight,
+            height = height,
             hypertension = hypertension,
             macrosomicBaby = macrosomicBaby,
             smoking = smoking,
             yearOfSmoking = yearOfSmoking,
             cholesterol = cholesterol,
-            bloodline = bloodline
+            bloodline = bloodline,
+            physicalActivityFrequency = physicalActivityFrequency,
+            smokeCount = smokeCount
         )
 
         return AddProfileResult(

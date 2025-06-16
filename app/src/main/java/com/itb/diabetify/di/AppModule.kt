@@ -33,6 +33,7 @@ import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
+import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
@@ -274,6 +275,14 @@ object AppModule {
         repository: ActivityRepository
     ): AddActivityUseCase {
         return AddActivityUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUpdateActivityUseCase(
+        repository: ActivityRepository
+    ): UpdateActivityUseCase {
+        return UpdateActivityUseCase(repository)
     }
 
     @Provides

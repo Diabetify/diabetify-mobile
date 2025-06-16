@@ -10,6 +10,7 @@ import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
+import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.presentation.common.FieldState
@@ -28,9 +29,13 @@ class AddActivityViewModel @Inject constructor(
     private val activityRepository: ActivityRepository,
     private val profileRepository: ProfileRepository,
     private val addActivityUseCase: AddActivityUseCase,
+    private val updateActivityUseCase: UpdateActivityUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val predictionUseCase: PredictionUseCase
 ) : ViewModel() {
+    @SuppressLint("NewApi")
+    val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
+
     private var _activityTodayState = mutableStateOf(DataState())
     val activityTodayState = _activityTodayState
 
@@ -40,12 +45,20 @@ class AddActivityViewModel @Inject constructor(
     private var _addActivityState = mutableStateOf(DataState())
     val addActivityState: State<DataState> = _addActivityState
 
+    private var _updateActivityState = mutableStateOf(DataState())
+    val updateActivityState: State<DataState> = _updateActivityState
+
     private var _updateProfileState = mutableStateOf(DataState())
     val updateProfileState: State<DataState> = _updateProfileState
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+    private val _smokingId = mutableStateOf<String?>(null)
+    val smokingId: State<String?> = _smokingId
+
+    private val _workoutId = mutableStateOf<String?>(null)
+    val workoutId: State<String?> = _workoutId
 
     private val _smokeValueState = mutableStateOf(FieldState())
     val smokeValueState: State<FieldState> = _smokeValueState
@@ -90,6 +103,8 @@ class AddActivityViewModel @Inject constructor(
                 _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
                 activity?.let {
+                    _smokingId.value = it.smokingId
+                    _workoutId.value = it.workoutId
                     _smokeValueState.value = FieldState(
                         text = it.smokingValue ?: "0",
                         error = null
@@ -193,55 +208,137 @@ class AddActivityViewModel @Inject constructor(
     }
 
     @SuppressLint("NewApi")
-    fun addActivity(type: String) {
+    fun handleSmoking() {
+        val smokingIdValue = smokingId.value
+        val smokeValue = smokeValueState.value.text.toIntOrNull() ?: 0
+
+        if (smokingIdValue != null) {
+            updateSmokingActivity(smokingIdValue, smokeValue)
+        } else {
+            addSmokingActivity(smokeValue)
+        }
+    }
+
+    @SuppressLint("NewApi")
+    fun handleWorkout() {
+        val workoutIdValue = workoutId.value
+        val workoutValue = workoutValueState.value.text.toIntOrNull() ?: 0
+
+        if (workoutIdValue != null) {
+            updateWorkoutActivity(workoutIdValue, workoutValue)
+        } else {
+            addWorkoutActivity(workoutValue)
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun addSmokingActivity(value: Int) {
         viewModelScope.launch {
             _addActivityState.value = addActivityState.value.copy(isLoading = true)
 
-            val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
-            val value = when (type) {
-                "smoke" -> smokeValueState.value.text.toIntOrNull() ?: 0
-                "workout" -> workoutValueState.value.text.toIntOrNull() ?: 0
-                else -> 0
-            }
-
-            Log.d("AddActivityViewModel", "Adding activity: $type with value: $value at date: $activityDate")
-
             val addActivityResult = addActivityUseCase(
                 activityDate = activityDate,
-                activityType = type,
+                activityType = "smoke",
                 value = value
             )
 
             _addActivityState.value = addActivityState.value.copy(isLoading = false)
 
-            when (addActivityResult?.result) {
+            handleActivityResult(addActivityResult, "add smoking activity")
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun addWorkoutActivity(value: Int) {
+        viewModelScope.launch {
+            _addActivityState.value = addActivityState.value.copy(isLoading = true)
+
+            val addActivityResult = addActivityUseCase(
+                activityDate = activityDate,
+                activityType = "workout",
+                value = value
+            )
+
+            _addActivityState.value = addActivityState.value.copy(isLoading = false)
+
+            handleActivityResult(addActivityResult, "add workout activity")
+        }
+    }
+
+    private fun updateSmokingActivity(activityId: String, value: Int) {
+        viewModelScope.launch {
+            _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
+
+            val updateActivityResult = updateActivityUseCase(
+                activityId = activityId,
+                activityDate = activityDate,
+                activityType = "smoke",
+                value = value
+            )
+
+            _updateActivityState.value = updateActivityState.value.copy(isLoading = false)
+
+            handleActivityResult(updateActivityResult, "update smoking activity")
+        }
+    }
+
+    private fun updateWorkoutActivity(activityId: String, value: Int) {
+        viewModelScope.launch {
+            _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
+
+            val updateActivityResult = updateActivityUseCase(
+                activityId = activityId,
+                activityDate = activityDate,
+                activityType = "workout",
+                value = value
+            )
+
+            _updateActivityState.value = updateActivityState.value.copy(isLoading = false)
+
+            handleActivityResult(updateActivityResult, "update workout activity")
+        }
+    }
+
+    private fun handleActivityResult(result: Any?, operationType: String) {
+        val resourceResult = when (result) {
+            is com.itb.diabetify.domain.model.activity.AddActivityResult -> result.result
+            is com.itb.diabetify.domain.model.activity.UpdateActivityResult -> result.result
+            else -> null
+        }
+
+        when (resourceResult) {
+            is Resource.Success -> {
+                Log.d("AddActivityViewModel", "Successfully performed: $operationType")
+                triggerPredictionUpdate()
+            }
+            is Resource.Error -> {
+                _errorMessage.value = resourceResult.message ?: "Unknown error occurred"
+                Log.d("AddActivityViewModel", "Failed to $operationType: ${resourceResult.message}")
+            }
+            is Resource.Loading -> {
+                Log.d("AddActivityViewModel", "Loading: $operationType")
+            }
+            else -> {
+                _errorMessage.value = "Unknown error occurred"
+                Log.d("AddActivityViewModel", "Unexpected error during: $operationType")
+            }
+        }
+    }
+
+    private fun triggerPredictionUpdate() {
+        viewModelScope.launch {
+            val predictionResult = predictionUseCase()
+            when (predictionResult.result) {
                 is Resource.Success -> {
-                    Log.d("AddActivityViewModel", "Activity added successfully")
-                    val predictionResult = predictionUseCase()
-                    when (predictionResult.result) {
-                        is Resource.Success -> {
-                            Log.d("AddActivityViewModel", "Prediction updated successfully")
-                        }
-                        is Resource.Error -> {
-                            _errorMessage.value = predictionResult.result.message ?: "Failed to update prediction"
-                            Log.d("AddActivityViewModel", "Failed to update prediction: ${predictionResult.result.message}")
-                        }
-                        else -> {
-                            _errorMessage.value = "Unknown error occurred during prediction"
-                            Log.d("AddActivityViewModel", "Unknown error during prediction")
-                        }
-                    }
+                    Log.d("AddActivityViewModel", "Prediction updated successfully")
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = addActivityResult.result.message ?: "Unknown error occurred"
-                    addActivityResult.result.message?.let { Log.d("AddActivityViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("AddActivityViewModel", "Loading")
+                    _errorMessage.value = predictionResult.result.message ?: "Failed to update prediction"
+                    Log.d("AddActivityViewModel", "Failed to update prediction: ${predictionResult.result.message}")
                 }
                 else -> {
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("AddActivityViewModel", "Unexpected error")
+                    _errorMessage.value = "Unknown error occurred during prediction"
+                    Log.d("AddActivityViewModel", "Unknown error during prediction")
                 }
             }
         }
@@ -281,20 +378,7 @@ class AddActivityViewModel @Inject constructor(
             when (updateProfileResult?.result) {
                 is Resource.Success -> {
                     Log.d("AddActivityViewModel", "Profile updated successfully")
-                    val predictionResult = predictionUseCase()
-                    when (predictionResult.result) {
-                        is Resource.Success -> {
-                            Log.d("AddActivityViewModel", "Prediction updated successfully")
-                        }
-                        is Resource.Error -> {
-                            _errorMessage.value = predictionResult.result.message ?: "Failed to update prediction"
-                            Log.d("AddActivityViewModel", "Failed to update prediction: ${predictionResult.result.message}")
-                        }
-                        else -> {
-                            _errorMessage.value = "Unknown error occurred during prediction"
-                            Log.d("AddActivityViewModel", "Unknown error during prediction")
-                        }
-                    }
+                    triggerPredictionUpdate()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = updateProfileResult.result.message ?: "Unknown error occurred"

@@ -12,23 +12,23 @@ data class PageData(
 val pages = listOf(
     PageData(
         imageResId = R.drawable.onboarding1,
-        title = "Catat Kebiasaan\nHarian Anda",
-        description = "Pantau pola makanan, tidur, olahraga, dan lainnya dengan mudah. Input harian Anda membantu Diabetify memberikan wawasan personal untuk manajemen kesehatan yang lebih baik."
+        title = "Kenali Risiko\nDiabetes Anda",
+        description = "Lakukan survei awal dan input data harian Anda. Diabetify akan memprediksi risiko diabetes berdasarkan data kesehatan dan gaya hidup Anda."
     ),
     PageData(
         imageResId = R.drawable.onboarding2,
-        title = "Kenali Faktor\nRisiko Anda",
-        description = "Analisis berbasis AI kami membantu Anda mengidentifikasi potensi faktor risiko diabetes berdasarkan gaya hidup dan data kesehatan Anda. Dapatkan wawasan yang jelas dan mulai langkah pencegahan sejak dini."
+        title = "Prediksi Transparan\ndengan XAI",
+        description = "Teknologi Explainable AI (XAI) membantu Anda memahami alasan di balik setiap prediksi risiko. Ketahui faktor mana yang paling berpengaruh terhadap kesehatan Anda."
     ),
     PageData(
         imageResId = R.drawable.onboarding3,
-        title = "Tips Kesehatan\nyang Dipersonalisasi",
-        description = "Dapatkan rekomendasi khusus untuk mengurangi risiko diabetes dan meningkatkan kesehatan Anda. Perubahan kecil hari ini menciptakan masa depan yang lebih sehat."
+        title = "Simulasikan dan\nEksplorasi Faktor Risiko",
+        description = "Gunakan fitur simulasi untuk memahami dampak perubahan gaya hidup terhadap risiko Anda. Dapatkan penjelasan transparan dari setiap faktor risiko."
     ),
     PageData(
         imageResId = R.drawable.onboarding4,
-        title = "Kesehatan Anda,\nTujuan Anda",
-        description = "Tetapkan tujuan kesehatan yang dipersonalisasi dan pantau progres Anda. Tetap termotivasi dan lakukan perbaikan secara bertahap dengan dukungan Diabetify."
+        title = "Ambil Kendali\natas Kesehatan Anda",
+        description = "Tetap termotivasi dengan tujuan yang jelas, aktivitas harian, dan panduan personal. Diabetify mendukung Anda dalam membentuk kebiasaan sehat secara bertahap."
     )
 )
 

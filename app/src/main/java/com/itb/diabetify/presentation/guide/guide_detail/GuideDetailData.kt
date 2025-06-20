@@ -162,10 +162,10 @@ Proses prediksi melibatkan:
             GuideSection(
                 title = "Interpretasi Hasil",
                 content = """Skor Risiko:
-• 0-30%: Risiko Rendah
-• 31-50%: Risiko Sedang
-• 51-65%: Risiko Tinggi
-• >65%: Risiko Sangat Tinggi
+• 0-35%: Risiko Rendah
+• 35-55%: Risiko Sedang
+• 55-70%: Risiko Tinggi
+• >70%: Risiko Sangat Tinggi
 
 Setiap faktor risiko ditampilkan dengan:
 • Persentase kontribusi

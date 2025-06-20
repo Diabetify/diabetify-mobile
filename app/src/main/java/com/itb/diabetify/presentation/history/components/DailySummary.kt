@@ -148,26 +148,26 @@ private fun RiskPercentageCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     color = when {
-                        riskPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
-                        riskPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
-                        riskPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                        riskPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
+                        riskPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
+                        riskPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
                         else -> Color(0xFFF44336) // Very high risk - Red
                     }
                 )
                 Text(
                     text = when {
-                        riskPercentage <= 30 -> "Risiko Rendah"
-                        riskPercentage <= 50 -> "Risiko Sedang"
-                        riskPercentage <= 65 -> "Risiko Tinggi"
+                        riskPercentage <= 35 -> "Risiko Rendah"
+                        riskPercentage <= 55 -> "Risiko Sedang"
+                        riskPercentage <= 70 -> "Risiko Tinggi"
                         else -> "Risiko Sangat Tinggi"
                     },
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
                     color = when {
-                        riskPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
-                        riskPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
-                        riskPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                        riskPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
+                        riskPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
+                        riskPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
                         else -> Color(0xFFF44336) // Very high risk - Red
                     }
                 )

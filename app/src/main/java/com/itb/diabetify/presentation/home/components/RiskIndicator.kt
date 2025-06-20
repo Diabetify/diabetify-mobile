@@ -94,16 +94,16 @@ fun RiskIndicator(
             )
 
             val riskLevel = when {
-                currentPercentage <= 30f -> "Rendah"
-                currentPercentage <= 50f -> "Sedang"
-                currentPercentage <= 65f -> "Tinggi"
+                currentPercentage <= 35f -> "Rendah"
+                currentPercentage <= 55f -> "Sedang"
+                currentPercentage <= 70f -> "Tinggi"
                 else -> "Sangat\nTinggi"
             }
 
             val riskColor = when {
-                currentPercentage <= 30f -> Color(0xFF8BC34A) // Low risk - Green
-                currentPercentage <= 50f -> Color(0xFFFFC107) // Medium risk - Yellow
-                currentPercentage <= 65f -> Color(0xFFFA821F) // High risk - Orange
+                currentPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
+                currentPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
+                currentPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
                 else -> Color(0xFFF44336) // Very high risk - Red
             }
 

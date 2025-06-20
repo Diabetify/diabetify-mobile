@@ -103,30 +103,30 @@ fun RiskDetailScreen(
             // Risk categories
             RiskCategory(
                 color = viewModel.lowRiskColor,
-                title = "0 - 30: Rendah",
-                description = "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score <= 30
+                title = "0 - 35: Rendah",
+                description = "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score <= 35
             )
 
             RiskCategory(
                 color = viewModel.mediumRiskColor,
-                title = "30 - 50: Sedang",
-                description = "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score in 31..50
+                title = "35 - 55: Sedang",
+                description = "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score in 35..55
             )
 
             RiskCategory(
                 color = viewModel.highRiskColor,
-                title = "50 - 65: Tinggi",
-                description = "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score in 51..65
+                title = "55 - 70: Tinggi",
+                description = "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score in 55..70
             )
 
             RiskCategory(
                 color = viewModel.veryHighRiskColor,
-                title = "65 - 100: Sangat Tinggi",
-                description = "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score > 65
+                title = "70 - 100: Sangat Tinggi",
+                description = "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes",
+                isHighlighted = score > 70
             )
         }
     }

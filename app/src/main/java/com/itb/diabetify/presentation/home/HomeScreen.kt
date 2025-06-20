@@ -56,7 +56,6 @@ import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
-import com.itb.diabetify.presentation.home.components.formatBoolean
 import com.itb.diabetify.presentation.home.components.formatRelativeTime
 import com.itb.diabetify.presentation.home.components.getActivityAverageColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
@@ -404,7 +403,7 @@ fun HomeScreen(
                         PrimaryButton(
                             text = "Mulai Simulasi",
                             onClick = {
-                                // navController.navigate(Route.WhatIfScreen.route)
+                                 navController.navigate(Route.WhatIfScreen.route)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

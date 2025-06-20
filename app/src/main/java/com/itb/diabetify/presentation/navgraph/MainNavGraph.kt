@@ -45,6 +45,9 @@ import com.itb.diabetify.presentation.settings.edit_survey.EditSurveyScreen
 import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
 import com.itb.diabetify.presentation.survey.SurveyScreen
 import com.itb.diabetify.presentation.survey.SurveyViewModel
+import com.itb.diabetify.presentation.whatif.WhatIfResultScreen
+import com.itb.diabetify.presentation.whatif.WhatIfScreen
+import com.itb.diabetify.presentation.whatif.WhatIfViewModel
 
 @Composable
 fun MainNavGraph(
@@ -177,6 +180,22 @@ fun MainNavGraph(
                 RiskFactorDetailScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
+                )
+            }
+
+            composable(route = Route.WhatIfScreen.route) {
+                val whatIfViewModel: WhatIfViewModel = hiltViewModel()
+                WhatIfScreen(
+                    navController = mainNavController,
+                    viewModel = whatIfViewModel
+                )
+            }
+
+            composable(route = Route.WhatIfResultScreen.route) {
+                val whatIfViewModel: WhatIfViewModel = hiltViewModel()
+                WhatIfResultScreen(
+                    navController = mainNavController,
+                    viewModel = whatIfViewModel
                 )
             }
 

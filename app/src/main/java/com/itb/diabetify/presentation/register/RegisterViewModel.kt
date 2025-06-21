@@ -24,6 +24,14 @@ class RegisterViewModel @Inject constructor(
     private val sendVerificationUseCase: SendVerificationUseCase,
     private val verifyOtpUseCase: VerifyOtpUseCase
 ): ViewModel() {
+    // Navigation and Error States
+    private val _navigationEvent = mutableStateOf<String?>(null)
+    val navigationEvent: State<String?> = _navigationEvent
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    // Operational States
     private var _createAccountState = mutableStateOf(DataState())
     val createAccountState: State<DataState> = _createAccountState
 
@@ -36,13 +44,7 @@ class RegisterViewModel @Inject constructor(
     private var _verifyOtpState = mutableStateOf(DataState())
     val verifyOtpState: State<DataState> = _verifyOtpState
 
-    private val _navigationEvent = mutableStateOf<String?>(null)
-    val navigationEvent: State<String?> = _navigationEvent
-
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
-
-
+    // Field States
     private val _nameState = mutableStateOf(FieldState())
     val nameState: State<FieldState> = _nameState
 

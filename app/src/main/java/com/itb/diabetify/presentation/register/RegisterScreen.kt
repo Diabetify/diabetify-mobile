@@ -6,11 +6,31 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.itb.diabetify.presentation.common.InputField
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,25 +66,27 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel
 ) {
-    val nameState = viewModel.nameState.value
-    val emailState = viewModel.emailState.value
-    val passwordState = viewModel.passwordState.value
+    // States
+    val nameState by viewModel.nameState
+    val emailState by viewModel.emailState
+    val passwordState by viewModel.passwordState
+    val privacyPolicyState by viewModel.privacyPolicyState
     var passwordVisible by remember { mutableStateOf(false) }
-    val privacyPolicyState = viewModel.privacyPolicyState.value
 
-    val navigationEvent = viewModel.navigationEvent.value
+    // Navigation event
+    val navigationEvent by viewModel.navigationEvent
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
             when (it) {
                 "HOME_SCREEN" -> {
                     navController.navigate(Route.MainNavigation.route)
-//                    navController.navigate(Route.SurveyScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }
         }
     }
 
+    // Google Sign-In client setup
     val context = LocalContext.current
     val googleSignInClient = remember {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -204,7 +226,7 @@ fun RegisterScreen(
                         fontFamily = poppinsFontFamily,
                         lineHeight = 15.sp,
                         color = colorResource(id = R.color.gray_2),
-                        modifier = Modifier.clickable { /* Open privacy policy link */ }
+                        modifier = Modifier.clickable { /* TODO: Open privacy policy link */ }
                     )
                 }
             }
@@ -274,7 +296,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.width(25.dp))
 
                 Surface(
-                    onClick = { /* Handle Google login */ },
+                    onClick = { /* TODO: Handle Facebook login */ },
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(15.dp),
                     color = Color.White,

@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,10 +56,12 @@ fun BiodataScreen(
     navController: NavController,
     viewModel: RegisterViewModel
 ) {
-    val genderState = viewModel.genderState.value
-    val birthDateState = viewModel.dobState.value
+    // States
+    val genderState by viewModel.genderState
+    val birthDateState by viewModel.dobState
     val showDatePicker = remember { mutableStateOf(false) }
 
+    // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -206,90 +209,6 @@ fun BiodataScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    // Weight field
-//                    InputField(
-//                        value = weightState.text,
-//                        onValueChange = { viewModel.setWeight(it) },
-//                        placeholderText = "Berat Badan",
-//                        iconResId = R.drawable.ic_scale,
-//                        modifier = Modifier.weight(1f),
-//                        keyboardType = KeyboardType.Number,
-//                        visualTransformation = VisualTransformation.None,
-//                        singleLine = true,
-//                        isError = weightState.error != null,
-//                        errorMessage = weightState.error ?: ""
-//                    )
-//
-//                    Spacer(modifier = Modifier.width(16.dp))
-//
-//                    Surface(
-//                        modifier = Modifier.size(48.dp),
-//                        shape = RoundedCornerShape(15.dp),
-//                        color = colorResource(id = R.color.primary),
-//                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-//                    ) {
-//                        Box(
-//                            modifier = Modifier.fillMaxSize(),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            Text(
-//                                text = "KG",
-//                                fontFamily = poppinsFontFamily,
-//                                fontWeight = FontWeight.Bold,
-//                                fontSize = 12.sp,
-//                                color = colorResource(id = R.color.gray_3)
-//                            )
-//                        }
-//                    }
-//                }
-//
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    // Height field
-//                    InputField(
-//                        value = heightState.text,
-//                        onValueChange = { viewModel.setHeight(it) },
-//                        placeholderText = "Tinggi Badan",
-//                        iconResId = R.drawable.ic_swap,
-//                        modifier = Modifier.weight(1f),
-//                        keyboardType = KeyboardType.Number,
-//                        visualTransformation = VisualTransformation.None,
-//                        singleLine = true,
-//                        isError = heightState.error != null,
-//                        errorMessage = heightState.error ?: ""
-//                    )
-//
-//                    Spacer(modifier = Modifier.width(16.dp))
-//
-//                    Surface(
-//                        modifier = Modifier.size(48.dp),
-//                        shape = RoundedCornerShape(15.dp),
-//                        color = colorResource(id = R.color.primary),
-//                        border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-//                    ) {
-//                        Box(
-//                            modifier = Modifier.fillMaxSize(),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            Text(
-//                                text = "CM",
-//                                fontFamily = poppinsFontFamily,
-//                                fontWeight = FontWeight.Bold,
-//                                fontSize = 12.sp,
-//                                color = colorResource(id = R.color.gray_3)
-//                            )
-//                        }
-//                    }
-//                }
             }
         }
 

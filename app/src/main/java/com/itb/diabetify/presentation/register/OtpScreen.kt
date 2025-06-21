@@ -292,7 +292,7 @@ fun OtpScreen(
         SuccessNotification(
             showSuccess = successMessage != null,
             successMessage = successMessage,
-            onDismiss = { viewModel.onErrorShown() },
+            onDismiss = { viewModel.onSuccessShown() },
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .zIndex(1000f)

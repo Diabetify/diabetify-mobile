@@ -41,7 +41,7 @@ interface AuthApiService {
         @Body sendVerificationRequest: SendVerificationRequest
     ) : AuthResponse
 
-    @POST("users/change-password")
+    @POST("users/reset-password")
     suspend fun changePassword(
         @Body changePasswordRequest: ChangePasswordRequest
     ) : AuthResponse

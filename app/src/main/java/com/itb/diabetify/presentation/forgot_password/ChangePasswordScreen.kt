@@ -312,7 +312,7 @@ fun ChangePasswordScreen(
         ErrorNotification(
             showError = errorMessage != null,
             errorMessage = errorMessage,
-            onDismiss = { viewModel.onErrorShown() },
+            onDismiss = { viewModel.onSuccessShown() },
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .zIndex(1000f)

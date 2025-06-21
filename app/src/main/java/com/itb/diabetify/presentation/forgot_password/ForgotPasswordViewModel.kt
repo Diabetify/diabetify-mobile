@@ -20,40 +20,43 @@ class ForgotPasswordViewModel @Inject constructor(
     private val sendVerificationUseCase: SendVerificationUseCase,
     private val changePasswordUseCase: ChangePasswordUseCase
 ): ViewModel() {
-    private val _successMessage = mutableStateOf<String?>(null)
-    val successMessage: State<String?> = _successMessage
-
-    private var _sendVerificationState = mutableStateOf(DataState())
-    val sendVerificationState: State<DataState> = _sendVerificationState
-
-    private var _changePasswordState = mutableStateOf(DataState())
-    val changePasswordState: State<DataState> = _changePasswordState
-
+    // Navigation, Error, and Success States
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+    private val _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
 
+    // Operational States
+    private var _sendVerificationState = mutableStateOf(DataState())
+    val sendVerificationState: State<DataState> = _sendVerificationState
+
+    private var _changePasswordState = mutableStateOf(DataState())
+    val changePasswordState: State<DataState> = _changePasswordState
+
+    // Field States
     private val _emailState = mutableStateOf(FieldState())
     val emailState: State<FieldState> = _emailState
 
+    private val _passwordState = mutableStateOf(FieldState())
+    val passwordState: State<FieldState> = _passwordState
+
+    private val _otpState = mutableStateOf(FieldState())
+    val otpState: State<FieldState> = _otpState
+
+    // Setters for Field States
     fun setEmail(value: String) {
         _emailState.value = emailState.value.copy(error = null)
         _emailState.value = emailState.value.copy(text = value)
     }
 
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
-
     fun setPassword(value: String) {
         _passwordState.value = passwordState.value.copy(error = null)
         _passwordState.value = passwordState.value.copy(text = value)
     }
-
-    private val _otpState = mutableStateOf(FieldState())
-    val otpState: State<FieldState> = _otpState
 
     fun setOtp(value: String) {
         if (value.length <= 6 && value.all { it.isDigit() }) {
@@ -62,6 +65,8 @@ class ForgotPasswordViewModel @Inject constructor(
         }
     }
 
+
+    // Validation Functions
     fun validateForgotPasswordFields(): Boolean {
         val email = emailState.value.text
 
@@ -75,6 +80,31 @@ class ForgotPasswordViewModel @Inject constructor(
         return isValid
     }
 
+    fun validateChangePasswordFields(): Boolean {
+        val password = passwordState.value.text
+        val code = otpState.value.text
+
+        var isValid = true
+
+        if (password.length < 8) {
+            _passwordState.value = passwordState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
+            isValid = false
+        }
+
+        if (code.isEmpty()) {
+            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
+            isValid = false
+        }
+
+        if (code.length != 6) {
+            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    // API Call Functions
     fun sendVerification(
         isResend: Boolean = false
     ) {
@@ -115,30 +145,6 @@ class ForgotPasswordViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun validateChangePasswordFields(): Boolean {
-        val password = passwordState.value.text
-        val code = otpState.value.text
-
-        var isValid = true
-
-        if (password.length < 8) {
-            _passwordState.value = passwordState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
-            isValid = false
-        }
-
-        if (code.isEmpty()) {
-            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
-            isValid = false
-        }
-
-        if (code.length != 6) {
-            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
-            isValid = false
-        }
-
-        return isValid
     }
 
     fun changePassword() {
@@ -187,6 +193,7 @@ class ForgotPasswordViewModel @Inject constructor(
         }
     }
 
+    // Helper Functions
     private fun resetValues() {
         _emailState.value = FieldState()
         _passwordState.value = FieldState()
@@ -201,7 +208,7 @@ class ForgotPasswordViewModel @Inject constructor(
         _errorMessage.value = null
     }
 
-    fun onSuccessMessageShown() {
+    fun onSuccessShown() {
         _successMessage.value = null
     }
 }

@@ -1,7 +1,6 @@
 package com.itb.diabetify.presentation.register
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,9 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.DropdownField
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
@@ -60,6 +61,8 @@ fun BiodataScreen(
     val genderState by viewModel.genderState
     val birthDateState by viewModel.dobState
     val showDatePicker = remember { mutableStateOf(false) }
+    val errorMessage = viewModel.errorMessage.value
+    val isLoading = viewModel.createAccountState.value.isLoading || viewModel.sendVerificationState.value.isLoading
 
     // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
@@ -73,17 +76,6 @@ fun BiodataScreen(
             }
         }
     }
-
-    val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
-    val isLoading = viewModel.createAccountState.value.isLoading || viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -135,7 +127,7 @@ fun BiodataScreen(
                 text = "Bantu kami mengenal Anda lebih baik!",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 lineHeight = 15.sp,
                 textAlign = TextAlign.Center,
                 color = colorResource(id = R.color.gray)
@@ -228,6 +220,16 @@ fun BiodataScreen(
             enabled = genderState.error == null && birthDateState.error == null && !isLoading,
             rightImageResId = R.drawable.ic_chevron_right,
             isLoading = isLoading
+        )
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = "Terjadi kesalahan, silakan coba lagi.",
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
         )
     }
 }

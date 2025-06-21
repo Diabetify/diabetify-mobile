@@ -23,8 +23,6 @@ data class SurveyQuestion(
 data class SurveyState(
     val currentPageIndex: Int = 0,
     val answers: Map<String, String> = emptyMap(),
-    val showSnackbar: Boolean = false,
-    val snackbarMessage: String = "",
     val isComplete: Boolean = false,
     val showReviewScreen: Boolean = false
 )

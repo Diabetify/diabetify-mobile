@@ -41,7 +41,6 @@ fun SurveyPage(
     modifier: Modifier = Modifier
 ) {
     var numericValue by remember { mutableStateOf(selectedAnswer ?: "") }
-
     LaunchedEffect(selectedAnswer) {
         if (question.questionType is SurveyQuestionType.Numeric) {
             numericValue = selectedAnswer ?: ""
@@ -74,7 +73,7 @@ fun SurveyPage(
             color = colorResource(R.color.black),
         )
 
-        // Additional Info if available
+        // Additional Info
         if (question.additionalInfo.isNotEmpty()) {
             Text(
                 text = question.additionalInfo,

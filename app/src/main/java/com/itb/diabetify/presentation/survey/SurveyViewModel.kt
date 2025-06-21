@@ -65,7 +65,7 @@ class SurveyViewModel @Inject constructor(
         val answer = _state.value.answers[currentQuestion.id]
 
         if (answer.isNullOrBlank()) {
-            showSnackbar("Mohon jawab pertanyaan ini dahulu")
+            _errorMessage.value = "Mohon jawab pertanyaan ini dahulu"
             return
         }
 
@@ -136,8 +136,7 @@ class SurveyViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     Log.d("SurveyViewModel", "Profile submission error: ${addProfileResult.result.message}")
-                    showSnackbar(addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan profil")
-                    _errorMessage.value = addProfileResult.result.message ?: "Unknown error occurred"
+                    _errorMessage.value = addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan profil"
                 }
                 is Resource.Loading -> {
                     Log.d("SurveyViewModel", "Profile submission loading")
@@ -145,8 +144,7 @@ class SurveyViewModel @Inject constructor(
                 else -> {
                     // Handle unexpected error
                     Log.e("SurveyViewModel", "Unexpected error in profile submission")
-                    showSnackbar("Terjadi kesalahan saat mengirimkan profil")
-                    _errorMessage.value = "Unknown error occurred"
+                    _errorMessage.value = "Terjadi kesalahan saat mengirimkan profil"
                 }
             }
         }
@@ -167,8 +165,7 @@ class SurveyViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     Log.d("SurveyViewModel", "Prediction error: ${predictionResult.result.message}")
-                    showSnackbar(predictionResult.result.message ?: "Terjadi kesalahan saat memprediksi")
-                    _errorMessage.value = predictionResult.result.message ?: "Unknown error occurred"
+                    _errorMessage.value = predictionResult.result.message ?: "Terjadi kesalahan saat memprediksi"
                 }
                 is Resource.Loading -> {
                     Log.d("SurveyViewModel", "Prediction loading")
@@ -176,8 +173,7 @@ class SurveyViewModel @Inject constructor(
                 else -> {
                     // Handle unexpected error
                     Log.e("SurveyViewModel", "Unexpected error in prediction")
-                    showSnackbar("Terjadi kesalahan saat memprediksi")
-                    _errorMessage.value = "Unknown error occurred"
+                    _errorMessage.value = "Terjadi kesalahan saat memprediksi"
                 }
             }
         }
@@ -192,18 +188,8 @@ class SurveyViewModel @Inject constructor(
         )
     }
 
-    private fun showSnackbar(message: String) {
-        _state.value = _state.value.copy(
-            showSnackbar = true,
-            snackbarMessage = message
-        )
-    }
-
-    fun clearSnackbar() {
-        _state.value = _state.value.copy(
-            showSnackbar = false,
-            snackbarMessage = ""
-        )
+    fun onErrorShown() {
+        _errorMessage.value = null
     }
 
     fun getCurrentQuestion(): SurveyQuestion {

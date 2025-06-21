@@ -51,35 +51,63 @@ class RegisterViewModel @Inject constructor(
     private val _nameStateCopy = mutableStateOf(FieldState())
     val nameStateCopy: State<FieldState> = _nameStateCopy
 
+    private val _emailState = mutableStateOf(FieldState())
+    val emailState: State<FieldState> = _emailState
+
+    private val _passwordState = mutableStateOf(FieldState())
+    val passwordState: State<FieldState> = _passwordState
+
+    private val _privacyPolicyState = mutableStateOf(false)
+    val privacyPolicyState: State<Boolean> = _privacyPolicyState
+
+    private val _genderState = mutableStateOf(FieldState())
+    val genderState: State<FieldState> = _genderState
+
+    private val _dobState = mutableStateOf(FieldState())
+    val dobState: State<FieldState> = _dobState
+
+    private val _otpState = mutableStateOf(FieldState())
+    val otpState: State<FieldState> = _otpState
+
+    // Setters for Field States
     fun setName(value: String) {
         _nameState.value = nameState.value.copy(error = null)
         _nameStateCopy.value = nameState.value.copy(text = value)
         _nameState.value = nameState.value.copy(text = value)
     }
 
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
-
     fun setEmail(value: String) {
         _emailState.value = emailState.value.copy(error = null)
         _emailState.value = emailState.value.copy(text = value)
     }
-
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
 
     fun setPassword(value: String) {
         _passwordState.value = passwordState.value.copy(error = null)
         _passwordState.value = passwordState.value.copy(text = value)
     }
 
-    private val _privacyPolicyState = mutableStateOf(false)
-    val privacyPolicyState: State<Boolean> = _privacyPolicyState
-
     fun setPrivacyPolicy(value: Boolean) {
         _privacyPolicyState.value = value
     }
 
+    fun setGender(value: String) {
+        _genderState.value = genderState.value.copy(error = null)
+        _genderState.value = genderState.value.copy(text = value)
+    }
+
+    fun setDob(value: String) {
+        _dobState.value = dobState.value.copy(error = null)
+        _dobState.value = dobState.value.copy(text = value)
+    }
+
+    fun setOtp(value: String) {
+        if (value.length <= 6 && value.all { it.isDigit() }) {
+            _otpState.value = otpState.value.copy(error = null)
+            _otpState.value = otpState.value.copy(text = value)
+        }
+    }
+
+    // Validation Functions
     fun validateRegisterFields(): Boolean {
         val name = nameState.value.text
         val email = emailState.value.text
@@ -105,32 +133,6 @@ class RegisterViewModel @Inject constructor(
         return isValid
     }
 
-    private val _genderState = mutableStateOf(FieldState())
-    val genderState: State<FieldState> = _genderState
-
-    fun setGender(value: String) {
-        _genderState.value = genderState.value.copy(error = null)
-        _genderState.value = genderState.value.copy(text = value)
-    }
-
-    private val _dobState = mutableStateOf(FieldState())
-    val dobState: State<FieldState> = _dobState
-
-    fun setDob(value: String) {
-        _dobState.value = dobState.value.copy(error = null)
-        _dobState.value = dobState.value.copy(text = value)
-    }
-
-    private val _otpState = mutableStateOf(FieldState())
-    val otpState: State<FieldState> = _otpState
-
-    fun setOtp(value: String) {
-        if (value.length <= 6 && value.all { it.isDigit() }) {
-            _otpState.value = otpState.value.copy(error = null)
-            _otpState.value = otpState.value.copy(text = value)
-        }
-    }
-
     fun validateBiodataFields(): Boolean {
         val gender = genderState.value.text
         val birthDate = dobState.value.text
@@ -150,6 +152,25 @@ class RegisterViewModel @Inject constructor(
         return isValid
     }
 
+    fun validateOtpFields(): Boolean {
+        val code = otpState.value.text
+
+        var isValid = true
+
+        if (code.isEmpty()) {
+            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
+            isValid = false
+        }
+
+        if (code.length != 6) {
+            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    // API Call Functions
     fun createAccount() {
         viewModelScope.launch {
             _createAccountState.value = createAccountState.value.copy(isLoading = true)
@@ -284,24 +305,6 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun validateOtpFields(): Boolean {
-        val code = otpState.value.text
-
-        var isValid = true
-
-        if (code.isEmpty()) {
-            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
-            isValid = false
-        }
-
-        if (code.length != 6) {
-            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
-            isValid = false
-        }
-
-        return isValid
-    }
-
     fun verifyOtp() {
         viewModelScope.launch {
             _verifyOtpState.value = verifyOtpState.value.copy(isLoading = true)
@@ -343,6 +346,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    // Helper Functions
     private fun resetValues() {
         _nameState.value = FieldState()
         _emailState.value = FieldState()

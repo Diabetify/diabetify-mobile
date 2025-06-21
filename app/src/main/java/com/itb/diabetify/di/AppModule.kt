@@ -53,6 +53,11 @@ import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
+import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
+import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCase
+import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
+import com.itb.diabetify.domain.manager.NotificationManager
+import com.itb.diabetify.data.manager.NotificationManagerImpl
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -409,5 +414,41 @@ object AppModule {
         repository: ProfileRepository
     ): UpdateProfileUseCase {
         return UpdateProfileUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesNotificationManager(
+        @ApplicationContext context: Context
+    ): NotificationManager {
+        return NotificationManagerImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun providesScheduleNotificationUseCase(
+        notificationManager: NotificationManager
+    ): ScheduleNotificationUseCase {
+        return ScheduleNotificationUseCase(notificationManager)
+    }
+
+    @Provides
+    @Singleton
+    fun providesCancelNotificationUseCase(
+        notificationManager: NotificationManager
+    ): CancelNotificationUseCase {
+        return CancelNotificationUseCase(notificationManager)
+    }
+
+    @Provides
+    @Singleton
+    fun providesNotificationUseCases(
+        scheduleNotificationUseCase: ScheduleNotificationUseCase,
+        cancelNotificationUseCase: CancelNotificationUseCase
+    ): NotificationUseCases {
+        return NotificationUseCases(
+            scheduleNotification = scheduleNotificationUseCase,
+            cancelNotification = cancelNotificationUseCase
+        )
     }
 }

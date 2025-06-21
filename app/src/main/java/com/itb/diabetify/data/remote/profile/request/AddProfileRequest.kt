@@ -12,7 +12,7 @@ data class AddProfileRequest (
     @SerializedName("macrosomic_baby")
     val macrosomicBaby: Boolean? = null,
     @SerializedName("smoking")
-    val smoking: Boolean? = null,
+    val smoking: Int? = null,
     @SerializedName("year_of_smoking")
     val yearOfSmoking: Int? = null,
     @SerializedName("cholesterol")

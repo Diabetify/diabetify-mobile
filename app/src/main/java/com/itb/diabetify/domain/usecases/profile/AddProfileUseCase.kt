@@ -12,7 +12,7 @@ class AddProfileUseCase(
         height: Int,
         hypertension: Boolean,
         macrosomicBaby: Boolean,
-        smoking: Boolean,
+        smoking: Int,
         yearOfSmoking: Int?,
         cholesterol: Boolean,
         bloodline: Boolean,

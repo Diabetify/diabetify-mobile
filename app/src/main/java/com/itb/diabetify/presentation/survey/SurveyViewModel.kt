@@ -275,7 +275,7 @@ class SurveyViewModel @Inject constructor(
             val height = _state.value.answers["height"]?.toIntOrNull() ?: 0
             val hypertension = _state.value.answers["hypertension"]?.toBoolean() ?: false
             val macrosomicBaby = _state.value.answers["pregnancy"]?.toBoolean() ?: false
-            val smoking = _state.value.answers["smoking_status"]?.toBoolean() ?: false
+            val smoking = _state.value.answers["smoking_status"]?.toIntOrNull() ?: 0
             val yearOfSmoking = _state.value.answers["smoking_age"]?.toIntOrNull() ?: 0
             val cholesterol = _state.value.answers["cholesterol"]?.toBoolean() ?: false
             val bloodline = _state.value.answers["bloodline"]?.toBoolean() ?: false

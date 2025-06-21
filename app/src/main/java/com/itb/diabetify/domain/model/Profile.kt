@@ -5,7 +5,7 @@ data class Profile(
     val weight: String? = null,
     val height: String? = null,
     val bmi: String? = null,
-    val smoking: Boolean? = null,
+    val smoking: Int? = null,
     val yearOfSmoking: String? = null,
     val macrosomicBaby: Boolean? = null,
     val cholesterol: Boolean? = null,

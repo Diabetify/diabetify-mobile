@@ -51,6 +51,7 @@ import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.common.SuccessNotification
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
@@ -63,6 +64,7 @@ fun OtpScreen(
     // States
     val otpState by viewModel.otpState
     val errorMessage = viewModel.errorMessage.value
+    val successMessage = viewModel.successMessage.value
     val isLoading = viewModel.verifyOtpState.value.isLoading
     val isResendLoading = viewModel.sendVerificationState.value.isLoading
     val maxLength = 6
@@ -280,6 +282,16 @@ fun OtpScreen(
         ErrorNotification(
             showError = errorMessage != null,
             errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
+        )
+
+        // Success notification
+        SuccessNotification(
+            showSuccess = successMessage != null,
+            successMessage = successMessage,
             onDismiss = { viewModel.onErrorShown() },
             modifier = Modifier
                 .align(Alignment.TopCenter)

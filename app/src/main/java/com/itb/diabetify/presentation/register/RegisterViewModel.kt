@@ -24,12 +24,15 @@ class RegisterViewModel @Inject constructor(
     private val sendVerificationUseCase: SendVerificationUseCase,
     private val verifyOtpUseCase: VerifyOtpUseCase
 ): ViewModel() {
-    // Navigation and Error States
+    // Navigation, Error, and Success States
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
+
+    private val _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
 
     // Operational States
     private var _createAccountState = mutableStateOf(DataState())
@@ -284,7 +287,7 @@ class RegisterViewModel @Inject constructor(
             when (sendVerificationResult.result) {
                 is Resource.Success -> {
                     if (isResend) {
-                        _errorMessage.value = "Kode OTP berhasil dikirim ulang"
+                        _successMessage.value = "Kode OTP berhasil dikirim ulang"
                     } else {
                         _navigationEvent.value = "OTP_SCREEN"
                     }
@@ -363,5 +366,9 @@ class RegisterViewModel @Inject constructor(
 
     fun onErrorShown() {
         _errorMessage.value = null
+    }
+
+    fun onSuccessShown() {
+        _successMessage.value = null
     }
 }

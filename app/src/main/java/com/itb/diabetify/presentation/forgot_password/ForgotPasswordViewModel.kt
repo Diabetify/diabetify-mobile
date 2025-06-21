@@ -20,6 +20,9 @@ class ForgotPasswordViewModel @Inject constructor(
     private val sendVerificationUseCase: SendVerificationUseCase,
     private val changePasswordUseCase: ChangePasswordUseCase
 ): ViewModel() {
+    private val _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
+
     private var _sendVerificationState = mutableStateOf(DataState())
     val sendVerificationState: State<DataState> = _sendVerificationState
 
@@ -92,7 +95,7 @@ class ForgotPasswordViewModel @Inject constructor(
             when (sendVerificationResult.result) {
                 is Resource.Success -> {
                     if (isResend) {
-                        _errorMessage.value = "Kode OTP telah dikirim ulang"
+                        _successMessage.value = "Kode OTP telah dikirim ulang"
                     } else {
                         _navigationEvent.value = "CHANGE_PASSWORD_SCREEN"
                     }
@@ -196,5 +199,9 @@ class ForgotPasswordViewModel @Inject constructor(
 
     fun onErrorShown() {
         _errorMessage.value = null
+    }
+
+    fun onSuccessMessageShown() {
+        _successMessage.value = null
     }
 }

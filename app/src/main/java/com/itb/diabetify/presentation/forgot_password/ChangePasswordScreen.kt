@@ -1,6 +1,5 @@
 package com.itb.diabetify.presentation.forgot_password
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -49,10 +48,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
+import com.itb.diabetify.presentation.common.SuccessNotification
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
@@ -62,14 +64,19 @@ fun ChangePasswordScreen(
     navController: NavController,
     viewModel: ForgotPasswordViewModel
 ) {
-    val passwordState = viewModel.passwordState.value
-    val otpState = viewModel.otpState.value
+    // States
+    val passwordState by viewModel.passwordState
+    val otpState by viewModel.otpState
+    val errorMessage = viewModel.errorMessage.value
+    val successMessage = viewModel.successMessage.value
+    val isLoading = viewModel.changePasswordState.value.isLoading
+    val isResendLoading = viewModel.sendVerificationState.value.isLoading
     var passwordVisible by remember { mutableStateOf(false) }
     val maxLength = 6
 
+    // Timer for resend code
     var resendTimerActive by remember { mutableStateOf(false) }
-    var timeLeft by remember { mutableStateOf(60) }
-
+    var timeLeft by remember { mutableIntStateOf(60) }
     LaunchedEffect(resendTimerActive) {
         if (resendTimerActive) {
             while (timeLeft > 0) {
@@ -81,6 +88,7 @@ fun ChangePasswordScreen(
         }
     }
 
+    // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -92,18 +100,6 @@ fun ChangePasswordScreen(
             }
         }
     }
-
-    val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
-    val isLoading = viewModel.changePasswordState.value.isLoading
-    val isResendLoading = viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -310,6 +306,26 @@ fun ChangePasswordScreen(
                 .offset(y = (-30).dp),
             enabled = otpState.error == null && otpState.text.length == maxLength && passwordState.error == null && !isLoading,
             isLoading = isLoading
+        )
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
+        )
+
+        // Success notification
+        SuccessNotification(
+            showSuccess = successMessage != null,
+            successMessage = successMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
         )
     }
 }

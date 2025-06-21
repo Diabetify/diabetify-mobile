@@ -22,6 +22,14 @@ class SurveyViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val predictionUseCase: PredictionUseCase
 ) : ViewModel() {
+    // Navigation and Error States
+    private val _navigationEvent = mutableStateOf<String?>(null)
+    val navigationEvent: State<String?> = _navigationEvent
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    // Operational States
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
 
@@ -31,21 +39,97 @@ class SurveyViewModel @Inject constructor(
     private var _predictionState = mutableStateOf(DataState())
     val predictionState: State<DataState> = _predictionState
 
-    private val _navigationEvent = mutableStateOf<String?>(null)
-    val navigationEvent: State<String?> = _navigationEvent
-
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
-
-
+    // Survey State
     private val _state = mutableStateOf(SurveyState())
     val state: State<SurveyState> = _state
 
     private val surveyQuestions = questions
 
+    // Setters for Survey State
+    fun setAnswer(questionId: String, answer: String) {
+        val newAnswers = _state.value.answers.toMutableMap()
+        newAnswers[questionId] = answer
+
+        val newErrors = _state.value.fieldErrors.toMutableMap()
+        val validationError = validateField(questionId, answer)
+        if (validationError != null) {
+            newErrors[questionId] = validationError
+        } else {
+            newErrors.remove(questionId)
+        }
+
+        _state.value = _state.value.copy(
+            answers = newAnswers,
+            fieldErrors = newErrors
+        )
+    }
+
+    // Validation Function
+    private fun validateField(questionId: String, answer: String): String? {
+        if (answer.isBlank()) {
+            return "Mohon jawab pertanyaan ini"
+        }
+
+        val question = displayedSurveyQuestions.find { it.id == questionId }
+        question?.let {
+            when (it.questionType) {
+                is SurveyQuestionType.Numeric -> {
+                    val numericValue = answer.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+
+                    when (questionId) {
+                        "weight" -> {
+                            if (numericValue < 30 || numericValue > 300) {
+                                return "Berat badan harus antara 30-300 kg"
+                            }
+                        }
+                        "height" -> {
+                            if (numericValue < 100 || numericValue > 250) {
+                                return "Tinggi badan harus antara 100-250 cm"
+                            }
+                        }
+                        "smoking_age" -> {
+                            if (numericValue < 10 || numericValue > 80) {
+                                return "Usia mulai merokok harus antara 10-80 tahun"
+                            }
+                        }
+                        "smoking_amount" -> {
+                            if (numericValue < 0 || numericValue > 100) {
+                                return "Jumlah rokok harus antara 0-100 batang"
+                            }
+                        }
+                        "systolic" -> {
+                            if (numericValue < 70 || numericValue > 250) {
+                                return "Tekanan sistolik harus antara 70-250 mmHg"
+                            }
+                        }
+                        "diastolic" -> {
+                            if (numericValue < 40 || numericValue > 150) {
+                                return "Tekanan diastolik harus antara 40-150 mmHg"
+                            }
+                        }
+                        "activity" -> {
+                            if (numericValue < 0 || numericValue > 7) {
+                                return "Aktivitas fisik harus antara 0-7 hari"
+                            }
+                        }
+                    }
+                }
+                is SurveyQuestionType.Selection -> {
+                    val validOptionIds = it.options.map { option -> option.id }
+                    if (!validOptionIds.contains(answer)) {
+                        return "Pilihan tidak valid"
+                    }
+                }
+            }
+        }
+        
+        return null
+    }
+
+    // Survey Helper Functions
     val displayedSurveyQuestions: List<SurveyQuestion>
         get() {
-            var filteredQuestions = surveyQuestions.filter { question ->
+            val filteredQuestions = surveyQuestions.filter { question ->
                 when (question.id) {
                     "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "1" || _state.value.answers["smoking_status"] == "2"
                     "pregnancy" -> {
@@ -65,9 +149,23 @@ class SurveyViewModel @Inject constructor(
         val answer = _state.value.answers[currentQuestion.id]
 
         if (answer.isNullOrBlank()) {
-            _errorMessage.value = "Mohon jawab pertanyaan ini dahulu"
+            val newErrors = _state.value.fieldErrors.toMutableMap()
+            newErrors[currentQuestion.id] = "Mohon jawab pertanyaan ini dahulu"
+            _state.value = _state.value.copy(fieldErrors = newErrors)
             return
         }
+
+        val validationError = validateField(currentQuestion.id, answer)
+        if (validationError != null) {
+            val newErrors = _state.value.fieldErrors.toMutableMap()
+            newErrors[currentQuestion.id] = validationError
+            _state.value = _state.value.copy(fieldErrors = newErrors)
+            return
+        }
+
+        val newErrors = _state.value.fieldErrors.toMutableMap()
+        newErrors.remove(currentQuestion.id)
+        _state.value = _state.value.copy(fieldErrors = newErrors)
 
         if (currentQuestion.id == "diastolic" && _state.value.answers["bp_unknown"] == "yes") {
             val systolic = _state.value.answers["systolic"]?.toIntOrNull()
@@ -84,7 +182,6 @@ class SurveyViewModel @Inject constructor(
                 currentPageIndex = _state.value.currentPageIndex + 1
             )
         } else {
-            // Show review screen before submitting
             _state.value = _state.value.copy(
                 showReviewScreen = true
             )
@@ -99,7 +196,78 @@ class SurveyViewModel @Inject constructor(
         }
     }
 
-    private fun submitSurvey() {
+    fun getCurrentQuestion(): SurveyQuestion {
+        return displayedSurveyQuestions[_state.value.currentPageIndex]
+    }
+
+    fun getProgress(): Float {
+        return (_state.value.currentPageIndex + 1).toFloat() / displayedSurveyQuestions.size
+    }
+
+    fun canGoNext(): Boolean {
+        val currentQuestion = getCurrentQuestion()
+        val answer = _state.value.answers[currentQuestion.id]
+        val hasError = _state.value.fieldErrors[currentQuestion.id] != null
+        return answer?.isNotBlank() == true && !hasError
+    }
+
+    fun canGoPrevious(): Boolean {
+        return _state.value.currentPageIndex > 0
+    }
+
+
+    fun backToSurvey() {
+        _state.value = _state.value.copy(
+            showReviewScreen = false
+        )
+    }
+
+    fun getAnsweredQuestions(): List<Pair<SurveyQuestion, String>> {
+        return displayedSurveyQuestions.mapNotNull { question ->
+            _state.value.answers[question.id]?.let { answer ->
+                question to answer
+            }
+        }
+    }
+
+    fun getFormattedAnswer(question: SurveyQuestion, answer: String): String {
+        return when (question.questionType) {
+            SurveyQuestionType.Selection -> {
+                question.options.find { it.id == answer }?.text ?: answer
+            }
+            SurveyQuestionType.Numeric -> {
+                "$answer ${question.numericUnit}"
+            }
+        }
+    }
+
+    // API Call Functions
+    fun submitSurvey() {
+        val errors = mutableMapOf<String, String>()
+        
+        displayedSurveyQuestions.forEach { question ->
+            val answer = _state.value.answers[question.id]
+            if (answer.isNullOrBlank()) {
+                errors[question.id] = "Mohon jawab pertanyaan ini"
+            } else {
+                val validationError = validateField(question.id, answer)
+                if (validationError != null) {
+                    errors[question.id] = validationError
+                }
+            }
+        }
+        
+        if (errors.isNotEmpty()) {
+            _state.value = _state.value.copy(
+                fieldErrors = errors,
+                showReviewScreen = false
+            )
+            _errorMessage.value = "Harap perbaiki kesalahan pada form sebelum melanjutkan"
+            return
+        }
+        
+        _state.value = _state.value.copy(fieldErrors = emptyMap())
+        
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
@@ -131,20 +299,20 @@ class SurveyViewModel @Inject constructor(
 
             when (addProfileResult.result) {
                 is Resource.Success -> {
-                    Log.d("SurveyViewModel", "Profile submission successful, proceeding with activity submission")
                     predict()
                 }
                 is Resource.Error -> {
-                    Log.d("SurveyViewModel", "Profile submission error: ${addProfileResult.result.message}")
                     _errorMessage.value = addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan profil"
+                    addProfileResult.result.message?.let { Log.d("SurveyViewModel", it) }
                 }
                 is Resource.Loading -> {
                     Log.d("SurveyViewModel", "Profile submission loading")
                 }
+
                 else -> {
                     // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error in profile submission")
                     _errorMessage.value = "Terjadi kesalahan saat mengirimkan profil"
+                    Log.e("SurveyViewModel", "Unexpected error in profile submission")
                 }
             }
         }
@@ -160,7 +328,6 @@ class SurveyViewModel @Inject constructor(
 
             when (predictionResult.result) {
                 is Resource.Success -> {
-                    Log.d("SurveyViewModel", "Prediction successful")
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
@@ -172,73 +339,19 @@ class SurveyViewModel @Inject constructor(
                 }
                 else -> {
                     // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error in prediction")
                     _errorMessage.value = "Terjadi kesalahan saat memprediksi"
+                    Log.e("SurveyViewModel", "Unexpected error in prediction")
                 }
             }
         }
     }
 
-    fun setAnswer(questionId: String, answer: String) {
-        val newAnswers = _state.value.answers.toMutableMap()
-        newAnswers[questionId] = answer
-
-        _state.value = _state.value.copy(
-            answers = newAnswers
-        )
-    }
-
-    fun onErrorShown() {
-        _errorMessage.value = null
-    }
-
-    fun getCurrentQuestion(): SurveyQuestion {
-        return displayedSurveyQuestions[_state.value.currentPageIndex]
-    }
-
-    fun getProgress(): Float {
-        return (_state.value.currentPageIndex + 1).toFloat() / displayedSurveyQuestions.size
-    }
-
-    fun canGoNext(): Boolean {
-        val currentQuestion = getCurrentQuestion()
-        return _state.value.answers[currentQuestion.id]?.isNotBlank() == true
-    }
-
-    fun canGoPrevious(): Boolean {
-        return _state.value.currentPageIndex > 0
-    }
-
+    // Helper Functions
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }
 
-    fun confirmAndSubmit() {
-        submitSurvey()
-    }
-
-    fun backToSurvey() {
-        _state.value = _state.value.copy(
-            showReviewScreen = false
-        )
-    }
-
-    fun getAnsweredQuestions(): List<Pair<SurveyQuestion, String>> {
-        return displayedSurveyQuestions.mapNotNull { question ->
-            _state.value.answers[question.id]?.let { answer ->
-                question to answer
-            }
-        }
-    }
-
-    fun getFormattedAnswer(question: SurveyQuestion, answer: String): String {
-        return when (question.questionType) {
-            SurveyQuestionType.Selection -> {
-                question.options.find { it.id == answer }?.text ?: answer
-            }
-            SurveyQuestionType.Numeric -> {
-                "$answer ${question.numericUnit}"
-            }
-        }
+    fun onErrorShown() {
+        _errorMessage.value = null
     }
 }

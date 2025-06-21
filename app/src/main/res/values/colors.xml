@@ -18,4 +18,5 @@
     <color name="primary">#274254</color>
     <color name="secondary">#20323A</color>
     <color name="tertiary">#648C9C</color>
+    <color name="red">#D32F2F</color>
 </resources>

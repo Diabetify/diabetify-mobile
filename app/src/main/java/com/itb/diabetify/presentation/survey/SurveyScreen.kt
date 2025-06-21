@@ -79,29 +79,28 @@ fun SurveyScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (state.showReviewScreen) {
-                    // Review screen
                     ReviewScreen(
                         answeredQuestions = viewModel.getAnsweredQuestions(),
-                        onConfirm = { viewModel.confirmAndSubmit() },
+                        onConfirm = { viewModel.submitSurvey() },
                         onBack = { viewModel.backToSurvey() },
                         isLoading = viewModel.profileState.value.isLoading || viewModel.activityState.value.isLoading || viewModel.predictionState.value.isLoading,
                         viewModel = viewModel
                     )
                 } else {
-                    // Survey question page
                     if (viewModel.displayedSurveyQuestions.isNotEmpty()) {
+                        val currentQuestion = viewModel.getCurrentQuestion()
                         SurveyPage(
-                            question = viewModel.getCurrentQuestion(),
+                            question = currentQuestion,
                             onAnswerSelected = { questionId, answer ->
                                 viewModel.setAnswer(questionId, answer)
                             },
-                            selectedAnswer = state.answers[viewModel.getCurrentQuestion().id]
+                            selectedAnswer = state.answers[currentQuestion.id],
+                            errorMessage = state.fieldErrors[currentQuestion.id]
                         )
                     }
                 }
             }
 
-            // Bottom section with progress
             if (!state.showReviewScreen) {
                 Column(
                     modifier = Modifier
@@ -109,7 +108,6 @@ fun SurveyScreen(
                         .padding(bottom = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Current question number
                     Text(
                         text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
                         fontFamily = poppinsFontFamily,
@@ -121,7 +119,6 @@ fun SurveyScreen(
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    // Progress indicator
                     LinearProgressIndicator(
                         progress = { viewModel.getProgress() },
                         modifier = Modifier
@@ -133,7 +130,6 @@ fun SurveyScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Previous and Next buttons
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

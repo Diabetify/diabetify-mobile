@@ -38,6 +38,7 @@ fun SurveyPage(
     question: SurveyQuestion,
     onAnswerSelected: (String, String) -> Unit,
     selectedAnswer: String?,
+    errorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
     var numericValue by remember { mutableStateOf(selectedAnswer ?: "") }
@@ -86,67 +87,94 @@ fun SurveyPage(
         // Answer options
         when (question.questionType) {
             is SurveyQuestionType.Selection -> {
-                question.options.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clickable { onAnswerSelected(question.id, option.id) },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = selectedAnswer == option.id,
-                            onClick = { onAnswerSelected(question.id, option.id) },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = colorResource(R.color.primary),
-                                unselectedColor = colorResource(R.color.black)
+                Column {
+                    question.options.forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clickable { onAnswerSelected(question.id, option.id) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selectedAnswer == option.id,
+                                onClick = { onAnswerSelected(question.id, option.id) },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(R.color.primary),
+                                    unselectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(R.color.black)
+                                )
                             )
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = option.text,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 18.sp,
+                                color = colorResource(R.color.black),
+                            )
+                        }
+                    }
+                    
+                    if (errorMessage != null) {
                         Text(
-                            text = option.text,
+                            text = errorMessage,
+                            color = colorResource(R.color.red),
+                            fontSize = 12.sp,
                             fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 18.sp,
-                            color = colorResource(R.color.black),
+                            fontWeight = FontWeight.Normal,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }
                 }
             }
             is SurveyQuestionType.Numeric -> {
-                OutlinedTextField(
-                    value = numericValue,
-                    onValueChange = {
-                        numericValue = it
-                        onAnswerSelected(question.id, it)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(
-                            "Masukkan nilai",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Normal
-                        )
-                    },
-                    textStyle = TextStyle(
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = colorResource(R.color.black)
-                    ),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    trailingIcon = {
-                        if (question.numericUnit.isNotEmpty()) {
+                Column {
+                    OutlinedTextField(
+                        value = numericValue,
+                        onValueChange = {
+                            numericValue = it
+                            onAnswerSelected(question.id, it)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = {
                             Text(
-                                text = question.numericUnit,
-                                modifier = Modifier.padding(end = 16.dp),
+                                "Masukkan nilai",
                                 fontFamily = poppinsFontFamily,
-                                fontWeight = FontWeight.Medium,
+                                fontWeight = FontWeight.Normal
                             )
-                        }
+                        },
+                        textStyle = TextStyle(
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = colorResource(R.color.black)
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        trailingIcon = {
+                            if (question.numericUnit.isNotEmpty()) {
+                                Text(
+                                    text = question.numericUnit,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                            }
+                        },
+                        isError = errorMessage != null
+                    )
+                    
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage,
+                            color = colorResource(R.color.red),
+                            fontSize = 12.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
                     }
-                )
+                }
             }
         }
     }

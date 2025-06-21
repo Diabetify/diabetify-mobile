@@ -30,7 +30,7 @@ fun SuccessScreen(
     navController: NavController
 ) {
     BackHandler {
-        // Do nothing to disable back navigation
+        // Do nothing
     }
 
     Box(

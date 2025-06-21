@@ -23,6 +23,7 @@ data class SurveyQuestion(
 data class SurveyState(
     val currentPageIndex: Int = 0,
     val answers: Map<String, String> = emptyMap(),
+    val fieldErrors: Map<String, String> = emptyMap(),
     val isComplete: Boolean = false,
     val showReviewScreen: Boolean = false
 )

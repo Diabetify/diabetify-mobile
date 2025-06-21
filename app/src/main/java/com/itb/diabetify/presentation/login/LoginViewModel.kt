@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
-import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -21,35 +20,39 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val googleLoginUseCase: GoogleLoginUseCase,
 ): ViewModel() {
-    private var _loginState = mutableStateOf(DataState())
-    val loginState: State<DataState> = _loginState
-
-    private var _googleLoginState = mutableStateOf(DataState())
-    val googleLoginState: State<DataState> = _googleLoginState
-
+    // Navigation and Error States
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
+    // Operational States
+    private var _loginState = mutableStateOf(DataState())
+    val loginState: State<DataState> = _loginState
 
+    private var _googleLoginState = mutableStateOf(DataState())
+    val googleLoginState: State<DataState> = _googleLoginState
+
+    // Field States
     private val _emailState = mutableStateOf(FieldState())
     val emailState: State<FieldState> = _emailState
 
+    private val _passwordState = mutableStateOf(FieldState())
+    val passwordState: State<FieldState> = _passwordState
+
+    // Setters for Field States
     fun setEmail(value: String) {
         _emailState.value = emailState.value.copy(error = null)
         _emailState.value = emailState.value.copy(text = value)
     }
-
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
 
     fun setPassword(value: String) {
         _passwordState.value = passwordState.value.copy(error = null)
         _passwordState.value = passwordState.value.copy(text = value)
     }
 
+    // Validation Functions
     fun validateLoginFields(): Boolean {
         val email = emailState.value.text
         val password = passwordState.value.text
@@ -69,6 +72,7 @@ class LoginViewModel @Inject constructor(
         return isValid
     }
 
+    // API Call Functions
     fun login() {
         viewModelScope.launch {
             _loginState.value = loginState.value.copy(isLoading = true)
@@ -141,6 +145,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    // Helper Functions
     private fun resetValues() {
         _emailState.value = FieldState()
         _passwordState.value = FieldState()

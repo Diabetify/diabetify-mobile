@@ -105,16 +105,6 @@ fun OtpScreen(
             .fillMaxSize()
             .background(colorResource(id = R.color.background))
     ) {
-        // Error notification
-        ErrorNotification(
-            showError = errorMessage != null,
-            errorMessage = errorMessage,
-            onDismiss = { viewModel.onErrorShown() },
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .zIndex(1000f)
-        )
-
         Image(
             modifier = Modifier
                 .size(150.dp)
@@ -284,6 +274,16 @@ fun OtpScreen(
                 .offset(y = (-30).dp),
             enabled = otpState.error == null && otpState.text.length == maxLength && !isLoading,
             isLoading = isLoading
+        )
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
         )
     }
 }

@@ -1,7 +1,6 @@
 package com.itb.diabetify.presentation.login
 
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -55,6 +55,7 @@ import com.google.android.gms.common.api.ApiException
 import com.itb.diabetify.BuildConfig
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.Divider
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
@@ -66,32 +67,28 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel
 ) {
-    val emailState = viewModel.emailState.value
-    val passwordState = viewModel.passwordState.value
+    // States
+    val emailState by viewModel.emailState
+    val passwordState by viewModel.passwordState
     var passwordVisible by remember { mutableStateOf(false) }
+    val errorMessage = viewModel.errorMessage.value
+    val isLoading = viewModel.loginState.value.isLoading
 
+    // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
             when (it) {
                 "HOME_SCREEN" -> {
                     navController.navigate(Route.MainNavigation.route)
-//                    navController.navigate(Route.SurveyScreen.route)
                     viewModel.onNavigationHandled()
                 }
             }
         }
     }
 
+    // Google Sign-In client setup
     val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
     val googleSignInClient = remember {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
@@ -101,8 +98,6 @@ fun LoginScreen(
 
         GoogleSignIn.getClient(context, gso)
     }
-
-    val isLoading = viewModel.loginState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -272,7 +267,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.width(25.dp))
 
                 Surface(
-                    onClick = { /* Handle Google login */ },
+                    onClick = { /* TODO: Handle Facebook login */ },
                     modifier = Modifier.size(50.dp),
                     shape = RoundedCornerShape(15.dp),
                     color = Color.White,
@@ -321,6 +316,16 @@ fun LoginScreen(
                 .width(150.dp)
                 .align(Alignment.TopCenter)
                 .offset(y = 15.dp)
+        )
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
         )
     }
 }

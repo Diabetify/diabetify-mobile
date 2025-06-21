@@ -54,7 +54,6 @@ import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
-import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
 

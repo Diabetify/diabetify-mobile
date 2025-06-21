@@ -36,7 +36,7 @@ interface AuthApiService {
         @Body loginRequest: GoogleLoginRequest
     ) : AuthResponse
 
-    @POST("users/reset-password")
+    @POST("users/forgot-password")
     suspend fun sendResetPasswordVerification(
         @Body sendVerificationRequest: SendVerificationRequest
     ) : AuthResponse

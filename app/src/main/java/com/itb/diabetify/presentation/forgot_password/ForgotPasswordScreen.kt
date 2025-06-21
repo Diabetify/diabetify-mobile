@@ -1,6 +1,5 @@
 package com.itb.diabetify.presentation.forgot_password
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,10 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,8 +24,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
@@ -37,8 +38,12 @@ fun ForgotPasswordScreen(
     navController: NavController,
     viewModel: ForgotPasswordViewModel
 ) {
-    val emailState = viewModel.emailState.value
+    // States
+    val emailState by viewModel.emailState
+    val errorMessage = viewModel.errorMessage.value
+    val isLoading = viewModel.sendVerificationState.value.isLoading
 
+    // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -50,17 +55,6 @@ fun ForgotPasswordScreen(
             }
         }
     }
-
-    val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
-    val isLoading = viewModel.sendVerificationState.value.isLoading
 
     Box(
         modifier = Modifier
@@ -98,7 +92,7 @@ fun ForgotPasswordScreen(
                 text = "Masukkan alamat email Anda untuk mendapatkan kode verifikasi",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 lineHeight = 15.sp,
                 textAlign = TextAlign.Center,
                 color = colorResource(id = R.color.gray)
@@ -139,6 +133,16 @@ fun ForgotPasswordScreen(
                 .offset(y = (-30).dp),
             enabled = emailState.error == null && !isLoading,
             isLoading = isLoading
+        )
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
         )
     }
 }

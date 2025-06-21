@@ -1,6 +1,5 @@
 package com.itb.diabetify.presentation.register
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -47,8 +46,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
@@ -59,13 +60,16 @@ fun OtpScreen(
     navController: NavController,
     viewModel: RegisterViewModel
 ) {
-    val otpState = viewModel.otpState.value
-    val focusRequester = remember { FocusRequester() }
+    // States
+    val otpState by viewModel.otpState
+    val errorMessage = viewModel.errorMessage.value
+    val isLoading = viewModel.verifyOtpState.value.isLoading
+    val isResendLoading = viewModel.sendVerificationState.value.isLoading
     val maxLength = 6
 
+    // Timer for resend code
     var resendTimerActive by remember { mutableStateOf(false) }
-    var timeLeft by remember { mutableStateOf(60) }
-
+    var timeLeft by remember { mutableIntStateOf(60) }
     LaunchedEffect(resendTimerActive) {
         if (resendTimerActive) {
             while (timeLeft > 0) {
@@ -77,10 +81,13 @@ fun OtpScreen(
         }
     }
 
+    // Request focus on OTP input field
+    val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
 
+    // Navigation event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -93,23 +100,21 @@ fun OtpScreen(
         }
     }
 
-    val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
-    val isLoading = viewModel.verifyOtpState.value.isLoading
-    val isResendLoading = viewModel.sendVerificationState.value.isLoading
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(id = R.color.background))
     ) {
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
+        )
+
         Image(
             modifier = Modifier
                 .size(150.dp)

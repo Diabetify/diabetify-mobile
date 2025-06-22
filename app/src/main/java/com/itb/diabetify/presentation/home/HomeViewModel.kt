@@ -14,14 +14,8 @@ import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
-import com.itb.diabetify.domain.usecases.reminder.ReminderUseCases
-import com.itb.diabetify.domain.model.Reminder
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
-import kotlinx.coroutines.flow.collectLatest
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,7 +26,6 @@ class HomeViewModel @Inject constructor(
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
     private val getLatestPredictionUseCase: GetLatestPredictionUseCase,
     private val getProfileUseCase: GetProfileUseCase,
-    private val reminderUseCases: ReminderUseCases,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
     private val activityRepository: ActivityRepository,
@@ -190,27 +183,11 @@ class HomeViewModel @Inject constructor(
     private val _lastPredictionAtState = mutableStateOf("")
     val lastPredictionAtState: State<String> = _lastPredictionAtState
 
-    // Reminder States
-    private val _allRemindersState = mutableStateOf<List<Reminder>>(emptyList())
-    val allRemindersState: State<List<Reminder>> = _allRemindersState
-
-    private val _unreadRemindersState = mutableStateOf<List<Reminder>>(emptyList())
-    val unreadRemindersState: State<List<Reminder>> = _unreadRemindersState
-
-    private val _reminderLoadingState = mutableStateOf(false)
-    val reminderLoadingState: State<Boolean> = _reminderLoadingState
-
-    private val _showReminderPopup = mutableStateOf(false)
-    val showReminderPopup: State<Boolean> = _showReminderPopup
-
     init {
         loadUserData()
         loadLatestPredictionData()
         loadActivityTodayData()
         loadProfileData()
-        loadAllReminders()
-        loadUnreadReminders()
-        createDailyReminderIfNeeded()
     }
 
     private fun loadUserData() {
@@ -553,47 +530,4 @@ class HomeViewModel @Inject constructor(
         val currentValue: String,
         val isModifiable: Boolean = true
     )
-
-    private fun loadAllReminders() {
-        viewModelScope.launch {
-            _reminderLoadingState.value = true
-            reminderUseCases.getAllReminders().collectLatest { reminders ->
-                _allRemindersState.value = reminders
-                _reminderLoadingState.value = false
-            }
-        }
-    }
-
-    private fun loadUnreadReminders() {
-        viewModelScope.launch {
-            reminderUseCases.getUnreadReminders().collectLatest { reminders ->
-                _unreadRemindersState.value = reminders
-            }
-        }
-    }
-
-    private fun createDailyReminderIfNeeded() {
-        viewModelScope.launch {
-            try {
-                reminderUseCases.createDailyReminder()
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error creating daily reminder: ${e.message}")
-            }
-        }
-    }
-
-    fun showReminderPopup() {
-        _showReminderPopup.value = true
-        viewModelScope.launch {
-            try {
-                reminderUseCases.markAllAsRead()
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error marking reminders as read: ${e.message}")
-            }
-        }
-    }
-
-    fun hideReminderPopup() {
-        _showReminderPopup.value = false
-    }
 }

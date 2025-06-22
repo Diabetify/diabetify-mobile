@@ -58,18 +58,7 @@ import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCas
 import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
 import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
-import com.itb.diabetify.data.local.database.DiabetifyDatabase
-import com.itb.diabetify.data.local.dao.ReminderDao
-import com.itb.diabetify.domain.repository.ReminderRepository
-import com.itb.diabetify.data.repository.ReminderRepositoryImpl
-import com.itb.diabetify.domain.usecases.reminder.GetAllRemindersUseCase
-import com.itb.diabetify.domain.usecases.reminder.GetUnreadRemindersUseCase
-import com.itb.diabetify.domain.usecases.reminder.AddReminderUseCase
-import com.itb.diabetify.domain.usecases.reminder.CompleteRemindersUseCase
-import com.itb.diabetify.domain.usecases.reminder.CreateDailyReminderUseCase
-import com.itb.diabetify.domain.usecases.reminder.ReminderUseCases
 import com.itb.diabetify.util.Constants.BASE_URL
-import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -460,89 +449,6 @@ object AppModule {
         return NotificationUseCases(
             scheduleNotification = scheduleNotificationUseCase,
             cancelNotification = cancelNotificationUseCase
-        )
-    }
-
-    @Provides
-    @Singleton
-    fun providesDatabase(@ApplicationContext context: Context): DiabetifyDatabase {
-        return Room.databaseBuilder(
-            context,
-            DiabetifyDatabase::class.java,
-            DiabetifyDatabase.DATABASE_NAME
-        ).build()
-    }
-
-    @Provides
-    fun providesReminderDao(database: DiabetifyDatabase): ReminderDao {
-        return database.reminderDao()
-    }
-
-    @Provides
-    @Singleton
-    fun providesReminderRepository(
-        reminderDao: ReminderDao
-    ): ReminderRepository {
-        return ReminderRepositoryImpl(reminderDao)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetAllRemindersUseCase(
-        repository: ReminderRepository
-    ): GetAllRemindersUseCase {
-        return GetAllRemindersUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetUnreadRemindersUseCase(
-        repository: ReminderRepository
-    ): GetUnreadRemindersUseCase {
-        return GetUnreadRemindersUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesAddReminderUseCase(
-        repository: ReminderRepository
-    ): AddReminderUseCase {
-        return AddReminderUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesCompleteRemindersUseCase(
-        repository: ReminderRepository
-    ): CompleteRemindersUseCase {
-        return CompleteRemindersUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesCreateDailyReminderUseCase(
-        repository: ReminderRepository
-    ): CreateDailyReminderUseCase {
-        return CreateDailyReminderUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesReminderUseCases(
-        getAllReminders: GetAllRemindersUseCase,
-        getUnreadReminders: GetUnreadRemindersUseCase,
-        addReminder: AddReminderUseCase,
-        addManualReminder: AddReminderUseCase,
-        markAllAsRead: CompleteRemindersUseCase,
-        createDailyReminder: CreateDailyReminderUseCase
-    ): ReminderUseCases {
-        return ReminderUseCases(
-            getAllReminders = getAllReminders,
-            getUnreadReminders = getUnreadReminders,
-            addReminder = addReminder,
-            addManualReminder = addManualReminder,
-            markAllAsRead = markAllAsRead,
-            createDailyReminder = createDailyReminder
         )
     }
 }

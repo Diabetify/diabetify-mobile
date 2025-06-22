@@ -37,6 +37,7 @@ import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
 import com.itb.diabetify.domain.usecases.app_entry.AppEntryUseCase
 import com.itb.diabetify.domain.usecases.app_entry.ReadAppEntry
 import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
+import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
 import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
@@ -133,58 +134,18 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesCreateAccountUseCase(
+    fun providesAuthUseCases(
         repository: AuthRepository
-    ): CreateAccountUseCase {
-        return CreateAccountUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesSendVerificationUseCase(
-        repository: AuthRepository,
-    ): SendVerificationUseCase {
-        return SendVerificationUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesVerifyOtpUseCase(
-        repository: AuthRepository
-    ): VerifyOtpUseCase {
-        return VerifyOtpUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesLoginUseCase(
-        repository: AuthRepository
-    ): LoginUseCase {
-        return LoginUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGoogleLoginUseCase(
-        repository: AuthRepository
-    ): GoogleLoginUseCase {
-        return GoogleLoginUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesChangePasswordUseCase(
-        repository: AuthRepository
-    ): ChangePasswordUseCase {
-        return ChangePasswordUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesLogoutUseCase(
-        repository: AuthRepository
-    ): LogoutUseCase {
-        return LogoutUseCase(repository)
+    ): AuthUseCases {
+        return AuthUseCases(
+            changePassword = ChangePasswordUseCase(repository),
+            createAccount = CreateAccountUseCase(repository),
+            googleLogin = GoogleLoginUseCase(repository),
+            login = LoginUseCase(repository),
+            logout = LogoutUseCase(repository),
+            sendVerification = SendVerificationUseCase(repository),
+            verifyOtp = VerifyOtpUseCase(repository)
+        )
     }
 
     @Provides

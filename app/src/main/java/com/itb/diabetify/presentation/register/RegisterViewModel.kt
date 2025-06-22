@@ -7,10 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
-import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
-import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
-import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
+import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,10 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val createAccountUseCase: CreateAccountUseCase,
-    private val googleLoginUseCase: GoogleLoginUseCase,
-    private val sendVerificationUseCase: SendVerificationUseCase,
-    private val verifyOtpUseCase: VerifyOtpUseCase
+    private val authUseCases: AuthUseCases
 ): ViewModel() {
     // Navigation, Error, and Success States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -185,7 +179,7 @@ class RegisterViewModel @Inject constructor(
             val gender = genderState.value.text
             val genderFormatted = if (gender == "Laki-laki") { "male" } else { "female" }
 
-            val createAccountResult = createAccountUseCase(
+            val createAccountResult = authUseCases.createAccount(
                 name = nameState.value.text,
                 email = emailState.value.text,
                 password = passwordState.value.text,
@@ -240,7 +234,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _googleLoginState.value = googleLoginState.value.copy(isLoading = true)
 
-            val googleLoginResult = googleLoginUseCase(
+            val googleLoginResult = authUseCases.googleLogin(
                 token = token
             )
 
@@ -273,7 +267,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
-            val sendVerificationResult = sendVerificationUseCase(
+            val sendVerificationResult = authUseCases.sendVerification(
                 email = emailState.value.text,
                 type = "register"
             )
@@ -312,7 +306,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _verifyOtpState.value = verifyOtpState.value.copy(isLoading = true)
 
-            val verifyOtpResult = verifyOtpUseCase(
+            val verifyOtpResult = authUseCases.verifyOtp(
                 email = emailState.value.text,
                 code = otpState.value.text
             )

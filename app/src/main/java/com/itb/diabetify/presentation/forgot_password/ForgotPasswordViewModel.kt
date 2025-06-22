@@ -6,8 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
-import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
+import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -17,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
-    private val sendVerificationUseCase: SendVerificationUseCase,
-    private val changePasswordUseCase: ChangePasswordUseCase
+    private val authUseCases: AuthUseCases
 ): ViewModel() {
     // Navigation, Error, and Success States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -111,7 +109,7 @@ class ForgotPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
-            val sendVerificationResult = sendVerificationUseCase(
+            val sendVerificationResult = authUseCases.sendVerification(
                 email = emailState.value.text,
                 type = "reset-password"
             )
@@ -151,7 +149,7 @@ class ForgotPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _changePasswordState.value = changePasswordState.value.copy(isLoading = true)
 
-            val changePasswordResult = changePasswordUseCase(
+            val changePasswordResult = authUseCases.changePassword(
                 email = emailState.value.text,
                 newPassword = passwordState.value.text,
                 code = otpState.value.text

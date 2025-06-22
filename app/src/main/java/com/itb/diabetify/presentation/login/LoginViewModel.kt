@@ -6,8 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
-import com.itb.diabetify.domain.usecases.auth.LoginUseCase
+import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -17,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val googleLoginUseCase: GoogleLoginUseCase,
+    private val authUseCases: AuthUseCases,
 ): ViewModel() {
     // Navigation and Error States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -77,7 +75,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _loginState.value = loginState.value.copy(isLoading = true)
 
-            val loginResult = loginUseCase(
+            val loginResult = authUseCases.login(
                 email = emailState.value.text,
                 password = passwordState.value.text
             )
@@ -118,7 +116,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _googleLoginState.value = googleLoginState.value.copy(isLoading = true)
 
-            val googleLoginResult = googleLoginUseCase(
+            val googleLoginResult = authUseCases.googleLogin(
                 token = token
             )
 

@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.UserRepository
-import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
+import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val editUserUseCase: EditUserUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val authUseCases: AuthUseCases
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -185,7 +185,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _logoutState.value = logoutState.value.copy(isLoading = true)
 
-            val logoutResult = logoutUseCase()
+            val logoutResult = authUseCases.logout()
 
             _logoutState.value = logoutState.value.copy(isLoading = false)
 

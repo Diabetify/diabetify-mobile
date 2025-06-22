@@ -63,6 +63,7 @@ import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
 import com.itb.diabetify.presentation.home.components.getBrinkmanIndexColor
 import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
 import com.itb.diabetify.presentation.home.components.getSmokingTextColor
+import com.itb.diabetify.presentation.home.components.ReminderPopup
 import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
@@ -147,23 +148,26 @@ fun HomeScreen(
                     }
                 }
 
+                // Reminder
                 Row {
                     BadgedBox(
                         badge = {
-                            Badge(
-                                containerColor = Color(0xFFDC2626),
-                                contentColor = Color.White
-                            ) {
-                                Text(text = "3")
+                            if (viewModel.unreadRemindersState.value.isNotEmpty()) {
+                                Badge(
+                                    containerColor = Color(0xFFDC2626),
+                                    contentColor = Color.White
+                                ) {
+                                    Text(text = viewModel.unreadRemindersState.value.size.toString())
+                                }
                             }
                         }
                     ) {
                         IconButton(
-                            onClick = { /* Handle notification */ }
+                            onClick = { viewModel.showReminderPopup() }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
+                                contentDescription = "Reminders",
                                 tint = colorResource(id = R.color.primary)
                             )
                         }
@@ -1121,5 +1125,15 @@ fun HomeScreen(
             }
             Spacer(modifier = Modifier.height(30.dp))
         }
+    }
+
+    // Reminder Popup
+    if (viewModel.showReminderPopup.value) {
+        ReminderPopup(
+            reminders = viewModel.allRemindersState.value,
+            onDismiss = {
+                viewModel.hideReminderPopup()
+            }
+        )
     }
 }

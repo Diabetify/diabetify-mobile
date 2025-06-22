@@ -65,12 +65,9 @@ import com.itb.diabetify.data.repository.ReminderRepositoryImpl
 import com.itb.diabetify.domain.usecases.reminder.GetAllRemindersUseCase
 import com.itb.diabetify.domain.usecases.reminder.GetUnreadRemindersUseCase
 import com.itb.diabetify.domain.usecases.reminder.AddReminderUseCase
-import com.itb.diabetify.domain.usecases.reminder.AddManualReminderUseCase
-import com.itb.diabetify.domain.usecases.reminder.MarkAllRemindersAsReadUseCase
+import com.itb.diabetify.domain.usecases.reminder.CompleteRemindersUseCase
 import com.itb.diabetify.domain.usecases.reminder.CreateDailyReminderUseCase
 import com.itb.diabetify.domain.usecases.reminder.ReminderUseCases
-import com.itb.diabetify.domain.manager.ReminderManager
-import com.itb.diabetify.data.manager.ReminderManagerImpl
 import com.itb.diabetify.util.Constants.BASE_URL
 import androidx.room.Room
 import dagger.Module
@@ -515,18 +512,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAddManualReminderUseCase(
-        repository: ReminderRepository
-    ): AddManualReminderUseCase {
-        return AddManualReminderUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
     fun providesMarkAllRemindersAsReadUseCase(
         repository: ReminderRepository
-    ): MarkAllRemindersAsReadUseCase {
-        return MarkAllRemindersAsReadUseCase(repository)
+    ): CompleteRemindersUseCase {
+        return CompleteRemindersUseCase(repository)
     }
 
     @Provides
@@ -543,8 +532,8 @@ object AppModule {
         getAllReminders: GetAllRemindersUseCase,
         getUnreadReminders: GetUnreadRemindersUseCase,
         addReminder: AddReminderUseCase,
-        addManualReminder: AddManualReminderUseCase,
-        markAllAsRead: MarkAllRemindersAsReadUseCase,
+        addManualReminder: AddReminderUseCase,
+        markAllAsRead: CompleteRemindersUseCase,
         createDailyReminder: CreateDailyReminderUseCase
     ): ReminderUseCases {
         return ReminderUseCases(
@@ -555,13 +544,5 @@ object AppModule {
             markAllAsRead = markAllAsRead,
             createDailyReminder = createDailyReminder
         )
-    }
-
-    @Provides
-    @Singleton
-    fun providesReminderManager(
-        reminderUseCases: ReminderUseCases
-    ): ReminderManager {
-        return ReminderManagerImpl(reminderUseCases)
     }
 }

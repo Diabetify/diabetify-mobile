@@ -2,7 +2,7 @@ package com.itb.diabetify
 
 import android.app.Application
 import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
-import com.itb.diabetify.domain.manager.ReminderManager
+import com.itb.diabetify.domain.usecases.reminder.ReminderUseCases
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ class DiabetifyApplication: Application() {
     lateinit var notificationUseCases: NotificationUseCases
     
     @Inject
-    lateinit var reminderManager: ReminderManager
+    lateinit var reminderUseCases: ReminderUseCases
     
     override fun onCreate() {
         super.onCreate()
@@ -24,7 +24,7 @@ class DiabetifyApplication: Application() {
         notificationUseCases.scheduleNotification()
         
         CoroutineScope(Dispatchers.IO).launch {
-            reminderManager.createDailyReminderIfNotExists()
+            reminderUseCases.createDailyReminder()
         }
     }
 }

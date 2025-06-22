@@ -53,7 +53,8 @@ import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
-import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
 import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCase
 import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
@@ -292,34 +293,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesGetLatestPredictionUseCase(
-        repository: PredictionRepository
-    ): GetLatestPredictionUseCase {
-        return GetLatestPredictionUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetPredictionByDateUseCase(
-        repository: PredictionRepository
-    ): GetPredictionByDateUseCase {
-        return GetPredictionByDateUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetPredictionScoreByDateUseCase(
-        repository: PredictionRepository
-    ): GetPredictionScoreByDateUseCase {
-        return GetPredictionScoreByDateUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesPredictionUseCase(
-        repository: PredictionRepository
-    ): PredictionUseCase {
-        return PredictionUseCase(repository)
+    fun providesPredictionUseCases(
+        repository: PredictionRepository,
+    ): PredictionUseCases {
+        return PredictionUseCases(
+            getLatestPrediction = GetLatestPredictionUseCase(repository),
+            getPredictionByDate = GetPredictionByDateUseCase(repository),
+            getPredictionScoreByDate = GetPredictionScoreByDateUseCase(repository),
+            predict = PredictUseCase(repository)
+        )
     }
 
     @Provides

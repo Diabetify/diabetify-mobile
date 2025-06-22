@@ -7,8 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.prediction.GetPredictionByDateUseCase
-import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.presentation.history.components.PredictionScoreEntry
 import com.itb.diabetify.data.remote.prediction.response.PredictionData
 import com.itb.diabetify.util.DataState
@@ -24,14 +23,33 @@ import javax.inject.Inject
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getPredictionScoreByDateUseCase: GetPredictionScoreByDateUseCase,
-    private val getPredictionByDateUseCase: GetPredictionByDateUseCase
+    private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
-    private var _predictionScoreState = mutableStateOf(DataState())
-    val predictionScoreState: State<DataState> = _predictionScoreState
+    private var _getPredictionByDateState = mutableStateOf(DataState())
+    val getPredictionByDateState: State<DataState> = _getPredictionByDateState
 
-    private val _predictionState = mutableStateOf(DataState())
-    val predictionState: State<DataState> = _predictionState
+    private var _getPredictionScoreByDateState = mutableStateOf(DataState())
+    val getPredictionScoreByDateState: State<DataState> = _getPredictionScoreByDateState
+
+    private val _selectedDate = mutableStateOf("")
+    val selectedDate: State<String> = _selectedDate
+
+    private val _predictionData = mutableStateOf(emptyList<List<Float>>())
+    val predictionData: State<List<List<Float>>> = _predictionData
+
+    private val _predictionScore = mutableStateOf(0.0f)
+    val predictionScore: State<Float> = _predictionScore
+
+    private val _predictionPercent = mutableStateOf("0.0")
+    val predictionPercent: State<String> = _predictionPercent
+
+    private val _riskLevel = mutableStateOf("Rendah")
+    val riskLevel: State<String> = _riskLevel
+
+    private val _lastPredictionAt = mutableStateOf("")
+    val lastPredictionAt: State<String> = _lastPredictionAt
+
+    private val _riskColor = mutableStateOf(androidx.compose.ui.graphics.Color.Green)
 
     private val _predictionScores = MutableStateFlow<List<PredictionScoreEntry>>(emptyList())
     val predictionScores: StateFlow<List<PredictionScoreEntry>> = _predictionScores
@@ -60,14 +78,14 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadPredictionForDate(date: String) {
         viewModelScope.launch {
-            _predictionState.value = _predictionState.value.copy(isLoading = true)
+            _getPredictionByDateState.value = getPredictionByDateState.value.copy(isLoading = true)
 
-            val getPredictionResult = getPredictionByDateUseCase(
+            val getPredictionResult = predictionUseCases.getPredictionByDate(
                 startDate = date,
                 endDate = date
             )
 
-            _predictionState.value = _predictionState.value.copy(isLoading = false)
+            _getPredictionByDateState.value = getPredictionByDateState.value.copy(isLoading = false)
 
             when (getPredictionResult.result) {
                 is Resource.Success -> {
@@ -93,7 +111,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadPredictionScores() {
         viewModelScope.launch {
-            _predictionScoreState.value = predictionScoreState.value.copy(isLoading = true)
+            _getPredictionScoreByDateState.value = getPredictionScoreByDateState.value.copy(isLoading = true)
 
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val selectedDate = LocalDate.parse(_dateState.value ?: LocalDate.now().format(formatter))
@@ -101,12 +119,12 @@ class HistoryViewModel @Inject constructor(
             val startDate = selectedDate.minusDays(15).format(formatter)
             val endDate = selectedDate.plusDays(15).format(formatter)
             
-            val getPredictionScoreByDateResult = getPredictionScoreByDateUseCase(
+            val getPredictionScoreByDateResult = predictionUseCases.getPredictionScoreByDate(
                 startDate = startDate,
                 endDate = endDate
             )
 
-            _predictionScoreState.value = predictionScoreState.value.copy(isLoading = false)
+            _getPredictionScoreByDateState.value = getPredictionScoreByDateState.value.copy(isLoading = false)
 
             when (getPredictionScoreByDateResult.result) {
                 is Resource.Success -> {

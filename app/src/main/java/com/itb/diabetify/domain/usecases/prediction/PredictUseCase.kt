@@ -4,7 +4,7 @@ import com.itb.diabetify.domain.model.prediction.PredictionResult
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.util.Resource
 
-class PredictionUseCase(
+class PredictUseCase(
     private val repository: PredictionRepository
 ) {
     suspend operator fun invoke(): PredictionResult {

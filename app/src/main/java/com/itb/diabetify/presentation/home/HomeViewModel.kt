@@ -11,7 +11,7 @@ import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
-import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
-    private val getLatestPredictionUseCase: GetLatestPredictionUseCase,
+    private val predictionUseCases: PredictionUseCases,
     private val getProfileUseCase: GetProfileUseCase,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
@@ -224,7 +224,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
 
-            val getLatestPredictionResult = getLatestPredictionUseCase()
+            val getLatestPredictionResult = predictionUseCases.getLatestPrediction()
 
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
 

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.domain.repository.UserRepository
-import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ import kotlinx.coroutines.runBlocking
 class SurveyViewModel @Inject constructor(
     private val addProfileUseCase: AddProfileUseCase,
     private val userRepository: UserRepository,
-    private val predictionUseCase: PredictionUseCase
+    private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
     // Navigation and Error States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -93,8 +93,8 @@ class SurveyViewModel @Inject constructor(
                             }
                         }
                         "smoking_amount" -> {
-                            if (numericValue < 0 || numericValue > 100) {
-                                return "Jumlah rokok harus antara 0-100 batang"
+                            if (numericValue < 0 || numericValue > 60) {
+                                return "Jumlah rokok harus antara 0-60 batang"
                             }
                         }
                         "systolic" -> {
@@ -297,6 +297,42 @@ class SurveyViewModel @Inject constructor(
 
             _profileState.value = profileState.value.copy(isLoading = false)
 
+            if (addProfileResult.weightError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("weight" to addProfileResult.weightError)
+                )
+            }
+
+            if (addProfileResult.heightError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("height" to addProfileResult.heightError)
+                )
+            }
+
+            if (addProfileResult.hypertensionError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("hypertension" to addProfileResult.hypertensionError)
+                )
+            }
+
+            if (addProfileResult.yearOfSmokingError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("smoking_age" to addProfileResult.yearOfSmokingError)
+                )
+            }
+
+            if (addProfileResult.smokeCountError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("smoking_amount" to addProfileResult.smokeCountError)
+                )
+            }
+
+            if (addProfileResult.physicalActivityFrequencyError != null) {
+                _state.value = _state.value.copy(
+                    fieldErrors = _state.value.fieldErrors + ("activity" to addProfileResult.physicalActivityFrequencyError)
+                )
+            }
+
             when (addProfileResult.result) {
                 is Resource.Success -> {
                     predict()
@@ -322,7 +358,7 @@ class SurveyViewModel @Inject constructor(
         viewModelScope.launch {
             _predictionState.value = predictionState.value.copy(isLoading = true)
 
-            val predictionResult = predictionUseCase()
+            val predictionResult = predictionUseCases.predict()
 
             _predictionState.value = predictionState.value.copy(isLoading = false)
 

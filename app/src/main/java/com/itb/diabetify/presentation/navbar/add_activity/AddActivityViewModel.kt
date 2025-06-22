@@ -7,11 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.ActivityRepository
-import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
-import com.itb.diabetify.domain.usecases.prediction.PredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
@@ -31,7 +30,7 @@ class AddActivityViewModel @Inject constructor(
     private val addActivityUseCase: AddActivityUseCase,
     private val updateActivityUseCase: UpdateActivityUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    private val predictionUseCase: PredictionUseCase
+    private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
     @SuppressLint("NewApi")
     val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
@@ -327,7 +326,7 @@ class AddActivityViewModel @Inject constructor(
 
     private fun triggerPredictionUpdate() {
         viewModelScope.launch {
-            val predictionResult = predictionUseCase()
+            val predictionResult = predictionUseCases.predict()
             when (predictionResult.result) {
                 is Resource.Success -> {
                     Log.d("AddActivityViewModel", "Prediction updated successfully")

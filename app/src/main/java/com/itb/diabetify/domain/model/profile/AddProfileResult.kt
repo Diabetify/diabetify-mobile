@@ -11,5 +11,7 @@ class AddProfileResult (
     val yearOfSmokingError: String? = null,
     val cholesterolError: String? = null,
     val bloodlineError: String? = null,
+    val physicalActivityFrequencyError: String? = null,
+    val smokeCountError: String? = null,
     val result: Resource<Unit>? = null
 )

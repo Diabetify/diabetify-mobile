@@ -159,15 +159,6 @@ fun SettingsScreen(
                         iconRes = R.drawable.ic_calendar,
                         modifier = Modifier.weight(1f)
                     )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    StatisticItem(
-                        value = "6",
-                        label = "Reminders",
-                        iconRes = R.drawable.ic_calendar,
-                        modifier = Modifier.weight(1f)
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

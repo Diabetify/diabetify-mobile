@@ -19,18 +19,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -144,29 +140,6 @@ fun HomeScreen(
                             fontWeight = FontWeight.Medium,
                             color = colorResource(id = R.color.gray)
                         )
-                    }
-                }
-
-                Row {
-                    BadgedBox(
-                        badge = {
-                            Badge(
-                                containerColor = Color(0xFFDC2626),
-                                contentColor = Color.White
-                            ) {
-                                Text(text = "3")
-                            }
-                        }
-                    ) {
-                        IconButton(
-                            onClick = { /* Handle notification */ }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = colorResource(id = R.color.primary)
-                            )
-                        }
                     }
                 }
             }

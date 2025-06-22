@@ -27,31 +27,11 @@ class ReminderRepositoryImpl @Inject constructor(
             entities.map { it.toDomainModel() }
         }
     }
-    
-    override suspend fun getReminderById(id: Int): Reminder? {
-        return reminderDao.getReminderById(id)?.toDomainModel()
-    }
-    
+
     override suspend fun insertReminder(reminder: Reminder): Long {
         return reminderDao.insertReminder(reminder.toEntity())
     }
-    
-    override suspend fun updateReminder(reminder: Reminder) {
-        reminderDao.updateReminder(reminder.toEntity())
-    }
-    
-    override suspend fun deleteReminder(reminder: Reminder) {
-        reminderDao.deleteReminder(reminder.toEntity())
-    }
-    
-    override suspend fun deleteReminderById(id: Int) {
-        reminderDao.deleteReminderById(id)
-    }
-    
-    override suspend fun markReminderAsRead(id: Int, isRead: Boolean) {
-        reminderDao.updateReminderReadStatus(id, isRead)
-    }
-    
+
     override suspend fun markAllRemindersAsRead() {
         reminderDao.markAllRemindersAsRead()
     }

@@ -1,11 +1,9 @@
 package com.itb.diabetify.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.itb.diabetify.data.local.entity.ReminderEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -17,23 +15,8 @@ interface ReminderDao {
     @Query("SELECT * FROM reminders WHERE isRead = 0 ORDER BY createdAt DESC")
     fun getUnreadReminders(): Flow<List<ReminderEntity>>
     
-    @Query("SELECT * FROM reminders WHERE id = :id")
-    suspend fun getReminderById(id: Int): ReminderEntity?
-    
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReminder(reminder: ReminderEntity): Long
-    
-    @Update
-    suspend fun updateReminder(reminder: ReminderEntity)
-    
-    @Delete
-    suspend fun deleteReminder(reminder: ReminderEntity)
-    
-    @Query("DELETE FROM reminders WHERE id = :id")
-    suspend fun deleteReminderById(id: Int)
-    
-    @Query("UPDATE reminders SET isRead = :isRead WHERE id = :id")
-    suspend fun updateReminderReadStatus(id: Int, isRead: Boolean)
     
     @Query("UPDATE reminders SET isRead = 1")
     suspend fun markAllRemindersAsRead()

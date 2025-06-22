@@ -512,7 +512,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesMarkAllRemindersAsReadUseCase(
+    fun providesCompleteRemindersUseCase(
         repository: ReminderRepository
     ): CompleteRemindersUseCase {
         return CompleteRemindersUseCase(repository)

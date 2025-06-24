@@ -47,6 +47,7 @@ fun SurveyScreen(
     val state = viewModel.state.value
     val errorMessage = viewModel.errorMessage.value
 
+    // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {

@@ -9,12 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
-import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
-import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
-import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -452,6 +449,7 @@ class HomeViewModel @Inject constructor(
                     _brinkmanIndexValueState.value = latestPrediction.brinkmanScore ?: "0.0"
                     _smokingStatusValueState.value = latestPrediction.smokingStatus ?: "0"
                     _physicalActivityAverageValueState.value = latestPrediction.physicalActivityFrequency ?: "0"
+                    _lastPredictionAtState.value = latestPrediction.createdAt ?: "Belum ada prediksi"
                 }
             }
         }
@@ -501,7 +499,6 @@ class HomeViewModel @Inject constructor(
 
                 user?.let {
                     _userNameState.value = it.name ?: ""
-                    _lastPredictionAtState.value = it.lastPredictionAt ?: "Belum ada prediksi"
                 }
             }
         }

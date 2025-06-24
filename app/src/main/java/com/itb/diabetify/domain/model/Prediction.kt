@@ -28,5 +28,6 @@ data class Prediction (
     val smokingStatusExplanation: String? = null,
     val physicalActivityFrequency: String? = null,
     val physicalActivityFrequencyContribution: String? = null,
-    val physicalActivityFrequencyExplanation: String? = null
+    val physicalActivityFrequencyExplanation: String? = null,
+    val createdAt: String? = null,
 )

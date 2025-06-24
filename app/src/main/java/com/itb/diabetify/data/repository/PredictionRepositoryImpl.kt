@@ -77,7 +77,8 @@ class PredictionRepositoryImpl (
                         smokingStatusExplanation = "",
                         physicalActivityFrequency = "0",
                         physicalActivityFrequencyContribution = "0.0",
-                        physicalActivityFrequencyExplanation = ""
+                        physicalActivityFrequencyExplanation = "",
+                        createdAt = response.data.firstOrNull()?.createdAt ?: ""
                     )
                 )
                 return Resource.Success(Unit)
@@ -130,7 +131,8 @@ class PredictionRepositoryImpl (
                         smokingStatusExplanation = prediction.smokingStatusExplanation,
                         physicalActivityFrequency = prediction.physicalActivityFrequency.toString(),
                         physicalActivityFrequencyContribution = physicalActivityContribution.toString(),
-                        physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation
+                        physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation,
+                        createdAt = prediction.createdAt
                     )
                 )
             }

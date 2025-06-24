@@ -20,6 +20,4 @@ data class UserData(
     val gender: String,
     @SerializedName("dob")
     val dob: String,
-    @SerializedName("last_prediction_at")
-    val lastPredictionAt: String,
 )

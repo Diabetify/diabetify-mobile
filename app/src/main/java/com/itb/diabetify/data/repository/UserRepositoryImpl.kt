@@ -56,10 +56,6 @@ class UserRepositoryImpl(
                             val dateTime = LocalDateTime.parse(dateString, formatter)
                             dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                         },
-                        lastPredictionAt = it.lastPredictionAt?.let { lastPredictionAt ->
-                            val dateTime = LocalDateTime.parse(lastPredictionAt.replace("Z", ""))
-                            dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                        } ?: "Belum ada prediksi"
                     )
                 )
             }

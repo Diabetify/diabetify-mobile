@@ -1,8 +1,15 @@
 package com.itb.diabetify.presentation.home.components
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 
 fun getBmiCategory(bmi: Double): String {
@@ -166,28 +173,49 @@ fun getSmokingTextColor(count: Int): Color {
     }
 }
 
+@SuppressLint("NewApi")
 fun formatRelativeTime(timestamp: String): String {
     if (timestamp.isEmpty() || timestamp == "Belum ada prediksi") return "Belum ada pemeriksaan"
-    
+
     try {
-        val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
-        val date = dateFormat.parse(timestamp) ?: return "Format waktu tidak valid"
-        
-        val now = System.currentTimeMillis()
-        val diffInMillis = now - date.time
-        
-        val seconds = diffInMillis / 1000
+        val utcDateTime = ZonedDateTime.parse(timestamp)
+
+        val deviceTimezone = ZoneId.systemDefault()
+        val localTime = utcDateTime.withZoneSameInstant(deviceTimezone)
+        val now = ZonedDateTime.now(deviceTimezone)
+
+        val duration = Duration.between(localTime, now)
+        val seconds = duration.seconds.coerceAtLeast(0)
         val minutes = seconds / 60
         val hours = minutes / 60
         val days = hours / 24
-        
+
         return when {
+            seconds < 60 -> "Baru saja"
             days > 0 -> "$days hari lalu"
             hours > 0 -> "$hours jam lalu"
             minutes > 0 -> "$minutes menit lalu"
-            else -> "$seconds detik lalu"
+            else -> "Baru saja"
         }
     } catch (e: Exception) {
         return "Waktu tidak valid"
+    }
+}
+
+@SuppressLint("NewApi")
+fun formatDisplayTime(timestamp: String, format: String = "dd/MM/yyyy HH:mm"): String {
+    if (timestamp.isEmpty() || timestamp == "Belum ada prediksi") return "Belum ada prediksi"
+
+    try {
+        val utcDateTime = ZonedDateTime.parse(timestamp)
+
+        val deviceTimezone = ZoneId.systemDefault()
+        val localTime = utcDateTime.withZoneSameInstant(deviceTimezone)
+
+        val displayFormatter = DateTimeFormatter.ofPattern(format)
+        return localTime.format(displayFormatter)
+
+    } catch (e: Exception) {
+        return "Format waktu tidak valid"
     }
 }

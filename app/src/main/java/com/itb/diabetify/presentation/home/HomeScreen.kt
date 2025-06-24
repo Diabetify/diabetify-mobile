@@ -52,6 +52,7 @@ import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
+import com.itb.diabetify.presentation.home.components.formatDisplayTime
 import com.itb.diabetify.presentation.home.components.formatRelativeTime
 import com.itb.diabetify.presentation.home.components.getActivityAverageColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
@@ -71,6 +72,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
+    // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -180,7 +182,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Terakhir diperbarui: ${viewModel.lastPredictionAtState.value}",
+                    text = "Terakhir diperbarui: ${formatDisplayTime(viewModel.lastPredictionAtState.value)}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,

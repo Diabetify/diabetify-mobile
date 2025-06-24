@@ -5,5 +5,4 @@ data class User(
     val email: String,
     val gender: String,
     val dob: String,
-    val lastPredictionAt: String
-) 
+)

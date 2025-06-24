@@ -86,4 +86,6 @@ data class PredictionData(
     val physicalActivityFrequencyImpact: Int,
     @SerializedName("physical_activity_frequency_explanation")
     val physicalActivityFrequencyExplanation: String,
+    @SerializedName("created_at")
+    val createdAt: String
 )

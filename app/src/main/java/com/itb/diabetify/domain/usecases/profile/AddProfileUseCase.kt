@@ -1,6 +1,5 @@
 package com.itb.diabetify.domain.usecases.profile
 
-import android.util.Log
 import com.itb.diabetify.data.remote.profile.request.AddProfileRequest
 import com.itb.diabetify.domain.model.profile.AddProfileResult
 import com.itb.diabetify.domain.repository.ProfileRepository

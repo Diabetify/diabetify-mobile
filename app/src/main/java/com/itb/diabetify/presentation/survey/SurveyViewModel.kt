@@ -5,9 +5,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
+import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
-    private val addProfileUseCase: AddProfileUseCase,
+    private val profileUseCases: ProfileUseCases,
     private val userRepository: UserRepository,
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
@@ -282,7 +282,7 @@ class SurveyViewModel @Inject constructor(
             val physicalActivityFrequency = _state.value.answers["activity"]?.toIntOrNull() ?: 0
             val smokingAmount = _state.value.answers["smoking_amount"]?.toIntOrNull() ?: 0
 
-            val addProfileResult = addProfileUseCase(
+            val addProfileResult = profileUseCases.addProfile(
                 weight = weight,
                 height = height,
                 hypertension = hypertension,

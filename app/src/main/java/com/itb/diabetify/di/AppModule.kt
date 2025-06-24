@@ -48,18 +48,19 @@ import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionByDateUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
-import com.itb.diabetify.domain.usecases.prediction.PredictUseCase
-import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
 import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCase
 import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
 import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
+import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -337,26 +338,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAddProfileUseCase(
+    fun provideProfileUseCases(
         repository: ProfileRepository
-    ): AddProfileUseCase {
-        return AddProfileUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetProfileUseCase(
-        repository: ProfileRepository
-    ): GetProfileUseCase {
-        return GetProfileUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesUpdateProfileUseCase(
-        repository: ProfileRepository
-    ): UpdateProfileUseCase {
-        return UpdateProfileUseCase(repository)
+    ): ProfileUseCases {
+        return ProfileUseCases(
+            addProfile = AddProfileUseCase(repository),
+            getProfile = GetProfileUseCase(repository),
+            updateProfile = UpdateProfileUseCase(repository)
+        )
     }
 
     @Provides

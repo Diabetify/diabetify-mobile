@@ -13,6 +13,7 @@ import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
+import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -25,7 +26,7 @@ class HomeViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
     private val predictionUseCases: PredictionUseCases,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val profileUseCases: ProfileUseCases,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
     private val activityRepository: ActivityRepository,
@@ -284,7 +285,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            val getProfileResult = getProfileUseCase()
+            val getProfileResult = profileUseCases.getProfile()
 
             _profileState.value = profileState.value.copy(isLoading = false)
 

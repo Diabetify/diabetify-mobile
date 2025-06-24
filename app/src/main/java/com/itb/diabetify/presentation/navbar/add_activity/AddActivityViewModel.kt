@@ -11,6 +11,7 @@ import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
+import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
@@ -29,7 +30,7 @@ class AddActivityViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val addActivityUseCase: AddActivityUseCase,
     private val updateActivityUseCase: UpdateActivityUseCase,
-    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val profileUseCases: ProfileUseCases,
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
     @SuppressLint("NewApi")
@@ -356,7 +357,7 @@ class AddActivityViewModel @Inject constructor(
 
             val updateProfileResult = when (type) {
                 "weight", "height", "hypertension", "birth", "bloodline", "cholesterol" -> {
-                    updateProfileUseCase(
+                    profileUseCases.updateProfile(
                         weight = weight,
                         height = height,
                         hypertension = hypertension,

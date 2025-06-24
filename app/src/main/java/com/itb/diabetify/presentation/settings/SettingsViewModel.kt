@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.domain.usecases.user.EditUserUseCase
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -20,8 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val editUserUseCase: EditUserUseCase,
+    private val userUseCases: UserUseCases,
     private val authUseCases: AuthUseCases
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
@@ -60,7 +60,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
 
-            userRepository.getUser().onEach { user ->
+            userUseCases.getUserRepository().onEach { user ->
                 user?.let {
                     _nameState.value = nameState.value.copy(
                         text = it.name ?: "",
@@ -135,7 +135,7 @@ class SettingsViewModel @Inject constructor(
             val gender = genderState.value.text
             val genderFormatted = if (gender == "Laki-laki") { "male" } else { "female" }
 
-            val editUserResult = editUserUseCase(
+            val editUserResult = userUseCases.editUser(
                 name = nameState.value.text,
                 email = emailState.value.text,
                 dob = dobFormatted,

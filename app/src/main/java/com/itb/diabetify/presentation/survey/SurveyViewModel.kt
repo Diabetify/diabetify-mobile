@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,7 @@ import kotlinx.coroutines.runBlocking
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
-    private val userRepository: UserRepository,
+    private val userUseCases: UserUseCases,
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
     // Navigation and Error States
@@ -133,7 +134,7 @@ class SurveyViewModel @Inject constructor(
                 when (question.id) {
                     "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "1" || _state.value.answers["smoking_status"] == "2"
                     "pregnancy" -> {
-                        val user = runBlocking { userRepository.getUser().first() }
+                        val user = runBlocking { userUseCases.getUserRepository().first() }
                         user?.gender?.lowercase() != "laki-laki" && user?.gender?.lowercase() != "male"
                     }
                     "systolic", "diastolic" -> _state.value.answers["bp_unknown"] == "yes"

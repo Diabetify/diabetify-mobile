@@ -61,6 +61,8 @@ import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
 import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.domain.usecases.user.GetUserRepositoryUseCase
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -192,18 +194,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesGetUserUseCase(
+    fun providesUserUseCases(
         repository: UserRepository
-    ): GetUserUseCase {
-        return GetUserUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesEditUserUseCase(
-        repository: UserRepository
-    ): EditUserUseCase {
-        return EditUserUseCase(repository)
+    ): UserUseCases {
+        return UserUseCases(
+            getUser = GetUserUseCase(repository),
+            getUserRepository = GetUserRepositoryUseCase(repository),
+            editUser = EditUserUseCase(repository)
+        )
     }
 
     @Provides

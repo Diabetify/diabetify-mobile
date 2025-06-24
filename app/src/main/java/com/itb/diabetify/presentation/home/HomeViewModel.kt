@@ -15,6 +15,7 @@ import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.GetProfileUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,14 +24,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getUserUseCase: GetUserUseCase,
+    private val userUseCases: UserUseCases,
     private val getActivityTodayUseCase: GetActivityTodayUseCase,
     private val predictionUseCases: PredictionUseCases,
     private val profileUseCases: ProfileUseCases,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
     private val activityRepository: ActivityRepository,
-    private val userRepository: UserRepository
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -195,7 +195,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
 
-            val getUserResult = getUserUseCase()
+            val getUserResult = userUseCases.getUser()
 
             _userState.value = userState.value.copy(isLoading = false)
 
@@ -496,7 +496,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
 
-            userRepository.getUser().collect { user ->
+            userUseCases.getUserRepository().collect { user ->
                 _userState.value = userState.value.copy(isLoading = false)
 
                 user?.let {

@@ -121,7 +121,7 @@ fun ProfileCard(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
+                    painter = painterResource(id = R.drawable.ic_profile_picture),
                     contentDescription = "Profile Image",
                     modifier = Modifier
                         .size(70.dp)

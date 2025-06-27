@@ -215,21 +215,21 @@ fun HomeScreen(
                             modifier = Modifier.padding(vertical = 5.dp),
                             color = when {
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 30 -> viewModel.lowRiskColor
+                                    ?.times(100)?.toInt() ?: 0) <= 35 -> viewModel.lowRiskColor
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 50 -> viewModel.mediumRiskColor
+                                    ?.times(100)?.toInt() ?: 0) <= 55 -> viewModel.mediumRiskColor
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 65 -> viewModel.highRiskColor
+                                    ?.times(100)?.toInt() ?: 0) <= 70 -> viewModel.highRiskColor
                                 else -> viewModel.veryHighRiskColor
                             },
                             description = when {
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 30 -> "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                    ?.times(100)?.toInt() ?: 0) <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 50 -> "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                    ?.times(100)?.toInt() ?: 0) <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
                                 (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 65 -> "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                                else -> "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                    ?.times(100)?.toInt() ?: 0) <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                                else -> "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes"
                             },
                             isHighlighted = true
                         )

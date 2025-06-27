@@ -41,7 +41,6 @@ import com.itb.diabetify.presentation.home.risk_factor_detail.RiskFactorDetailSc
 import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
-import com.itb.diabetify.presentation.settings.edit_survey.EditSurveyScreen
 import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
 import com.itb.diabetify.presentation.survey.SurveyScreen
 import com.itb.diabetify.presentation.survey.SurveyViewModel
@@ -256,14 +255,6 @@ fun MainNavGraph(
             composable(route = Route.EditProfileScreen.route) {
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 EditProfileScreen(
-                    navController = mainNavController,
-                    viewModel = settingsViewModel,
-                )
-            }
-
-            composable(route = Route.EditSurveyScreen.route) {
-                val settingsViewModel: SettingsViewModel = hiltViewModel()
-                EditSurveyScreen(
                     navController = mainNavController,
                     viewModel = settingsViewModel,
                 )

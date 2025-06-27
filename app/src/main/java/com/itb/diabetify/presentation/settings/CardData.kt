@@ -13,17 +13,7 @@ data class ContentData(
     val onClick: () -> Unit = {}
 )
 
-fun getSettingsCards(onDataPribadiClick: () -> Unit) = listOf(
-    CardData(
-        title = "Akun",
-        contents = listOf(
-            ContentData(
-                icon = R.drawable.ic_personal,
-                name = "Edit Survey",
-                onClick = onDataPribadiClick
-            )
-        )
-    ),
+fun getSettingsCards() = listOf(
     CardData(
         title = "Lainnya",
         contents = listOf(

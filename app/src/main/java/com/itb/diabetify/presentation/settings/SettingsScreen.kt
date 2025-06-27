@@ -1,6 +1,5 @@
 package com.itb.diabetify.presentation.settings
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,13 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.presentation.settings.components.ConfirmationDialog
@@ -46,6 +46,11 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onLogout: () -> Unit
 ) {
+    // States
+    val errorMessage = viewModel.errorMessage.value
+    val isLoading = viewModel.logoutState.value.isLoading
+
+    // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
         navigationEvent?.let {
@@ -58,17 +63,8 @@ fun SettingsScreen(
         }
     }
 
-    val context = LocalContext.current
-    val errorMessage = viewModel.errorMessage.value
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onErrorShown()
-        }
-    }
-
+    // Logout Dialog
     var showLogoutDialog by remember { mutableStateOf(false) }
-
     if (showLogoutDialog) {
         ConfirmationDialog(
             onConfirm = {
@@ -164,13 +160,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Cards section
-                getSettingsCards(
-                    onDataPribadiClick = {
-                        navController.navigate(Route.EditSurveyScreen.route) {
-                            launchSingleTop = true
-                        }
-                    }
-                ).forEach { cardData ->
+                getSettingsCards().forEach { cardData ->
                     SettingsCard(cardData = cardData)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -184,10 +174,22 @@ fun SettingsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    enabled = !isLoading,
+                    isLoading = isLoading
                 )
             }
 
             Spacer(modifier = Modifier.height(30.dp))
         }
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
+        )
     }
 }

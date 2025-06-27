@@ -24,6 +24,17 @@ class SettingsViewModel @Inject constructor(
     private val userUseCases: UserUseCases,
     private val authUseCases: AuthUseCases
 ): ViewModel() {
+    // Navigation, Error, and Success States
+    private val _navigationEvent = mutableStateOf<String?>(null)
+    val navigationEvent: State<String?> = _navigationEvent
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    private var _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
+
+    // Operational States
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
 
@@ -33,13 +44,7 @@ class SettingsViewModel @Inject constructor(
     private var _logoutState = mutableStateOf(DataState())
     val logoutState: State<DataState> = _logoutState
 
-    private val _navigationEvent = mutableStateOf<String?>(null)
-    val navigationEvent: State<String?> = _navigationEvent
-
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
-
-
+    // Field States
     private val _nameState = mutableStateOf(FieldState())
     val nameState: State<FieldState> = _nameState
 
@@ -52,39 +57,12 @@ class SettingsViewModel @Inject constructor(
     private val _dobState = mutableStateOf(FieldState())
     val dobState: State<FieldState> = _dobState
 
+    // Initialization
     init {
         collectUserData()
     }
 
-    private fun collectUserData() {
-        viewModelScope.launch {
-            _userState.value = userState.value.copy(isLoading = true)
-
-            userUseCases.getUserRepository().onEach { user ->
-                user?.let {
-                    _nameState.value = nameState.value.copy(
-                        text = it.name ?: "",
-                        error = null
-                    )
-                    _emailState.value = emailState.value.copy(
-                        text = it.email ?: "",
-                        error = null
-                    )
-                    _genderState.value = genderState.value.copy(
-                        text = it.gender ?: "",
-                        error = null
-                    )
-                    _dobState.value = dobState.value.copy(
-                        text = it.dob ?: "",
-                        error = null
-                    )
-                }
-            }.launchIn(viewModelScope)
-
-            _userState.value = userState.value.copy(isLoading = false)
-        }
-    }
-
+    // Setters for Field States
     fun setName(value: String) {
         _nameState.value = nameState.value.copy(error = null)
         _nameState.value = nameState.value.copy(text = value)
@@ -105,9 +83,12 @@ class SettingsViewModel @Inject constructor(
         _dobState.value = dobState.value.copy(text = value)
     }
 
+    // Validation Functions
     fun validateEditProfileFields(): Boolean {
         val name = nameState.value.text
         val email = emailState.value.text
+        val gender = genderState.value.text
+        val dob = dobState.value.text
 
         var isValid = true
 
@@ -121,7 +102,47 @@ class SettingsViewModel @Inject constructor(
             isValid = false
         }
 
+        if (gender.isEmpty()) {
+            _genderState.value = genderState.value.copy(error = "Jenis kelamin tidak boleh kosong")
+            isValid = false
+        }
+
+        if (dob.isEmpty()) {
+            _dobState.value = dobState.value.copy(error = "Tanggal lahir tidak boleh kosong")
+            isValid = false
+        }
+
         return isValid
+    }
+
+    // Use Case Calls
+    private fun collectUserData() {
+        viewModelScope.launch {
+            _userState.value = userState.value.copy(isLoading = true)
+
+            userUseCases.getUserRepository().onEach { user ->
+                user?.let {
+                    _nameState.value = nameState.value.copy(
+                        text = it.name,
+                        error = null
+                    )
+                    _emailState.value = emailState.value.copy(
+                        text = it.email,
+                        error = null
+                    )
+                    _genderState.value = genderState.value.copy(
+                        text = it.gender,
+                        error = null
+                    )
+                    _dobState.value = dobState.value.copy(
+                        text = it.dob,
+                        error = null
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+            _userState.value = userState.value.copy(isLoading = false)
+        }
     }
 
     fun editProfile() {
@@ -162,6 +183,7 @@ class SettingsViewModel @Inject constructor(
 
             when (editUserResult.result) {
                 is Resource.Success -> {
+                    _successMessage.value = "Profil berhasil diperbarui"
                     Log.d("SettingsViewModel", "Profile updated successfully")
                 }
                 is Resource.Error -> {
@@ -210,11 +232,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // Helper Functions
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }
 
     fun onErrorShown() {
         _errorMessage.value = null
+    }
+
+    fun onSuccessShown() {
+        _successMessage.value = null
     }
 }

@@ -27,7 +27,6 @@ sealed class Route(
     }
     object SettingsScreen: Route(route = "settingsScreen")
     object EditProfileScreen: Route(route = "editProfileScreen")
-    object EditSurveyScreen: Route(route = "editSurveyScreen")
     object AppStartNavigation : Route(route = "appStartNavigation")
     object AuthNavigation : Route(route = "authNavigation")
     object MainNavigation : Route(route = "mainNavigation")

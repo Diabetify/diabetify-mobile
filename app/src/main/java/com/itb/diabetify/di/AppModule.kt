@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.google.gson.Gson
 import com.itb.diabetify.data.manager.ActivityManagerImpl
+import com.itb.diabetify.data.manager.ConnectivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.PredictionManagerImpl
 import com.itb.diabetify.data.manager.ProfileManagerImpl
@@ -20,6 +21,7 @@ import com.itb.diabetify.data.repository.AuthRepositoryImpl
 import com.itb.diabetify.data.repository.PredictionRepositoryImpl
 import com.itb.diabetify.data.repository.ProfileRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
+import com.itb.diabetify.domain.manager.ConnectivityManager
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
@@ -45,6 +47,9 @@ import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
 import com.itb.diabetify.domain.usecases.auth.VerifyOtpUseCase
+import com.itb.diabetify.domain.usecases.connectivity.CheckConnectivityUseCase
+import com.itb.diabetify.domain.usecases.connectivity.ConnectivityUseCases
+import com.itb.diabetify.domain.usecases.connectivity.ObserveConnectivityUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionByDateUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
@@ -356,29 +361,31 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesScheduleNotificationUseCase(
-        notificationManager: NotificationManager
-    ): ScheduleNotificationUseCase {
-        return ScheduleNotificationUseCase(notificationManager)
-    }
-
-    @Provides
-    @Singleton
-    fun providesCancelNotificationUseCase(
-        notificationManager: NotificationManager
-    ): CancelNotificationUseCase {
-        return CancelNotificationUseCase(notificationManager)
-    }
-
-    @Provides
-    @Singleton
     fun providesNotificationUseCases(
-        scheduleNotificationUseCase: ScheduleNotificationUseCase,
-        cancelNotificationUseCase: CancelNotificationUseCase
+        notificationManager: NotificationManager
     ): NotificationUseCases {
         return NotificationUseCases(
-            scheduleNotification = scheduleNotificationUseCase,
-            cancelNotification = cancelNotificationUseCase
+            scheduleNotification = ScheduleNotificationUseCase(notificationManager),
+            cancelNotification = CancelNotificationUseCase(notificationManager)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providesConnectivityManager(
+        @ApplicationContext context: Context
+    ): ConnectivityManager {
+        return ConnectivityManagerImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun providesConnectivityUseCases(
+        connectivityManager: ConnectivityManager
+    ): ConnectivityUseCases {
+        return ConnectivityUseCases(
+            observeConnectivity = ObserveConnectivityUseCase(connectivityManager),
+            checkConnectivity = CheckConnectivityUseCase(connectivityManager)
         )
     }
 }

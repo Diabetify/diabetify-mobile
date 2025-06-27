@@ -44,7 +44,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             DiabetifyTheme {
                 val startDestination = viewModel.startDestination
-                AuthNavGraph(startDestination)
+                AuthNavGraph(
+                    startDestination = startDestination,
+                    onRetryConnection = { viewModel.retryConnection() }
+                )
             }
         }
     }

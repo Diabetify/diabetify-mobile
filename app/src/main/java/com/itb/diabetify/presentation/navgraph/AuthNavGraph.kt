@@ -19,6 +19,7 @@ import com.itb.diabetify.presentation.login.LoginViewModel
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.OnBoardingViewModel
 import com.itb.diabetify.presentation.register.BiodataScreen
+import com.itb.diabetify.presentation.no_internet.NoInternetScreen
 import com.itb.diabetify.presentation.register.OtpScreen
 import com.itb.diabetify.presentation.register.RegisterScreen
 import com.itb.diabetify.presentation.register.RegisterViewModel
@@ -27,7 +28,8 @@ import com.itb.diabetify.presentation.register.SuccessScreen
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun AuthNavGraph(
-    startDestination: String
+    startDestination: String,
+    onRetryConnection: () -> Unit = {}
 ) {
     val navController = rememberNavController()
 
@@ -172,6 +174,15 @@ fun AuthNavGraph(
                     navController = navController
                 )
             }
+        }
+
+        composable(
+            route = Route.NoInternetScreen.route
+        ) {
+            NoInternetScreen(
+                navController = navController,
+                onRetryClicked = onRetryConnection
+            )
         }
     }
 }

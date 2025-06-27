@@ -351,7 +351,7 @@ class AddActivityViewModel @Inject constructor(
             val weight = weightValueState.value.text
             val height = heightValueState.value.text
             val hypertension = hypertensionValueState.value.text.toBoolean()
-            val macrosomicBaby = birthValueState.value.text.toBoolean()
+            val macrosomicBaby = birthValueState.value.text.toInt()
             val bloodline = bloodlineValueState.value.text.toBoolean()
             val cholesterol = cholesterolValueState.value.text.toBoolean()
 

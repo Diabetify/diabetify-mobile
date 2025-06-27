@@ -49,8 +49,9 @@ val questions = listOf(
         questionText = "Apakah Anda pernah melahirkan bayi dengan berat 4 kg atau lebih?",
         questionType = SurveyQuestionType.Selection,
         options = listOf(
-            SurveyOption("true", "Pernah"),
-            SurveyOption("false", "Tidak")
+            SurveyOption("0", "Tidak"),
+            SurveyOption("1", "Pernah"),
+            SurveyOption("2", "Tidak Pernah Melahirkan")
         )
     ),
     SurveyQuestion(

@@ -11,7 +11,7 @@ class UpdateProfileUseCase(
         weight: String,
         height: String,
         hypertension: Boolean,
-        macrosomicBaby: Boolean,
+        macrosomicBaby: Int,
         bloodline: Boolean,
         cholesterol: Boolean,
     ): UpdateProfileResult {

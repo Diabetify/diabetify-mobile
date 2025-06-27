@@ -10,7 +10,7 @@ data class UpdateProfileRequest (
     @SerializedName("hypertension")
     val hypertension: Boolean? = null,
     @SerializedName("macrosomic_baby")
-    val macrosomicBaby: Boolean? = null,
+    val macrosomicBaby: Int? = null,
     @SerializedName("cholesterol")
     val cholesterol: Boolean? = null,
     @SerializedName("bloodline")

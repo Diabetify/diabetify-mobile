@@ -3,7 +3,8 @@ package com.itb.diabetify.presentation.navbar.add_activity
 enum class DataInputQuestionType {
     Numeric,
     Selection,
-    Hypertension
+    Hypertension,
+    Pregnancy
 }
 
 data class InputOption(
@@ -39,10 +40,11 @@ val questions = listOf(
         id = "birth",
         category = "Riwayat Kehamilan",
         questionText = "Apakah Anda melahirkan bayi dengan berat 4 kg atau lebih?",
-        questionType = DataInputQuestionType.Selection,
+        questionType = DataInputQuestionType.Pregnancy,
         options = listOf(
-            InputOption("yes", "Pernah"),
-            InputOption("no", "Tidak")
+            InputOption("0", "Tidak"),
+            InputOption("1", "Pernah"),
+            InputOption("2", "Tidak Pernah Melahirkan")
         )
     ),
     DataInputQuestion(

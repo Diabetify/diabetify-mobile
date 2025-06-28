@@ -53,6 +53,7 @@ fun AddActionPopup(
     onDismissRequest: () -> Unit,
     viewModel: AddActivityViewModel
 ) {
+    // States
     val smokeValueState = viewModel.smokeValueState.value
     val workoutValueState = viewModel.workoutValueState.value
     val weightValueState = viewModel.weightValueState.value
@@ -61,7 +62,6 @@ fun AddActionPopup(
     val hypertensionValueState = viewModel.hypertensionValueState.value
     val cholesterolValueState = viewModel.cholesterolValueState.value
     val bloodlineValueState = viewModel.bloodlineValueState.value
-
     val currentValues = mapOf(
         "weight" to weightValueState.text,
         "height" to heightValueState.text,
@@ -72,10 +72,10 @@ fun AddActionPopup(
         "cholesterol" to cholesterolValueState.text,
         "bloodline" to bloodlineValueState.text
     )
-
     var showBottomSheet by remember { mutableStateOf(false) }
     var currentQuestionType by remember { mutableStateOf("weight") }
 
+    // Bottom Sheet
     if (showBottomSheet) {
         val isNumericQuestion = listOf("weight", "height", "cigarette").contains(currentQuestionType)
 
@@ -89,6 +89,7 @@ fun AddActionPopup(
         )
     }
 
+    // Popup
     if (isVisible) {
         Dialog(
             onDismissRequest = onDismissRequest,
@@ -105,7 +106,6 @@ fun AddActionPopup(
                     .clickable { onDismissRequest() },
                 contentAlignment = Alignment.BottomCenter
             ) {
-                // Menu content
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth(),

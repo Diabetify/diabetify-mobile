@@ -5,5 +5,5 @@ object Constants {
 
     const val APP_ENTRY = "appEntry"
 
-    const val BASE_URL = "http://188.166.248.132/"
+    const val BASE_URL = "https://dev.henry-anand.web.id/"
 }

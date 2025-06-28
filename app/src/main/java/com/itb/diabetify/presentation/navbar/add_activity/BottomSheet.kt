@@ -56,6 +56,7 @@ fun BottomSheet(
     currentSelectionValue: String? = null,
     viewModel: AddActivityViewModel
 ) {
+    // States
     val surveyQuestions = questions
     val currentQuestion = surveyQuestions.find { it.id == questionType } ?: surveyQuestions.first()
 
@@ -147,9 +148,18 @@ fun BottomSheet(
                                         currentValue = currentSelectionValue,
                                         onSave = {
                                             when (currentQuestion.id) {
-                                                "birth", "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(currentQuestion.id)
+                                                "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(currentQuestion.id)
                                                 "activity" -> viewModel.handleWorkout()
                                             }
+                                            onDismissRequest()
+                                        },
+                                        viewModel = viewModel
+                                    )
+                                    DataInputQuestionType.Pregnancy -> PregnancyInput(
+                                        question = currentQuestion,
+                                        currentValue = currentSelectionValue,
+                                        onSave = {
+                                            viewModel.updateProfile("birth")
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel
@@ -277,7 +287,6 @@ fun SelectionInput(
                     .clickable { 
                         selectedOption = option.id
                         when (question.id) {
-                            "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
                             "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
                             "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
@@ -290,12 +299,77 @@ fun SelectionInput(
                     onClick = { 
                         selectedOption = option.id
                         when (question.id) {
-                            "birth" -> viewModel.setBirthValue((option.id == "yes").toString())
                             "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
                             "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
                             "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
                             "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "1" else "0")
                         }
+                    },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = colorResource(id = R.color.primary)
+                    )
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = option.label,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Submit button
+        PrimaryButton(
+            text = "Simpan",
+            onClick = { selectedOption?.let { onSave(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(50.dp),
+        )
+    }
+}
+
+@Composable
+fun PregnancyInput(
+    question: DataInputQuestion,
+    currentValue: String? = null,
+    onSave: (String) -> Unit,
+    viewModel: AddActivityViewModel
+) {
+    var selectedOption by remember { mutableStateOf(currentValue) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Spacer(Modifier.height(8.dp))
+
+        // Radio options
+        question.options.forEach { option ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .clickable { 
+                        selectedOption = option.id
+                        val backendValue = (option.id.toIntOrNull() ?: 0)
+                        viewModel.setBirthValue(backendValue.toString())
+                    }
+            ) {
+                RadioButton(
+                    selected = selectedOption == option.id,
+                    onClick = { 
+                        selectedOption = option.id
+                        val backendValue = (option.id.toIntOrNull() ?: 0)
+                        viewModel.setBirthValue(backendValue.toString())
                     },
                     colors = RadioButtonDefaults.colors(
                         selectedColor = colorResource(id = R.color.primary)
@@ -406,7 +480,6 @@ fun HypertensionInput(
                     onValueChange = { newValue ->
                         if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                             viewModel.setSystolicValue(newValue)
-                            // Calculate hypertension whenever values change
                             if (newValue.isNotEmpty() && viewModel.diastolicValueState.value.text.isNotEmpty()) {
                                 val systolic = newValue.toIntOrNull() ?: 0
                                 val diastolic = viewModel.diastolicValueState.value.text.toIntOrNull() ?: 0
@@ -457,7 +530,6 @@ fun HypertensionInput(
                     onValueChange = { newValue ->
                         if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                             viewModel.setDiastolicValue(newValue)
-                            // Calculate hypertension whenever values change
                             if (newValue.isNotEmpty() && viewModel.systolicValueState.value.text.isNotEmpty()) {
                                 val systolic = viewModel.systolicValueState.value.text.toIntOrNull() ?: 0
                                 val diastolic = newValue.toIntOrNull() ?: 0

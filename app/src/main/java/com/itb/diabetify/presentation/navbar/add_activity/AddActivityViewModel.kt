@@ -6,13 +6,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.model.activity.AddActivityResult
+import com.itb.diabetify.domain.model.activity.UpdateActivityResult
 import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
 import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
-import com.itb.diabetify.domain.usecases.profile.UpdateProfileUseCase
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -136,8 +137,9 @@ class AddActivityViewModel @Inject constructor(
                         text = it.height.toString(),
                         error = null
                     )
+                    val frontendBirthValue = (it.macrosomicBaby).toString()
                     _birthValueState.value = FieldState(
-                        text = it.macrosomicBaby.toString(),
+                        text = frontendBirthValue,
                         error = null
                     )
                     _hypertensionValueState.value = FieldState(
@@ -301,8 +303,8 @@ class AddActivityViewModel @Inject constructor(
 
     private fun handleActivityResult(result: Any?, operationType: String) {
         val resourceResult = when (result) {
-            is com.itb.diabetify.domain.model.activity.AddActivityResult -> result.result
-            is com.itb.diabetify.domain.model.activity.UpdateActivityResult -> result.result
+            is AddActivityResult -> result.result
+            is UpdateActivityResult -> result.result
             else -> null
         }
 

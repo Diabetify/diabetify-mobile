@@ -65,6 +65,8 @@ import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCas
 import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
 import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
+import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
+import com.itb.diabetify.domain.usecases.activity.GetActivityRepositoryUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.GetUserRepositoryUseCase
 import com.itb.diabetify.domain.usecases.user.UserUseCases
@@ -242,26 +244,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAddActivityUseCase(
+    fun providesActivityUseCases(
         repository: ActivityRepository
-    ): AddActivityUseCase {
-        return AddActivityUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesUpdateActivityUseCase(
-        repository: ActivityRepository
-    ): UpdateActivityUseCase {
-        return UpdateActivityUseCase(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun providesGetActivityByDateUseCase(
-        repository: ActivityRepository
-    ): GetActivityTodayUseCase {
-        return GetActivityTodayUseCase(repository)
+    ): ActivityUseCases {
+        return ActivityUseCases(
+            addActivity = AddActivityUseCase(repository),
+            getActivityToday = GetActivityTodayUseCase(repository),
+            getActivityRepository = GetActivityRepositoryUseCase(repository),
+            updateActivity = UpdateActivityUseCase(repository),
+        )
     }
 
     @Provides

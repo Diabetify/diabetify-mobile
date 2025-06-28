@@ -6,10 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.PredictionRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
-import com.itb.diabetify.domain.usecases.activity.GetActivityTodayUseCase
+import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
@@ -22,12 +21,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userUseCases: UserUseCases,
-    private val getActivityTodayUseCase: GetActivityTodayUseCase,
+    private val activityUseCases: ActivityUseCases,
     private val predictionUseCases: PredictionUseCases,
     private val profileUseCases: ProfileUseCases,
     private val predictionRepository: PredictionRepository,
     private val profileRepository: ProfileRepository,
-    private val activityRepository: ActivityRepository,
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -252,7 +250,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
 
-            val getActivityTodayResult = getActivityTodayUseCase()
+            val getActivityTodayResult = activityUseCases.getActivityToday()
 
             _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
@@ -479,7 +477,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
 
-            activityRepository.getActivityToday().collect { activity ->
+            activityUseCases.getActivityRepository().collect { activity ->
                 _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
                 activity?.let { todayActivity ->

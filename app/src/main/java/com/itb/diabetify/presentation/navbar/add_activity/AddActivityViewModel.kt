@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.model.activity.AddActivityResult
 import com.itb.diabetify.domain.model.activity.UpdateActivityResult
-import com.itb.diabetify.domain.repository.ActivityRepository
 import com.itb.diabetify.domain.repository.ProfileRepository
-import com.itb.diabetify.domain.usecases.activity.AddActivityUseCase
-import com.itb.diabetify.domain.usecases.activity.UpdateActivityUseCase
+import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.presentation.common.FieldState
@@ -27,10 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddActivityViewModel @Inject constructor(
-    private val activityRepository: ActivityRepository,
     private val profileRepository: ProfileRepository,
-    private val addActivityUseCase: AddActivityUseCase,
-    private val updateActivityUseCase: UpdateActivityUseCase,
+    private val activityUseCases: ActivityUseCases,
     private val profileUseCases: ProfileUseCases,
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
@@ -100,7 +96,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _activityTodayState.value = DataState(isLoading = true)
 
-            activityRepository.getActivityToday().onEach { activity ->
+            activityUseCases.getActivityRepository().onEach { activity ->
                 _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
                 activity?.let {
@@ -238,7 +234,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _addActivityState.value = addActivityState.value.copy(isLoading = true)
 
-            val addActivityResult = addActivityUseCase(
+            val addActivityResult = activityUseCases.addActivity(
                 activityDate = activityDate,
                 activityType = "smoke",
                 value = value
@@ -255,7 +251,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _addActivityState.value = addActivityState.value.copy(isLoading = true)
 
-            val addActivityResult = addActivityUseCase(
+            val addActivityResult = activityUseCases.addActivity(
                 activityDate = activityDate,
                 activityType = "workout",
                 value = value
@@ -271,7 +267,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
 
-            val updateActivityResult = updateActivityUseCase(
+            val updateActivityResult = activityUseCases.updateActivity(
                 activityId = activityId,
                 activityDate = activityDate,
                 activityType = "smoke",
@@ -288,7 +284,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
 
-            val updateActivityResult = updateActivityUseCase(
+            val updateActivityResult = activityUseCases.updateActivity(
                 activityId = activityId,
                 activityDate = activityDate,
                 activityType = "workout",

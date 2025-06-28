@@ -246,7 +246,7 @@ fun GuideScreen(
                 // FAQ
                 SectionHeader(
                     title = "FAQ",
-                    subtitle = "Pertanyaan yang sering diajukan tentang diabetes dan XAI.",
+                    subtitle = "Pertanyaan yang sering diajukan tentang aplikasi.",
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
 

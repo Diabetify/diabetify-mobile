@@ -67,6 +67,7 @@ import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
 import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.activity.GetActivityRepositoryUseCase
+import com.itb.diabetify.domain.usecases.profile.GetProfileRepositoryUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.GetUserRepositoryUseCase
 import com.itb.diabetify.domain.usecases.user.UserUseCases
@@ -338,6 +339,7 @@ object AppModule {
         return ProfileUseCases(
             addProfile = AddProfileUseCase(repository),
             getProfile = GetProfileUseCase(repository),
+            getProfileRepository = GetProfileRepositoryUseCase(repository),
             updateProfile = UpdateProfileUseCase(repository)
         )
     }

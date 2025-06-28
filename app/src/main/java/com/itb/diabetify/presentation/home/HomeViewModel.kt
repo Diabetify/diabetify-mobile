@@ -25,7 +25,6 @@ class HomeViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases,
     private val profileUseCases: ProfileUseCases,
     private val predictionRepository: PredictionRepository,
-    private val profileRepository: ProfileRepository,
 ): ViewModel() {
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -457,7 +456,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            profileRepository.getProfile().collect { profile ->
+            profileUseCases.getProfileRepository().collect { profile ->
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let { userProfile ->

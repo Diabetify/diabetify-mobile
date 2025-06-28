@@ -62,6 +62,8 @@ fun AddActionPopup(
     val hypertensionValueState = viewModel.hypertensionValueState.value
     val cholesterolValueState = viewModel.cholesterolValueState.value
     val bloodlineValueState = viewModel.bloodlineValueState.value
+    val userGender = viewModel.userGender.value
+    val isFemale = userGender?.lowercase() == "perempuan" || userGender?.lowercase() == "female"
     val currentValues = mapOf(
         "weight" to weightValueState.text,
         "height" to heightValueState.text,
@@ -201,7 +203,7 @@ fun AddActionPopup(
 
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = if (isFemale) Arrangement.SpaceEvenly else Arrangement.Center
                         ) {
                             AnimatedTrackingButton(
                                 icon = R.drawable.ic_family,
@@ -213,15 +215,17 @@ fun AddActionPopup(
                                 }
                             )
 
-                            AnimatedTrackingButton(
-                                icon = R.drawable.ic_baby,
-                                label = "Kehamilan",
-                                delayMillis = 300,
-                                onClick = {
-                                    currentQuestionType = "birth"
-                                    showBottomSheet = true
-                                }
-                            )
+                            if (isFemale) {
+                                AnimatedTrackingButton(
+                                    icon = R.drawable.ic_baby,
+                                    label = "Kehamilan",
+                                    delayMillis = 300,
+                                    onClick = {
+                                        currentQuestionType = "birth"
+                                        showBottomSheet = true
+                                    }
+                                )
+                            }
                         }
 
                         // Daily tracking options

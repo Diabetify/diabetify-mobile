@@ -8,10 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.model.activity.AddActivityResult
 import com.itb.diabetify.domain.model.activity.UpdateActivityResult
-import com.itb.diabetify.domain.repository.ProfileRepository
 import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -25,10 +25,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddActivityViewModel @Inject constructor(
-    private val profileRepository: ProfileRepository,
     private val activityUseCases: ActivityUseCases,
     private val profileUseCases: ProfileUseCases,
-    private val predictionUseCases: PredictionUseCases
+    private val predictionUseCases: PredictionUseCases,
+    private val userUseCases: UserUseCases
 ) : ViewModel() {
     @SuppressLint("NewApi")
     val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
@@ -47,6 +47,12 @@ class AddActivityViewModel @Inject constructor(
 
     private var _updateProfileState = mutableStateOf(DataState())
     val updateProfileState: State<DataState> = _updateProfileState
+
+    private val _userState = mutableStateOf(DataState())
+    val userState: State<DataState> = _userState
+
+    private val _userGender = mutableStateOf<String?>(null)
+    val userGender: State<String?> = _userGender
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
@@ -90,6 +96,22 @@ class AddActivityViewModel @Inject constructor(
     init {
         collectActivityTodayData()
         collectProfileData()
+        collectUserData()
+    }
+
+    private fun collectUserData() {
+        viewModelScope.launch {
+            _userState.value = userState.value.copy(isLoading = true)
+
+            userUseCases.getUserRepository().onEach { user ->
+                _userState.value = userState.value.copy(isLoading = false)
+                _userGender.value = user?.gender
+                
+                user?.let {
+                    Log.d("AddActivityViewModel", "User gender collected: ${it.gender}")
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
     private fun collectActivityTodayData() {
@@ -121,7 +143,7 @@ class AddActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            profileRepository.getProfile().onEach { profile ->
+            profileUseCases.getProfileRepository().onEach { profile ->
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let {

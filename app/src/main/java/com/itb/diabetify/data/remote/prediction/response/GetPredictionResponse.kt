@@ -31,7 +31,7 @@ data class PredictionData(
     @SerializedName("bmi_explanation")
     val bmiExplanation: String,
     @SerializedName("brinkman_score")
-    val brinkmanScore: Double,
+    val brinkmanScore: Int,
     @SerializedName("brinkman_score_contribution")
     val brinkmanScoreContribution: Double,
     @SerializedName("brinkman_score_impact")
@@ -63,7 +63,7 @@ data class PredictionData(
     @SerializedName("is_bloodline_explanation")
     val isBloodlineExplanation: String,
     @SerializedName("is_macrosomic_baby")
-    val isMacrosomicBaby: Boolean,
+    val isMacrosomicBaby: Int,
     @SerializedName("is_macrosomic_baby_contribution")
     val isMacrosomicBabyContribution: Double,
     @SerializedName("is_macrosomic_baby_impact")
@@ -78,6 +78,8 @@ data class PredictionData(
     val smokingStatusImpact: Int,
     @SerializedName("smoking_status_explanation")
     val smokingStatusExplanation: String,
+    @SerializedName("avg_smoke_count")
+    val avgSmokeCount: Int,
     @SerializedName("physical_activity_frequency")
     val physicalActivityFrequency: Int,
     @SerializedName("physical_activity_frequency_contribution")

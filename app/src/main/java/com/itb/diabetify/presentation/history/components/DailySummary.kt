@@ -109,9 +109,9 @@ private fun RiskPercentageCard(
                     .clip(CircleShape)
                     .background(
                         when {
-                            riskPercentage <= 30 -> Color(0xFF8BC34A).copy(alpha = 0.1f)
-                            riskPercentage <= 50 -> Color(0xFFFFC107).copy(alpha = 0.1f)
-                            riskPercentage <= 65 -> Color(0xFFFA821F).copy(alpha = 0.1f)
+                            riskPercentage <= 35 -> Color(0xFF8BC34A).copy(alpha = 0.1f)
+                            riskPercentage <= 55 -> Color(0xFFFFC107).copy(alpha = 0.1f)
+                            riskPercentage <= 70 -> Color(0xFFFA821F).copy(alpha = 0.1f)
                             else -> Color(0xFFF44336).copy(alpha = 0.1f)
                         }
                     ),
@@ -121,9 +121,9 @@ private fun RiskPercentageCard(
                     imageVector = Icons.Outlined.Favorite,
                     contentDescription = "Risk Assessment",
                     tint = when {
-                        riskPercentage <= 30 -> Color(0xFF8BC34A)
-                        riskPercentage <= 50 -> Color(0xFFFFC107)
-                        riskPercentage <= 65 -> Color(0xFFFA821F)
+                        riskPercentage <= 35 -> Color(0xFF8BC34A)
+                        riskPercentage <= 55 -> Color(0xFFFFC107)
+                        riskPercentage <= 70 -> Color(0xFFFA821F)
                         else -> Color(0xFFF44336)
                     },
                     modifier = Modifier.size(24.dp)

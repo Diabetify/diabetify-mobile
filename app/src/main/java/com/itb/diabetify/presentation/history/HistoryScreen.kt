@@ -32,6 +32,7 @@ import com.itb.diabetify.presentation.history.components.DailySummary
 import com.itb.diabetify.presentation.history.components.DailySummaryData
 import com.itb.diabetify.presentation.history.components.RiskFactorContribution
 import com.itb.diabetify.presentation.history.components.DailyInput
+import com.itb.diabetify.presentation.survey.SurveyOption
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -43,7 +44,6 @@ fun HistoryScreen(
 ) {
     val predictionScores = viewModel.predictionScores.collectAsState(initial = emptyList())
     val currentPrediction = viewModel.currentPrediction.collectAsState(initial = null)
-    val currentDate = LocalDate.now()
     val context = LocalContext.current
 
     Box(
@@ -158,35 +158,44 @@ fun HistoryScreen(
                             )
                         ),
                         dailyInputs = listOf(
+                            DailyInput("Usia", "${prediction.age} tahun"),
                             DailyInput("Indeks Massa Tubuh", "${prediction.bmi} kg/m²"),
                             DailyInput("Hipertensi",
                                 if (prediction.isHypertension) "Ya" else "Tidak"
                             ),
                             DailyInput(
-                                "Riwayat Bayi Makrosomia",
-                                if (prediction.isMacrosomicBaby) "Ya" else "Tidak"
-                            ),
-                            DailyInput(
-                                "Aktivitas Fisik",
-                                "${prediction.physicalActivityFrequency} menit"
-                            ),
-                            DailyInput("Usia", "${prediction.age} tahun"),
-                            DailyInput(
-                                "Status Merokok",
-                                prediction.smokingStatus
-                            ),
-                            DailyInput(
-                                "Indeks Brinkman",
-                                "${prediction.brinkmanScore}"
+                                "Kolesterol",
+                                if (prediction.isCholesterol) "Ya" else "Tidak"
                             ),
                             DailyInput(
                                 "Riwayat Keluarga",
                                 if (prediction.isBloodline) "Ya" else "Tidak"
                             ),
                             DailyInput(
-                                "Kolesterol",
-                                if (prediction.isCholesterol) "Ya" else "Tidak"
-                            )
+                                "Riwayat Bayi Makrosomia",
+                                if (prediction.isMacrosomicBaby == 1) "Ya" else "Tidak"
+                            ),
+                            DailyInput(
+                                "Status Merokok",
+                                when (prediction.smokingStatus) {
+                                    "0" -> "Tidak Pernah"
+                                    "1" -> "Sudah Berhenti"
+                                    "2" -> "Masih Merokok"
+                                    else -> "Tidak Diketahui"
+                                }
+                            ),
+                            DailyInput(
+                                "Indeks Brinkman",
+                                "${prediction.brinkmanScore}"
+                            ),
+                            DailyInput(
+                                "Jumlah Rokok",
+                                "${prediction.avgSmokeCount} batang / hari"
+                            ),
+                            DailyInput(
+                                "Frekuensi Aktivitas Fisik",
+                                "${prediction.physicalActivityFrequency}x / minggu"
+                            ),
                         )
                     )
                 )

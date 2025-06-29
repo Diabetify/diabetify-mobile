@@ -44,7 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
+import com.itb.diabetify.presentation.common.SuccessNotification
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -54,15 +57,15 @@ fun AddActionPopup(
     viewModel: AddActivityViewModel
 ) {
     // States
-    val smokeValueState = viewModel.smokeValueState.value
-    val workoutValueState = viewModel.workoutValueState.value
-    val weightValueState = viewModel.weightValueState.value
-    val heightValueState = viewModel.heightValueState.value
-    val birthValueState = viewModel.birthValueState.value
-    val hypertensionValueState = viewModel.hypertensionValueState.value
-    val cholesterolValueState = viewModel.cholesterolValueState.value
-    val bloodlineValueState = viewModel.bloodlineValueState.value
-    val userGender = viewModel.userGender.value
+    val smokeValueState by viewModel.smokeValueState
+    val workoutValueState by viewModel.workoutValueState
+    val weightValueState by viewModel.weightValueState
+    val heightValueState by viewModel.heightValueState
+    val birthValueState by viewModel.birthValueState
+    val hypertensionValueState by viewModel.hypertensionValueState
+    val cholesterolValueState by viewModel.cholesterolValueState
+    val bloodlineValueState by viewModel.bloodlineValueState
+    val userGender by viewModel.userGender
     val isFemale = userGender?.lowercase() == "perempuan" || userGender?.lowercase() == "female"
     val currentValues = mapOf(
         "weight" to weightValueState.text,
@@ -74,10 +77,12 @@ fun AddActionPopup(
         "cholesterol" to cholesterolValueState.text,
         "bloodline" to bloodlineValueState.text
     )
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val errorMessage = viewModel.errorMessage.value
+    val successMessage = viewModel.successMessage.value
     var currentQuestionType by remember { mutableStateOf("weight") }
 
     // Bottom Sheet
+    var showBottomSheet by remember { mutableStateOf(false) }
     if (showBottomSheet) {
         val isNumericQuestion = listOf("weight", "height", "cigarette").contains(currentQuestionType)
 
@@ -308,6 +313,26 @@ fun AddActionPopup(
                         }
                     }
                 }
+
+                // Error notification
+                ErrorNotification(
+                    showError = errorMessage != null,
+                    errorMessage = errorMessage,
+                    onDismiss = { viewModel.onErrorShown() },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .zIndex(1000f)
+                )
+
+                // Success notification
+                SuccessNotification(
+                    showSuccess = successMessage != null,
+                    successMessage = successMessage,
+                    onDismiss = { viewModel.onSuccessShown() },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .zIndex(1000f)
+                )
             }
         }
     }

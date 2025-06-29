@@ -53,12 +53,13 @@ fun BottomNavigationBar(
     elevation: Dp = 8.dp,
     onItemSelected: (String) -> Unit = {},
 ) {
+    // States
     val selectedItem = viewModel.selectedItem.value
     val items = viewModel.navigationItems
     val middleIndex = items.size / 2
 
+    // Popup
     var showPopup by remember { mutableStateOf(false) }
-
     if (showPopup) {
         AddActionPopup(
             isVisible = showPopup,

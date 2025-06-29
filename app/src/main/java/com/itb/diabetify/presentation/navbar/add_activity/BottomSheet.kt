@@ -25,8 +25,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -135,10 +135,6 @@ fun BottomSheet(
                                         question = currentQuestion,
                                         currentValue = currentNumericValue,
                                         onSave = {
-                                            when (currentQuestion.id) {
-                                                "cigarette" -> viewModel.handleSmoking()
-                                                "weight", "height" -> viewModel.updateProfile(currentQuestion.id)
-                                            }
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel
@@ -147,10 +143,6 @@ fun BottomSheet(
                                         question = currentQuestion,
                                         currentValue = currentSelectionValue,
                                         onSave = {
-                                            when (currentQuestion.id) {
-                                                "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(currentQuestion.id)
-                                                "activity" -> viewModel.handleWorkout()
-                                            }
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel
@@ -159,7 +151,6 @@ fun BottomSheet(
                                         question = currentQuestion,
                                         currentValue = currentSelectionValue,
                                         onSave = {
-                                            viewModel.updateProfile("birth")
                                             onDismissRequest()
                                         },
                                         viewModel = viewModel
@@ -167,7 +158,6 @@ fun BottomSheet(
                                     DataInputQuestionType.Hypertension -> HypertensionInput(
                                         viewModel = viewModel,
                                         onSave = { 
-                                            viewModel.updateProfile("hypertension")
                                             onDismissRequest()
                                         }
                                     )
@@ -188,7 +178,31 @@ fun NumericInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
     var inputValue by remember { mutableStateOf(currentValue ?: "") }
+    var hasSubmitted by remember { mutableStateOf(false) }
+    
+    val fieldState = when (question.id) {
+        "cigarette" -> viewModel.smokeValueState.value
+        "weight" -> viewModel.weightValueState.value
+        "height" -> viewModel.heightValueState.value
+        else -> null
+    }
+    
+    val errorMessage = fieldState?.error
+    val canSubmit = viewModel.isFieldValid(
+        when (question.id) {
+            "cigarette" -> "smoke"
+            else -> question.id
+        }
+    )
+    
+    LaunchedEffect(isLoading, hasSubmitted) {
+        if (hasSubmitted && !isLoading) {
+            onSave(inputValue)
+            hasSubmitted = false
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -196,8 +210,7 @@ fun NumericInput(
     ) {
         Spacer(Modifier.height(18.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -222,13 +235,7 @@ fun NumericInput(
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = colorResource(id = R.color.primary),
-                    unfocusedIndicatorColor = colorResource(id = R.color.secondary)
-                ),
+                modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     question.numericUnit?.let {
                         Text(
@@ -238,8 +245,19 @@ fun NumericInput(
                             fontWeight = FontWeight.Medium,
                         )
                     }
-                }
+                },
+                isError = errorMessage != null
             )
+            
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    color = colorResource(R.color.red),
+                    fontSize = 12.sp,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -247,11 +265,19 @@ fun NumericInput(
         // Submit button
         PrimaryButton(
             text = "Simpan",
-            onClick = { onSave(inputValue) },
+            onClick = { 
+                hasSubmitted = true
+                when (question.id) {
+                    "cigarette" -> viewModel.handleSmoking()
+                    "weight", "height" -> viewModel.updateProfile(question.id)
+                }
+            },
+            enabled = canSubmit && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(50.dp),
+            isLoading = isLoading
         )
     }
 }
@@ -263,6 +289,7 @@ fun SelectionInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
     val initialValue = when (currentValue?.lowercase()) {
         "true" -> "yes"
         "false" -> "no"
@@ -270,6 +297,29 @@ fun SelectionInput(
     }
     
     var selectedOption by remember { mutableStateOf(initialValue) }
+    var hasSubmitted by remember { mutableStateOf(false) }
+    val fieldState = when (question.id) {
+        "hypertension" -> viewModel.hypertensionValueState.value
+        "cholesterol" -> viewModel.cholesterolValueState.value
+        "bloodline" -> viewModel.bloodlineValueState.value
+        "activity" -> viewModel.workoutValueState.value
+        else -> null
+    }
+    
+    val errorMessage = fieldState?.error
+    val canSubmit = viewModel.isFieldValid(
+        when (question.id) {
+            "activity" -> "workout"
+            else -> question.id
+        }
+    )
+    
+    LaunchedEffect(isLoading, hasSubmitted) {
+        if (hasSubmitted && !isLoading) {
+            selectedOption?.let { onSave(it) }
+            hasSubmitted = false
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -277,47 +327,62 @@ fun SelectionInput(
     ) {
         Spacer(Modifier.height(8.dp))
 
-        // Radio options
-        question.options.forEach { option ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .clickable { 
-                        selectedOption = option.id
-                        when (question.id) {
-                            "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
-                            "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
-                            "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
-                            "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "1" else "0")
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Radio options
+            question.options.forEach { option ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clickable { 
+                            selectedOption = option.id
+                            when (question.id) {
+                                "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                                "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
+                                "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
+                                "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "true" else "false")
+                            }
                         }
-                    }
-            ) {
-                RadioButton(
-                    selected = selectedOption == option.id,
-                    onClick = { 
-                        selectedOption = option.id
-                        when (question.id) {
-                            "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
-                            "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
-                            "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
-                            "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "1" else "0")
-                        }
-                    },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = colorResource(id = R.color.primary)
+                ) {
+                    RadioButton(
+                        selected = selectedOption == option.id,
+                        onClick = { 
+                            selectedOption = option.id
+                            when (question.id) {
+                                "hypertension" -> viewModel.setHypertensionValue((option.id == "yes").toString())
+                                "cholesterol" -> viewModel.setCholesterolValue((option.id == "yes").toString())
+                                "bloodline" -> viewModel.setBloodlineValue((option.id == "yes").toString())
+                                "activity" -> viewModel.setWorkoutValue(if (option.id == "yes") "true" else "false")
+                            }
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                            unselectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                        )
                     )
-                )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
+                    Text(
+                        text = option.label,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+            
+            if (errorMessage != null) {
                 Text(
-                    text = option.label,
+                    text = errorMessage,
+                    color = colorResource(R.color.red),
+                    fontSize = 12.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                    color = Color.Black
+                    fontWeight = FontWeight.Normal,
                 )
             }
         }
@@ -327,11 +392,19 @@ fun SelectionInput(
         // Submit button
         PrimaryButton(
             text = "Simpan",
-            onClick = { selectedOption?.let { onSave(it) } },
+            onClick = { 
+                hasSubmitted = true
+                when (question.id) {
+                    "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(question.id)
+                    "activity" -> viewModel.handleWorkout()
+                }
+            },
+            enabled = canSubmit && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(50.dp),
+            isLoading = isLoading
         )
     }
 }
@@ -343,7 +416,20 @@ fun PregnancyInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
     var selectedOption by remember { mutableStateOf(currentValue) }
+    var hasSubmitted by remember { mutableStateOf(false) }
+    
+    val fieldState = viewModel.birthValueState.value
+    val errorMessage = fieldState.error
+    val canSubmit = viewModel.isFieldValid("birth")
+    
+    LaunchedEffect(isLoading, hasSubmitted) {
+        if (hasSubmitted && !isLoading) {
+            selectedOption?.let { onSave(it) }
+            hasSubmitted = false
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -351,39 +437,54 @@ fun PregnancyInput(
     ) {
         Spacer(Modifier.height(8.dp))
 
-        // Radio options
-        question.options.forEach { option ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .clickable { 
-                        selectedOption = option.id
-                        val backendValue = (option.id.toIntOrNull() ?: 0)
-                        viewModel.setBirthValue(backendValue.toString())
-                    }
-            ) {
-                RadioButton(
-                    selected = selectedOption == option.id,
-                    onClick = { 
-                        selectedOption = option.id
-                        val backendValue = (option.id.toIntOrNull() ?: 0)
-                        viewModel.setBirthValue(backendValue.toString())
-                    },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = colorResource(id = R.color.primary)
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Radio options
+            question.options.forEach { option ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clickable { 
+                            selectedOption = option.id
+                            val birthValue = (option.id.toIntOrNull() ?: 0)
+                            viewModel.setBirthValue(birthValue.toString())
+                        }
+                ) {
+                    RadioButton(
+                        selected = selectedOption == option.id,
+                        onClick = { 
+                            selectedOption = option.id
+                            val birthValue = (option.id.toIntOrNull() ?: 0)
+                            viewModel.setBirthValue(birthValue.toString())
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                            unselectedColor = if (errorMessage != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                        )
                     )
-                )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
+                    Text(
+                        text = option.label,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+            
+            if (errorMessage != null) {
                 Text(
-                    text = option.label,
+                    text = errorMessage,
+                    color = colorResource(R.color.red),
+                    fontSize = 12.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                    color = Color.Black
+                    fontWeight = FontWeight.Normal,
                 )
             }
         }
@@ -393,11 +494,16 @@ fun PregnancyInput(
         // Submit button
         PrimaryButton(
             text = "Simpan",
-            onClick = { selectedOption?.let { onSave(it) } },
+            onClick = { 
+                hasSubmitted = true
+                viewModel.updateProfile("birth")
+            },
+            enabled = canSubmit && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(50.dp),
+            isLoading = isLoading
         )
     }
 }
@@ -407,7 +513,16 @@ fun HypertensionInput(
     viewModel: AddActivityViewModel,
     onSave: (String) -> Unit
 ) {
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
     var knowsBPValue by remember { mutableStateOf<String?>(null) }
+    var hasSubmitted by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(isLoading, hasSubmitted) {
+        if (hasSubmitted && !isLoading) {
+            onSave(viewModel.hypertensionValueState.value.text)
+            hasSubmitted = false
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -475,45 +590,55 @@ fun HypertensionInput(
                     color = Color.Black,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                OutlinedTextField(
-                    value = viewModel.systolicValueState.value.text,
-                    onValueChange = { newValue ->
-                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
-                            viewModel.setSystolicValue(newValue)
-                            if (newValue.isNotEmpty() && viewModel.diastolicValueState.value.text.isNotEmpty()) {
-                                val systolic = newValue.toIntOrNull() ?: 0
-                                val diastolic = viewModel.diastolicValueState.value.text.toIntOrNull() ?: 0
-                                val hasHypertension = systolic >= 140 || diastolic >= 90
-                                viewModel.setHypertensionValue(hasHypertension.toString())
-                            }
-                        }
-                    },
-                    textStyle = TextStyle(
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = colorResource(R.color.black)
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
+                
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = colorResource(id = R.color.primary),
-                        unfocusedIndicatorColor = colorResource(id = R.color.secondary)
-                    ),
-                    trailingIcon = {
-                        Text(
-                            text = "mmHg",
-                            modifier = Modifier.padding(end = 10.dp),
+                        .padding(horizontal = 16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.systolicValueState.value.text,
+                        onValueChange = { newValue ->
+                            if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                                viewModel.setSystolicValue(newValue)
+                                if (newValue.isNotEmpty() && viewModel.diastolicValueState.value.text.isNotEmpty()) {
+                                    val systolic = newValue.toIntOrNull() ?: 0
+                                    val diastolic = viewModel.diastolicValueState.value.text.toIntOrNull() ?: 0
+                                    val hasHypertension = systolic >= 140 || diastolic >= 90
+                                    viewModel.setHypertensionValue(hasHypertension.toString())
+                                }
+                            }
+                        },
+                        textStyle = TextStyle(
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = colorResource(R.color.black)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            Text(
+                                text = "mmHg",
+                                modifier = Modifier.padding(end = 10.dp),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = viewModel.systolicValueState.value.error != null
+                    )
+                    
+                    viewModel.systolicValueState.value.error?.let { error ->
+                        Text(
+                            text = error,
+                            color = colorResource(R.color.red),
+                            fontSize = 12.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
                         )
                     }
-                )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -525,45 +650,55 @@ fun HypertensionInput(
                     color = Color.Black,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                OutlinedTextField(
-                    value = viewModel.diastolicValueState.value.text,
-                    onValueChange = { newValue ->
-                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
-                            viewModel.setDiastolicValue(newValue)
-                            if (newValue.isNotEmpty() && viewModel.systolicValueState.value.text.isNotEmpty()) {
-                                val systolic = viewModel.systolicValueState.value.text.toIntOrNull() ?: 0
-                                val diastolic = newValue.toIntOrNull() ?: 0
-                                val hasHypertension = systolic >= 140 || diastolic >= 90
-                                viewModel.setHypertensionValue(hasHypertension.toString())
-                            }
-                        }
-                    },
-                    textStyle = TextStyle(
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = colorResource(R.color.black)
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
+                
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = colorResource(id = R.color.primary),
-                        unfocusedIndicatorColor = colorResource(id = R.color.secondary)
-                    ),
-                    trailingIcon = {
-                        Text(
-                            text = "mmHg",
-                            modifier = Modifier.padding(end = 10.dp),
+                        .padding(horizontal = 16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.diastolicValueState.value.text,
+                        onValueChange = { newValue ->
+                            if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                                viewModel.setDiastolicValue(newValue)
+                                if (newValue.isNotEmpty() && viewModel.systolicValueState.value.text.isNotEmpty()) {
+                                    val systolic = viewModel.systolicValueState.value.text.toIntOrNull() ?: 0
+                                    val diastolic = newValue.toIntOrNull() ?: 0
+                                    val hasHypertension = systolic >= 140 || diastolic >= 90
+                                    viewModel.setHypertensionValue(hasHypertension.toString())
+                                }
+                            }
+                        },
+                        textStyle = TextStyle(
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = colorResource(R.color.black)
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            Text(
+                                text = "mmHg",
+                                modifier = Modifier.padding(end = 10.dp),
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        isError = viewModel.diastolicValueState.value.error != null
+                    )
+                    
+                    viewModel.diastolicValueState.value.error?.let { error ->
+                        Text(
+                            text = error,
+                            color = colorResource(R.color.red),
+                            fontSize = 12.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
                         )
                     }
-                )
+                }
             }
             "no" -> {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -579,52 +714,68 @@ fun HypertensionInput(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .clickable { viewModel.setHypertensionValue("true") }
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    RadioButton(
-                        selected = viewModel.hypertensionValueState.value.text == "true",
-                        onClick = { viewModel.setHypertensionValue("true") },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = colorResource(id = R.color.primary)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clickable { viewModel.setHypertensionValue("true") }
+                    ) {
+                        RadioButton(
+                            selected = viewModel.hypertensionValueState.value.text == "true",
+                            onClick = { viewModel.setHypertensionValue("true") },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                                unselectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Ya",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = Color.Black
-                    )
-                }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Ya",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        )
+                    }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .clickable { viewModel.setHypertensionValue("false") }
-                ) {
-                    RadioButton(
-                        selected = viewModel.hypertensionValueState.value.text == "false",
-                        onClick = { viewModel.setHypertensionValue("false") },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = colorResource(id = R.color.primary)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clickable { viewModel.setHypertensionValue("false") }
+                    ) {
+                        RadioButton(
+                            selected = viewModel.hypertensionValueState.value.text == "false",
+                            onClick = { viewModel.setHypertensionValue("false") },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                                unselectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Tidak",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = Color.Black
-                    )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Tidak",
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        )
+                    }
+                    
+                    viewModel.hypertensionValueState.value.error?.let { error ->
+                        Text(
+                            text = error,
+                            color = colorResource(R.color.red),
+                            fontSize = 12.sp,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
                 }
             }
         }
@@ -632,17 +783,20 @@ fun HypertensionInput(
         Spacer(modifier = Modifier.height(24.dp))
         PrimaryButton(
             text = "Simpan",
-            onClick = { onSave(viewModel.hypertensionValueState.value.text) },
+            onClick = { 
+                hasSubmitted = true
+                viewModel.updateProfile("hypertension")
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(50.dp),
             enabled = when (knowsBPValue) {
-                "yes" -> viewModel.systolicValueState.value.text.isNotEmpty() &&
-                        viewModel.diastolicValueState.value.text.isNotEmpty()
-                "no" -> viewModel.hypertensionValueState.value.text.isNotEmpty()
+                "yes" -> viewModel.canUpdateBloodPressure()
+                "no" -> viewModel.isFieldValid("hypertension")
                 else -> false
-            }
+            } && !isLoading,
+            isLoading = isLoading
         )
     }
 }

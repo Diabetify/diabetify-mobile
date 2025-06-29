@@ -30,11 +30,16 @@ class AddActivityViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases,
     private val userUseCases: UserUseCases
 ) : ViewModel() {
-    @SuppressLint("NewApi")
-    val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
+    // Error and Success States
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
 
+    private var _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
+
+    // Operational States
     private var _activityTodayState = mutableStateOf(DataState())
-    val activityTodayState = _activityTodayState
+    val activityTodayState: State<DataState> = _activityTodayState
 
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
@@ -51,18 +56,7 @@ class AddActivityViewModel @Inject constructor(
     private val _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
 
-    private val _userGender = mutableStateOf<String?>(null)
-    val userGender: State<String?> = _userGender
-
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
-
-    private val _smokingId = mutableStateOf<String?>(null)
-    val smokingId: State<String?> = _smokingId
-
-    private val _workoutId = mutableStateOf<String?>(null)
-    val workoutId: State<String?> = _workoutId
-
+    // Field States
     private val _smokeValueState = mutableStateOf(FieldState())
     val smokeValueState: State<FieldState> = _smokeValueState
 
@@ -93,12 +87,166 @@ class AddActivityViewModel @Inject constructor(
     private val _cholesterolValueState = mutableStateOf(FieldState())
     val cholesterolValueState: State<FieldState> = _cholesterolValueState
 
+    // Other States
+    private val _userGender = mutableStateOf<String?>(null)
+    val userGender: State<String?> = _userGender
+
+    private val _smokingId = mutableStateOf<String?>(null)
+    val smokingId: State<String?> = _smokingId
+
+    private val _workoutId = mutableStateOf<String?>(null)
+    val workoutId: State<String?> = _workoutId
+
+    @SuppressLint("NewApi")
+    val activityDate = ZonedDateTime.now(ZoneOffset.UTC).toString()
+
+    // Initialization
     init {
         collectActivityTodayData()
         collectProfileData()
         collectUserData()
     }
 
+    // Validation Function
+    private fun validateField(fieldType: String, value: String): String? {
+        if (value.isBlank()) {
+            return "Mohon isi field ini"
+        }
+
+        when (fieldType) {
+            "smoke" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 0 || numericValue > 60) {
+                    return "Jumlah rokok harus antara 0-60 batang"
+                }
+            }
+            "weight" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 30 || numericValue > 300) {
+                    return "Berat badan harus antara 30-300 kg"
+                }
+            }
+            "height" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 100 || numericValue > 250) {
+                    return "Tinggi badan harus antara 100-250 cm"
+                }
+            }
+            "birth" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 0 || numericValue > 10) {
+                    return "Jumlah bayi makrosomik harus antara 0-10"
+                }
+            }
+            "systolic" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 70 || numericValue > 250) {
+                    return "Tekanan sistolik harus antara 70-250 mmHg"
+                }
+            }
+            "diastolic" -> {
+                val numericValue = value.toIntOrNull() ?: return "Harap masukkan angka yang valid"
+                if (numericValue < 40 || numericValue > 150) {
+                    return "Tekanan diastolik harus antara 40-150 mmHg"
+                }
+            }
+            "workout" -> {
+                if (value != "true" && value != "false") {
+                    return "Pilihan workout tidak valid"
+                }
+            }
+            "hypertension", "bloodline", "cholesterol" -> {
+                if (value != "true" && value != "false") {
+                    return "Pilihan tidak valid"
+                }
+            }
+        }
+        
+        return null
+    }
+
+    // Setters for Field States
+    fun setSmokeValue(value: String) {
+        val validationError = validateField("smoke", value)
+        _smokeValueState.value = smokeValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setWorkoutValue(value: String) {
+        val validationError = validateField("workout", value)
+        _workoutValueState.value = workoutValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setWeightValue(value: String) {
+        val validationError = validateField("weight", value)
+        _weightValueState.value = weightValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setHeightValue(value: String) {
+        val validationError = validateField("height", value)
+        _heightValueState.value = heightValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setBirthValue(value: String) {
+        val validationError = validateField("birth", value)
+        _birthValueState.value = birthValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setHypertensionValue(value: String) {
+        val validationError = validateField("hypertension", value)
+        _hypertensionValueState.value = hypertensionValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setSystolicValue(value: String) {
+        val validationError = validateField("systolic", value)
+        _systolicValueState.value = systolicValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setDiastolicValue(value: String) {
+        val validationError = validateField("diastolic", value)
+        _diastolicValueState.value = diastolicValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setBloodlineValue(value: String) {
+        val validationError = validateField("bloodline", value)
+        _bloodlineValueState.value = bloodlineValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    fun setCholesterolValue(value: String) {
+        val validationError = validateField("cholesterol", value)
+        _cholesterolValueState.value = cholesterolValueState.value.copy(
+            text = value,
+            error = validationError
+        )
+    }
+
+    // Use Case Calls
     private fun collectUserData() {
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
@@ -155,9 +303,9 @@ class AddActivityViewModel @Inject constructor(
                         text = it.height.toString(),
                         error = null
                     )
-                    val frontendBirthValue = (it.macrosomicBaby).toString()
+                    val birthValue = (it.macrosomicBaby).toString()
                     _birthValueState.value = FieldState(
-                        text = frontendBirthValue,
+                        text = birthValue,
                         error = null
                     )
                     _hypertensionValueState.value = FieldState(
@@ -177,60 +325,20 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
-    fun setSmokeValue(value: String) {
-        _smokeValueState.value = smokeValueState.value.copy(error = null)
-        _smokeValueState.value = smokeValueState.value.copy(text = value)
-    }
-
-    fun setWorkoutValue(value: String) {
-        _workoutValueState.value = workoutValueState.value.copy(error = null)
-        _workoutValueState.value = workoutValueState.value.copy(text = value)
-    }
-
-    fun setWeightValue(value: String) {
-        _weightValueState.value = weightValueState.value.copy(error = null)
-        _weightValueState.value = weightValueState.value.copy(text = value)
-    }
-
-    fun setHeightValue(value: String) {
-        _heightValueState.value = heightValueState.value.copy(error = null)
-        _heightValueState.value = heightValueState.value.copy(text = value)
-    }
-
-    fun setBirthValue(value: String) {
-        _birthValueState.value = birthValueState.value.copy(error = null)
-        _birthValueState.value = birthValueState.value.copy(text = value)
-    }
-
-    fun setHypertensionValue(value: String) {
-        _hypertensionValueState.value = hypertensionValueState.value.copy(error = null)
-        _hypertensionValueState.value = hypertensionValueState.value.copy(text = value)
-    }
-
-    fun setSystolicValue(value: String) {
-        _systolicValueState.value = systolicValueState.value.copy(error = null)
-        _systolicValueState.value = systolicValueState.value.copy(text = value)
-    }
-
-    fun setDiastolicValue(value: String) {
-        _diastolicValueState.value = diastolicValueState.value.copy(error = null)
-        _diastolicValueState.value = diastolicValueState.value.copy(text = value)
-    }
-
-    fun setBloodlineValue(value: String) {
-        _bloodlineValueState.value = bloodlineValueState.value.copy(error = null)
-        _bloodlineValueState.value = bloodlineValueState.value.copy(text = value)
-    }
-
-    fun setCholesterolValue(value: String) {
-        _cholesterolValueState.value = cholesterolValueState.value.copy(error = null)
-        _cholesterolValueState.value = cholesterolValueState.value.copy(text = value)
-    }
-
     @SuppressLint("NewApi")
     fun handleSmoking() {
+        // Validate smoke value before processing
+        val smokeValueText = smokeValueState.value.text
+        val validationError = validateField("smoke", smokeValueText)
+        
+        if (validationError != null) {
+            _smokeValueState.value = smokeValueState.value.copy(error = validationError)
+            _errorMessage.value = validationError
+            return
+        }
+
         val smokingIdValue = smokingId.value
-        val smokeValue = smokeValueState.value.text.toIntOrNull() ?: 0
+        val smokeValue = smokeValueText.toIntOrNull() ?: 0
 
         if (smokingIdValue != null) {
             updateSmokingActivity(smokingIdValue, smokeValue)
@@ -241,8 +349,17 @@ class AddActivityViewModel @Inject constructor(
 
     @SuppressLint("NewApi")
     fun handleWorkout() {
+        val workoutValueText = workoutValueState.value.text
+        val validationError = validateField("workout", workoutValueText)
+        
+        if (validationError != null) {
+            _workoutValueState.value = workoutValueState.value.copy(error = validationError)
+            _errorMessage.value = validationError
+            return
+        }
+
         val workoutIdValue = workoutId.value
-        val workoutValue = workoutValueState.value.text.toIntOrNull() ?: 0
+        val workoutValue = if (workoutValueText.lowercase() == "true" || workoutValueText == "1") 1 else 0
 
         if (workoutIdValue != null) {
             updateWorkoutActivity(workoutIdValue, workoutValue)
@@ -350,6 +467,7 @@ class AddActivityViewModel @Inject constructor(
             val predictionResult = predictionUseCases.predict()
             when (predictionResult.result) {
                 is Resource.Success -> {
+                    _successMessage.value = "Data updated successfully"
                     Log.d("AddActivityViewModel", "Prediction updated successfully")
                 }
                 is Resource.Error -> {
@@ -366,6 +484,49 @@ class AddActivityViewModel @Inject constructor(
 
     fun updateProfile(type: String) {
         viewModelScope.launch {
+            val validationErrors = mutableListOf<String>()
+            
+            val weightError = validateField("weight", weightValueState.value.text)
+            if (weightError != null) {
+                _weightValueState.value = weightValueState.value.copy(error = weightError)
+                validationErrors.add("Berat badan: $weightError")
+            }
+            
+            val heightError = validateField("height", heightValueState.value.text)
+            if (heightError != null) {
+                _heightValueState.value = heightValueState.value.copy(error = heightError)
+                validationErrors.add("Tinggi badan: $heightError")
+            }
+            
+            val hypertensionError = validateField("hypertension", hypertensionValueState.value.text)
+            if (hypertensionError != null) {
+                _hypertensionValueState.value = hypertensionValueState.value.copy(error = hypertensionError)
+                validationErrors.add("Hipertensi: $hypertensionError")
+            }
+            
+            val birthError = validateField("birth", birthValueState.value.text)
+            if (birthError != null) {
+                _birthValueState.value = birthValueState.value.copy(error = birthError)
+                validationErrors.add("Bayi makrosomik: $birthError")
+            }
+            
+            val bloodlineError = validateField("bloodline", bloodlineValueState.value.text)
+            if (bloodlineError != null) {
+                _bloodlineValueState.value = bloodlineValueState.value.copy(error = bloodlineError)
+                validationErrors.add("Riwayat keluarga: $bloodlineError")
+            }
+            
+            val cholesterolError = validateField("cholesterol", cholesterolValueState.value.text)
+            if (cholesterolError != null) {
+                _cholesterolValueState.value = cholesterolValueState.value.copy(error = cholesterolError)
+                validationErrors.add("Kolesterol: $cholesterolError")
+            }
+            
+            if (validationErrors.isNotEmpty()) {
+                _errorMessage.value = "Harap perbaiki kesalahan berikut:\n${validationErrors.joinToString("\n")}"
+                return@launch
+            }
+
             _updateProfileState.value = updateProfileState.value.copy(isLoading = true)
 
             val weight = weightValueState.value.text
@@ -413,5 +574,37 @@ class AddActivityViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // Validation Helper Functions
+    fun isFieldValid(fieldType: String): Boolean {
+        val fieldState = when (fieldType) {
+            "smoke" -> smokeValueState.value
+            "workout" -> workoutValueState.value
+            "weight" -> weightValueState.value
+            "height" -> heightValueState.value
+            "birth" -> birthValueState.value
+            "hypertension" -> hypertensionValueState.value
+            "systolic" -> systolicValueState.value
+            "diastolic" -> diastolicValueState.value
+            "bloodline" -> bloodlineValueState.value
+            "cholesterol" -> cholesterolValueState.value
+            else -> return false
+        }
+        
+        return fieldState.error == null && fieldState.text.isNotBlank()
+    }
+
+    fun canUpdateBloodPressure(): Boolean {
+        return isFieldValid("systolic") && isFieldValid("diastolic")
+    }
+
+    // Helper Functions
+    fun onErrorShown() {
+        _errorMessage.value = null
+    }
+
+    fun onSuccessShown() {
+        _successMessage.value = null
     }
 }

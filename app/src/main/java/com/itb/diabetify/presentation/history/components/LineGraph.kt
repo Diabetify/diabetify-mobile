@@ -15,10 +15,8 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import java.util.Calendar
 
 data class PredictionScoreEntry(
     val day: Int,
@@ -27,7 +25,7 @@ data class PredictionScoreEntry(
 
 @Composable
 fun LineGraph(
-    currentDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
+    currentDay: Int? = null,
     predictionScores: List<PredictionScoreEntry> = emptyList(),
     modifier: Modifier = Modifier
 ) {
@@ -55,7 +53,7 @@ fun LineGraph(
 private fun setupChart(
     chart: LineChart,
     data: List<PredictionScoreEntry>,
-    currentDay: Int
+    currentDay: Int?
 ) {
     val entries = data.map { entry ->
         Entry(entry.day.toFloat(), entry.score)
@@ -73,8 +71,16 @@ private fun setupChart(
         fillAlpha = 30
     }
 
-    val currentDayEntry = data.find { it.day == currentDay }?.let { entry ->
-        Entry(entry.day.toFloat(), entry.score)
+    val dayToHighlight = when {
+        currentDay != null && data.any { it.day == currentDay } -> currentDay
+        data.isNotEmpty() -> data.maxByOrNull { it.day }?.day
+        else -> null
+    }
+
+    val currentDayEntry = dayToHighlight?.let { day ->
+        data.find { it.day == day }?.let { entry ->
+            Entry(entry.day.toFloat(), entry.score)
+        }
     }
 
     if (currentDayEntry != null) {
@@ -108,13 +114,7 @@ private fun setupChart(
             granularity = 1f
             axisMinimum = if (data.isNotEmpty()) data.minOf { it.day }.toFloat() else 1f
             axisMaximum = if (data.isNotEmpty()) data.maxOf { it.day }.toFloat() else 30f
-            textSize = 12f
-            textColor = Color.Gray.toArgb()
-            valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return "Day ${value.toInt()}"
-                }
-            }
+            setDrawLabels(false)
         }
 
         axisLeft.apply {

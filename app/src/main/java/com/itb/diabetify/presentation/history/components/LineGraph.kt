@@ -20,13 +20,14 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 data class PredictionScoreEntry(
     val day: Int,
-    val score: Float
+    val score: Float,
+    val date: String
 )
 
 @Composable
 fun LineGraph(
-    currentDay: Int? = null,
     predictionScores: List<PredictionScoreEntry> = emptyList(),
+    selectedDate: String = "",
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -37,14 +38,14 @@ fun LineGraph(
         AndroidView(
             factory = { context ->
                 LineChart(context).apply {
-                    setupChart(this, predictionScores, currentDay)
+                    setupChart(this, predictionScores, selectedDate)
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp),
             update = { chart ->
-                setupChart(chart, predictionScores, currentDay)
+                setupChart(chart, predictionScores, selectedDate)
             }
         )
     }
@@ -53,9 +54,15 @@ fun LineGraph(
 private fun setupChart(
     chart: LineChart,
     data: List<PredictionScoreEntry>,
-    currentDay: Int?
+    selectedDate: String
 ) {
-    val entries = data.map { entry ->
+    val sortedData = data.sortedBy { it.date }
+
+    val processedData = sortedData.mapIndexed { index, entry ->
+        entry.copy(day = index + 1)
+    }
+
+    val entries = processedData.map { entry ->
         Entry(entry.day.toFloat(), entry.score)
     }
 
@@ -71,20 +78,11 @@ private fun setupChart(
         fillAlpha = 30
     }
 
-    val dayToHighlight = when {
-        currentDay != null && data.any { it.day == currentDay } -> currentDay
-        data.isNotEmpty() -> data.maxByOrNull { it.day }?.day
-        else -> null
-    }
+    val entryToHighlight = processedData.find { it.date == selectedDate }
 
-    val currentDayEntry = dayToHighlight?.let { day ->
-        data.find { it.day == day }?.let { entry ->
-            Entry(entry.day.toFloat(), entry.score)
-        }
-    }
-
-    if (currentDayEntry != null) {
-        val highlightDataSet = LineDataSet(listOf(currentDayEntry), "Current Day").apply {
+    if (entryToHighlight != null) {
+        val highlightEntry = Entry(entryToHighlight.day.toFloat(), entryToHighlight.score)
+        val highlightDataSet = LineDataSet(listOf(highlightEntry), "Selected Day").apply {
             color = Color(0xFFFF5722).toArgb()
             setCircleColor(Color(0xFFFF5722).toArgb())
             circleRadius = 8f
@@ -112,8 +110,8 @@ private fun setupChart(
             position = XAxis.XAxisPosition.BOTTOM
             setDrawGridLines(true)
             granularity = 1f
-            axisMinimum = if (data.isNotEmpty()) data.minOf { it.day }.toFloat() else 1f
-            axisMaximum = if (data.isNotEmpty()) data.maxOf { it.day }.toFloat() else 30f
+            axisMinimum = if (processedData.isNotEmpty()) processedData.minOf { it.day }.toFloat() else 1f
+            axisMaximum = if (processedData.isNotEmpty()) processedData.maxOf { it.day }.toFloat() else 30f
             setDrawLabels(false)
         }
 

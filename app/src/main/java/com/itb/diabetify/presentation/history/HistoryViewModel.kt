@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -90,7 +92,7 @@ class HistoryViewModel @Inject constructor(
             when (getPredictionResult.result) {
                 is Resource.Success -> {
                     val prediction = getPredictionResult.result.data?.data?.firstOrNull()
-                    
+
                     _currentPrediction.value = prediction
                     Log.d("HistoryViewModel", "Prediction loaded successfully for date: $date")
                 }
@@ -115,10 +117,10 @@ class HistoryViewModel @Inject constructor(
 
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val selectedDate = LocalDate.parse(_dateState.value ?: LocalDate.now().format(formatter))
-            
+
             val startDate = selectedDate.minusDays(15).format(formatter)
             val endDate = selectedDate.plusDays(15).format(formatter)
-            
+
             val getPredictionScoreByDateResult = predictionUseCases.getPredictionScoreByDate(
                 startDate = startDate,
                 endDate = endDate
@@ -129,12 +131,16 @@ class HistoryViewModel @Inject constructor(
             when (getPredictionScoreByDateResult.result) {
                 is Resource.Success -> {
                     val scores = if (getPredictionScoreByDateResult.result.data?.data != null) {
-                        getPredictionScoreByDateResult.result.data.data.mapIndexed { index, scoreData ->
-                            PredictionScoreEntry(
-                                day = index + 1,
-                                score = (scoreData?.riskScore?.toFloat() ?: 0f) * 100f
-                            )
-                        }
+                        getPredictionScoreByDateResult.result.data.data.mapIndexedNotNull { index, scoreData ->
+                            scoreData?.let {
+                                val localDate = convertUtcToLocalDate(it.createdAt)
+                                PredictionScoreEntry(
+                                    day = index + 1,
+                                    score = (it.riskScore.toFloat()) * 100f,
+                                    date = localDate
+                                )
+                            }
+                        }.sortedBy { it.date }
                     } else {
                         Log.d("HistoryViewModel", "No prediction scores data available")
                         emptyList()
@@ -153,6 +159,28 @@ class HistoryViewModel @Inject constructor(
                     _errorMessage.value = "Unknown error occurred"
                     Log.d("HistoryViewModel", "Unexpected error")
                 }
+            }
+        }
+    }
+
+    private fun convertUtcToLocalDate(timestamp: String): String {
+        return try {
+            val zonedDateTime = ZonedDateTime.parse(timestamp.replace(" ", "T"))
+
+            val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault())
+
+            localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        } catch (e: Exception) {
+            Log.e("HistoryViewModel", "Error parsing timestamp: $timestamp", e)
+
+            try {
+                val isoFormatted = timestamp.replace(" ", "T")
+                val zonedDateTime = ZonedDateTime.parse(isoFormatted)
+                val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault())
+                localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            } catch (e2: Exception) {
+                Log.e("HistoryViewModel", "Fallback parsing also failed for: $timestamp", e2)
+                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             }
         }
     }

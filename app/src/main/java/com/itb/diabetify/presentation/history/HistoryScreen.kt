@@ -34,7 +34,6 @@ import com.itb.diabetify.presentation.history.components.DailySummary
 import com.itb.diabetify.presentation.history.components.DailySummaryData
 import com.itb.diabetify.presentation.history.components.RiskFactorContribution
 import com.itb.diabetify.presentation.history.components.DailyInput
-import com.itb.diabetify.presentation.history.components.PredictionScoreEntry
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -98,11 +97,8 @@ fun HistoryScreen(
             )
 
             LineGraph(
-                currentDay = calculateCurrentDayForGraph(
-                    selectedDate = viewModel.dateState.value,
-                    predictionScores = predictionScores.value
-                ),
-                predictionScores = predictionScores.value
+                predictionScores = predictionScores.value,
+                selectedDate = viewModel.dateState.value
             )
 
             if (isLoading) {
@@ -276,37 +272,5 @@ fun HistoryScreen(
                 .align(Alignment.TopCenter)
                 .zIndex(1000f)
         )
-    }
-}
-
-@SuppressLint("NewApi")
-private fun calculateCurrentDayForGraph(
-    selectedDate: String,
-    predictionScores: List<PredictionScoreEntry>
-): Int? {
-    return when {
-        predictionScores.isEmpty() -> null
-
-        selectedDate.isEmpty() -> predictionScores.maxByOrNull { it.day }?.day
-
-        selectedDate.isNotEmpty() -> {
-            try {
-                val selected = LocalDate.parse(selectedDate)
-                val today = LocalDate.now()
-
-                val daysDifference = java.time.temporal.ChronoUnit.DAYS.between(selected, today).toInt()
-                val targetDay = predictionScores.maxByOrNull { it.day }?.day?.minus(daysDifference)
-
-                if (targetDay != null && predictionScores.any { it.day == targetDay }) {
-                    targetDay
-                } else {
-                    predictionScores.maxByOrNull { it.day }?.day
-                }
-            } catch (e: Exception) {
-                predictionScores.maxByOrNull { it.day }?.day
-            }
-        }
-
-        else -> null
     }
 }

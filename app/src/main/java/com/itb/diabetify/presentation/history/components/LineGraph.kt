@@ -1,14 +1,21 @@
 package com.itb.diabetify.presentation.history.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -17,6 +24,8 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.itb.diabetify.R
+import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 data class PredictionScoreEntry(
     val day: Int,
@@ -35,19 +44,38 @@ fun LineGraph(
             .fillMaxWidth()
             .padding(top = 26.dp)
     ) {
-        AndroidView(
-            factory = { context ->
-                LineChart(context).apply {
-                    setupChart(this, predictionScores, selectedDate)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            update = { chart ->
-                setupChart(chart, predictionScores, selectedDate)
+        if (predictionScores.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Tidak ada data skor prediksi dalam rentang 15 hari",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = colorResource(id = R.color.black),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
-        )
+        } else {
+            AndroidView(
+                factory = { context ->
+                    LineChart(context).apply {
+                        setupChart(this, predictionScores, selectedDate)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                update = { chart ->
+                    setupChart(chart, predictionScores, selectedDate)
+                }
+            )
+        }
     }
 }
 

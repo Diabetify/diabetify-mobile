@@ -32,7 +32,7 @@ fun LineGraph(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(top = 26.dp)
     ) {
         AndroidView(
             factory = { context ->

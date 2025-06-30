@@ -156,4 +156,8 @@ class HistoryViewModel @Inject constructor(
             }
         }
     }
+
+    fun onErrorShown() {
+        _errorMessage.value = null
+    }
 }

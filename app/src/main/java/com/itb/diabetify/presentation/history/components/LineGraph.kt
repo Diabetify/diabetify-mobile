@@ -155,11 +155,9 @@ private fun setupChart(
 
         setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
-                // Handle point selection if needed
             }
 
             override fun onNothingSelected() {
-                // Handle deselection if needed
             }
         })
 

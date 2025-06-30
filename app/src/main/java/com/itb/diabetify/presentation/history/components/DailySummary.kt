@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -84,6 +82,7 @@ fun DailySummary(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun RiskPercentageCard(
     riskPercentage: Float,
@@ -148,10 +147,10 @@ private fun RiskPercentageCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     color = when {
-                        riskPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
-                        riskPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
-                        riskPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
-                        else -> Color(0xFFF44336) // Very high risk - Red
+                        riskPercentage <= 35f -> Color(0xFF8BC34A)
+                        riskPercentage <= 55f -> Color(0xFFFFC107)
+                        riskPercentage <= 70f -> Color(0xFFFA821F)
+                        else -> Color(0xFFF44336)
                     }
                 )
                 Text(
@@ -165,10 +164,10 @@ private fun RiskPercentageCard(
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
                     color = when {
-                        riskPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
-                        riskPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
-                        riskPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
-                        else -> Color(0xFFF44336) // Very high risk - Red
+                        riskPercentage <= 35f -> Color(0xFF8BC34A)
+                        riskPercentage <= 55f -> Color(0xFFFFC107)
+                        riskPercentage <= 70f -> Color(0xFFFA821F)
+                        else -> Color(0xFFF44336)
                     }
                 )
             }

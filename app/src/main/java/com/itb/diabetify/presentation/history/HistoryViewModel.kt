@@ -27,57 +27,43 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
+    // Navigation and Error States
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    // Operational States
     private var _getPredictionByDateState = mutableStateOf(DataState())
     val getPredictionByDateState: State<DataState> = _getPredictionByDateState
 
     private var _getPredictionScoreByDateState = mutableStateOf(DataState())
     val getPredictionScoreByDateState: State<DataState> = _getPredictionScoreByDateState
 
-    private val _selectedDate = mutableStateOf("")
-    val selectedDate: State<String> = _selectedDate
-
-    private val _predictionData = mutableStateOf(emptyList<List<Float>>())
-    val predictionData: State<List<List<Float>>> = _predictionData
-
-    private val _predictionScore = mutableStateOf(0.0f)
-    val predictionScore: State<Float> = _predictionScore
-
-    private val _predictionPercent = mutableStateOf("0.0")
-    val predictionPercent: State<String> = _predictionPercent
-
-    private val _riskLevel = mutableStateOf("Rendah")
-    val riskLevel: State<String> = _riskLevel
-
-    private val _lastPredictionAt = mutableStateOf("")
-    val lastPredictionAt: State<String> = _lastPredictionAt
-
-    private val _riskColor = mutableStateOf(androidx.compose.ui.graphics.Color.Green)
-
+    // UI States
     private val _predictionScores = MutableStateFlow<List<PredictionScoreEntry>>(emptyList())
     val predictionScores: StateFlow<List<PredictionScoreEntry>> = _predictionScores
 
     private val _currentPrediction = MutableStateFlow<PredictionData?>(null)
     val currentPrediction: StateFlow<PredictionData?> = _currentPrediction
 
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
-
     private val _dateState = mutableStateOf(
         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     )
     val dateState: State<String> = _dateState
 
+    // Initialization
     init {
         loadPredictionScores()
         loadPredictionForDate(_dateState.value)
     }
 
+    // Setters for UI States
     fun setDate(date: String) {
         _dateState.value = date
         loadPredictionScores()
         loadPredictionForDate(date)
     }
 
+    // Use Case Calls
     private fun loadPredictionForDate(date: String) {
         viewModelScope.launch {
             _getPredictionByDateState.value = getPredictionByDateState.value.copy(isLoading = true)
@@ -185,6 +171,7 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
+    // Helper Functions
     fun onErrorShown() {
         _errorMessage.value = null
     }

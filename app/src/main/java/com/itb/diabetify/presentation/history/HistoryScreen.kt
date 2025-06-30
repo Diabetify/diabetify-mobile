@@ -43,6 +43,7 @@ import java.time.format.DateTimeFormatter
 fun HistoryScreen(
     viewModel: HistoryViewModel
 ) {
+    // States
     val predictionScores = viewModel.predictionScores.collectAsState(initial = emptyList())
     val currentPrediction = viewModel.currentPrediction.collectAsState(initial = null)
     val errorMessage = viewModel.errorMessage.value
@@ -96,11 +97,6 @@ fun HistoryScreen(
                 },
             )
 
-            LineGraph(
-                predictionScores = predictionScores.value,
-                selectedDate = viewModel.dateState.value
-            )
-
             if (isLoading) {
                 Box(
                     modifier = Modifier
@@ -126,6 +122,11 @@ fun HistoryScreen(
                     }
                 }
             } else if (currentPrediction.value == null) {
+                LineGraph(
+                    predictionScores = predictionScores.value,
+                    selectedDate = viewModel.dateState.value
+                )
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -161,6 +162,11 @@ fun HistoryScreen(
                     }
                 }
             } else {
+                LineGraph(
+                    predictionScores = predictionScores.value,
+                    selectedDate = viewModel.dateState.value
+                )
+
                 currentPrediction.value?.let { prediction ->
                     DailySummary(
                         summaryData = DailySummaryData(

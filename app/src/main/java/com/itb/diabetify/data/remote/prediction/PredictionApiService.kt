@@ -1,8 +1,11 @@
 package com.itb.diabetify.data.remote.prediction
 
+import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionResponse
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
 import com.itb.diabetify.data.remote.prediction.response.PredictionResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfPredictionResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -30,4 +33,9 @@ interface PredictionApiService {
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String
     ): GetPredictionScoreResponse
+
+    @POST("prediction/what-if")
+    suspend fun whatIfPrediction(
+        @Body whatIfRequest: WhatIfPredictionRequest
+    ): WhatIfPredictionResponse
 }

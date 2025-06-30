@@ -5,4 +5,5 @@ data class PredictionUseCases(
     val getPredictionByDate: GetPredictionByDateUseCase,
     val getPredictionScoreByDate: GetPredictionScoreByDateUseCase,
     val predict: PredictUseCase,
+    val whatIfPrediction: WhatIfPredictionUseCase
 )

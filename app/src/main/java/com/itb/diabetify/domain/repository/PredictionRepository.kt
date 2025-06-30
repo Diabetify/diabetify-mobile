@@ -1,7 +1,9 @@
 package com.itb.diabetify.domain.repository
 
+import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionResponse
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfPredictionResponse
 import com.itb.diabetify.domain.model.Prediction
 import com.itb.diabetify.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -13,5 +15,6 @@ interface PredictionRepository {
     suspend fun fetchLatestPrediction(): Resource<Unit>
     suspend fun fetchPredictionByDate(startDate: String, endDate: String): Resource<GetPredictionResponse>
     suspend fun fetchPredictionScoreByDate(startDate: String, endDate: String): Resource<GetPredictionScoreResponse>
+    suspend fun whatIfPrediction(whatIfRequest: WhatIfPredictionRequest): Resource<WhatIfPredictionResponse>
     fun getLatestPrediction(): Flow<Prediction?>
 }

@@ -1,8 +1,10 @@
 package com.itb.diabetify.data.repository
 
 import com.itb.diabetify.data.remote.prediction.PredictionApiService
+import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionResponse
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfPredictionResponse
 import com.itb.diabetify.domain.manager.PredictionManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.model.Prediction
@@ -171,6 +173,17 @@ class PredictionRepositoryImpl (
     ): Resource<GetPredictionScoreResponse> {
         return try {
             val response = predictionApiService.getPredictionScoreByDate(startDate, endDate)
+            Resource.Success(response)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun whatIfPrediction(whatIfRequest: WhatIfPredictionRequest): Resource<WhatIfPredictionResponse> {
+        return try {
+            val response = predictionApiService.whatIfPrediction(whatIfRequest)
             Resource.Success(response)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

@@ -52,12 +52,12 @@ fun WhatIfScreen(
     val macrosomicBaby = viewModel.macrosomicBaby.value
     val yearsSmoking = viewModel.yearsSmoking.value
     val isBloodline = viewModel.isBloodline.value
-    val smokingStatus = viewModel.smokingStatus.value
-    val averageCigarettes = viewModel.averageCigarettes.value
-    val weight = viewModel.weight.value
-    val isHypertension = viewModel.isHypertension.value
-    val physicalActivityFrequency = viewModel.physicalActivityFrequency.value
-    val isCholesterol = viewModel.isCholesterol.value
+    val smokingStatus = viewModel.smokingStatusFieldState.value
+    val averageCigarettes = viewModel.averageCigarettesFieldState.value
+    val weight = viewModel.weightFieldState.value
+    val isHypertension = viewModel.isHypertensionFieldState.value
+    val physicalActivityFrequency = viewModel.physicalActivityFieldState.value
+    val isCholesterol = viewModel.isCholesterolFieldState.value
 
     val isLoading = viewModel.whatIfPredictionState.value.isLoading
 
@@ -166,7 +166,7 @@ fun WhatIfScreen(
                 value = age.toString(),
                 onValueChange = { },
                 placeholderText = "Usia",
-                iconResId = R.drawable.ic_baby,
+                iconResId = R.drawable.ic_profile,
                 enabled = false,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -261,20 +261,20 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = when (smokingStatus) {
-                    0 -> "Tidak Pernah Merokok"
-                    1 -> "Berhenti Merokok"
-                    2 -> "Aktif Merokok"
+                selectedOption = when (smokingStatus.text) {
+                    "0" -> "Tidak Pernah Merokok"
+                    "1" -> "Berhenti Merokok"
+                    "2" -> "Aktif Merokok"
                     else -> "Tidak Pernah Merokok"
                 },
                 onOptionSelected = { selectedText ->
                     val status = when (selectedText) {
-                        "Tidak Pernah Merokok" -> 0
-                        "Berhenti Merokok" -> 1
-                        "Aktif Merokok" -> 2
-                        else -> 0
+                        "Tidak Pernah Merokok" -> "0"
+                        "Berhenti Merokok" -> "1"
+                        "Aktif Merokok" -> "2"
+                        else -> "0"
                     }
-//                    viewModel.updateSmokingStatus(status)
+                    viewModel.setSmokingStatus(status)
                 },
                 options = listOf(
                     "Tidak Pernah Merokok",
@@ -289,7 +289,7 @@ fun WhatIfScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Average cigarettes
-            if (smokingStatus > 0) {
+            if (smokingStatus.text.toInt() > 0) {
                 Text(
                     text = "Rata-rata rokok per hari",
                     fontFamily = poppinsFontFamily,
@@ -298,8 +298,8 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 InputField(
-                    value = averageCigarettes.toString(),
-                    onValueChange = { },
+                    value = averageCigarettes.text,
+                    onValueChange = { viewModel.setAverageCigarettes(it) },
                     placeholderText = "Rata-rata rokok per hari",
                     iconResId = R.drawable.ic_smoking,
                     keyboardType = KeyboardType.Number,
@@ -318,8 +318,8 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = weight.toString(),
-                onValueChange = { },
+                value = weight.text,
+                onValueChange = { viewModel.setWeight(it) },
                 placeholderText = "Berat badan (kg)",
                 iconResId = R.drawable.ic_weight,
                 keyboardType = KeyboardType.Decimal,
@@ -337,9 +337,9 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = if (isHypertension) "Ya" else "Tidak",
+                selectedOption = if (isHypertension.text == "true") "Ya" else "Tidak",
                 onOptionSelected = { selectedText ->
-//                    viewModel.updateHypertension(selectedText == "Ya")
+                    viewModel.setIsHypertension((selectedText == "Ya").toString())
                 },
                 options = listOf("Tidak", "Ya"),
                 placeHolderText = "Hipertensi",
@@ -358,8 +358,8 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = physicalActivityFrequency.toString(),
-                onValueChange = { },
+                value = physicalActivityFrequency.text,
+                onValueChange = { viewModel.setPhysicalActivity(it) },
                 placeholderText = "Aktivitas fisik per minggu (hari)",
                 iconResId = R.drawable.ic_walk,
                 keyboardType = KeyboardType.Number,
@@ -377,9 +377,9 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = if (isCholesterol) "Ya" else "Tidak",
+                selectedOption = if (isCholesterol.text == "true") "Ya" else "Tidak",
                 onOptionSelected = { selectedText ->
-//                    viewModel.updateCholesterol(selectedText == "Ya")
+                    viewModel.setIsCholesterol((selectedText == "Ya").toString())
                 },
                 options = listOf("Tidak", "Ya"),
                 placeHolderText = "Kolesterol",
@@ -396,7 +396,7 @@ fun WhatIfScreen(
             ) {
                 CustomizableButton(
                     text = "Reset",
-                    onClick = { },
+                    onClick = { viewModel.resetFields() },
                     backgroundColor = Color.Gray,
                     modifier = Modifier
                         .weight(1f)

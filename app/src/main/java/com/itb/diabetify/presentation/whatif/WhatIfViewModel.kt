@@ -55,24 +55,6 @@ class WhatIfViewModel @Inject constructor(
     private val _isBloodline = mutableStateOf(false)
     val isBloodline: State<Boolean> = _isBloodline
 
-    private val _smokingStatus = mutableIntStateOf(0) // 0=never, 1=quit, 2=active
-    val smokingStatus: State<Int> = _smokingStatus
-
-    private val _averageCigarettes = mutableIntStateOf(0)
-    val averageCigarettes: State<Int> = _averageCigarettes
-
-    private val _weight = mutableIntStateOf(0)
-    val weight: State<Int> = _weight
-
-    private val _isHypertension = mutableStateOf(false)
-    val isHypertension: State<Boolean> = _isHypertension
-
-    private val _physicalActivityFrequency = mutableIntStateOf(0)
-    val physicalActivityFrequency: State<Int> = _physicalActivityFrequency
-
-    private val _isCholesterol = mutableStateOf(false)
-    val isCholesterol: State<Boolean> = _isCholesterol
-
     private val _smokingStatusFieldState = mutableStateOf(FieldState())
     val smokingStatusFieldState: State<FieldState> = _smokingStatusFieldState
 
@@ -91,11 +73,44 @@ class WhatIfViewModel @Inject constructor(
     private val _isCholesterolFieldState = mutableStateOf(FieldState())
     val isCholesterolFieldState: State<FieldState> = _isCholesterolFieldState
 
+    // Initialization
     init {
         collectLatestPrediction()
         collectProfileData()
     }
 
+    // Setters for Field States
+    fun setSmokingStatus(value: String) {
+        _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = null)
+        _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(text = value)
+    }
+
+    fun setAverageCigarettes(value: String) {
+        _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(error = null)
+        _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(text = value)
+    }
+
+    fun setWeight(value: String) {
+        _weightFieldState.value = weightFieldState.value.copy(error = null)
+        _weightFieldState.value = weightFieldState.value.copy(text = value)
+    }
+
+    fun setIsHypertension(value: String) {
+        _isHypertensionFieldState.value = isHypertensionFieldState.value.copy(error = null)
+        _isHypertensionFieldState.value = isHypertensionFieldState.value.copy(text = value)
+    }
+
+    fun setPhysicalActivity(value: String) {
+        _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(error = null)
+        _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(text = value)
+    }
+
+    fun setIsCholesterol(value: String) {
+        _isCholesterolFieldState.value = isCholesterolFieldState.value.copy(error = null)
+        _isCholesterolFieldState.value = isCholesterolFieldState.value.copy(text = value)
+    }
+
+    // Use Case Calls
     private fun collectLatestPrediction() {
         viewModelScope.launch {
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
@@ -105,11 +120,16 @@ class WhatIfViewModel @Inject constructor(
 
                 prediction?.let {
                     _age.intValue = it.age?.toInt() ?: 0
-                    _averageCigarettes.intValue = it.avgSmokeCount?.toInt() ?: 0
-                    _physicalActivityFrequency.intValue = it.physicalActivityFrequency?.toInt() ?: 0
-                }
 
-                Log.d("WhatIfViewModel", "Latest Prediction: ${prediction?.isMacrosomicBaby}")
+                    _averageCigarettesFieldState.value = FieldState(
+                        text = it.avgSmokeCount ?: "0",
+                        error = null
+                    )
+                    _physicalActivityFieldState.value = FieldState(
+                        text = it.physicalActivityFrequency ?: "0",
+                        error = null
+                    )
+                }
             }.launchIn(viewModelScope)
         }
     }
@@ -122,19 +142,90 @@ class WhatIfViewModel @Inject constructor(
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let {
-                    _macrosomicBaby.intValue = it.macrosomicBaby?.toInt() ?: 0
-                    _isBloodline.value = it.bloodline ?: false
-                    _smokingStatus.intValue = it.smoking?.toInt() ?: 0
+                    _macrosomicBaby.intValue = it.macrosomicBaby ?: 0
                     _yearsSmoking.intValue = it.yearOfSmoking?.toInt() ?: 0
-                    _weight.intValue = it.weight?.toInt() ?: 0
-                    _isHypertension.value = it.hypertension ?: false
-                    _isCholesterol.value = it.cholesterol ?: false
+                    _isBloodline.value = it.bloodline ?: false
+
+                    _smokingStatusFieldState.value = FieldState(
+                        text = it.smoking?.toString() ?: "0",
+                        error = null
+                    )
+                    _weightFieldState.value = FieldState(
+                        text = it.weight ?: "0",
+                        error = null
+                    )
+                    _isHypertensionFieldState.value = FieldState(
+                        text = it.hypertension?.toString() ?: "false",
+                        error = null
+                    )
+                    _isCholesterolFieldState.value = FieldState(
+                        text = it.cholesterol?.toString() ?: "false",
+                        error = null
+                    )
                 }
             }.launchIn(viewModelScope)
         }
     }
 
     fun calculateWhatIfPrediction() {
+        viewModelScope.launch {
+            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
+
+            val smokingStatus = smokingStatusFieldState.value.text.toIntOrNull()
+            val averageCigarettes = averageCigarettesFieldState.value.text.toIntOrNull()
+            val weight = weightFieldState.value.text.toIntOrNull()
+            val isHypertension = isHypertensionFieldState.value.text.toBooleanStrictOrNull()
+            val physicalActivity = physicalActivityFieldState.value.text.toIntOrNull()
+            val isCholesterol = isCholesterolFieldState.value.text.toBooleanStrictOrNull()
+
+            val whatIfPredictionResult = predictionUseCases.whatIfPrediction(
+                smokingStatus = smokingStatus ?: 0,
+                avgSmokeCount = averageCigarettes ?: 0,
+                weight = weight ?: 0,
+                isHypertension = isHypertension ?: false,
+                physicalActivityFrequency = physicalActivity ?: 0,
+                isCholesterol = isCholesterol ?: false
+            )
+
+            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+
+            if (whatIfPredictionResult.smokingStatusError != null) {
+                _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = whatIfPredictionResult.smokingStatusError)
+            }
+
+            if (whatIfPredictionResult.avgSmokeCountError != null) {
+                _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(error = whatIfPredictionResult.avgSmokeCountError)
+            }
+
+            if (whatIfPredictionResult.weightError != null) {
+                _weightFieldState.value = weightFieldState.value.copy(error = whatIfPredictionResult.weightError)
+            }
+
+            if (whatIfPredictionResult.physicalActivityFrequencyError != null) {
+                _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(error = whatIfPredictionResult.physicalActivityFrequencyError)
+            }
+
+            when (whatIfPredictionResult.result) {
+                is Resource.Success -> {
+                    Log.d("WhatIfViewModel", "WhatIf Prediction Success: ${whatIfPredictionResult.result.data?.data?.riskPercentage}")
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = whatIfPredictionResult.result.message ?: "An error occurred"
+                    whatIfPredictionResult.result.message?.let { Log.e("WhatIfViewModel", it) }
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Unknown error occurred"
+                    Log.e("WhatIfViewModel", "Unknown error occurred")
+                }
+            }
+        }
+    }
+
+    fun resetFields() {
+        collectLatestPrediction()
+        collectProfileData()
     }
 
     fun onNavigationHandled() {

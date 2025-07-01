@@ -16,8 +16,6 @@ data class WhatIfData(
     val featureExplanations: Map<String, FeatureExplanation>,
     @SerializedName("risk_percentage")
     val riskPercentage: Double,
-    @SerializedName("risk_score")
-    val riskScore: Double,
 )
 
 data class FeatureExplanation(

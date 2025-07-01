@@ -11,6 +11,8 @@ data class WhatIfPredictionRequest (
     val weight: Int,
     @SerializedName("is_hypertension")
     val isHypertension: Boolean,
+    @SerializedName("physical_activity_frequency")
+    val physicalActivityFrequency: Int,
     @SerializedName("is_cholesterol")
     val isCholesterol: Boolean,
 )

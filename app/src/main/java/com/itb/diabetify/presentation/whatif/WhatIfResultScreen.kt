@@ -42,9 +42,9 @@ fun WhatIfResultScreen(
     viewModel: WhatIfViewModel
 ) {
     val scrollState = rememberScrollState()
-    val state = viewModel.state.value
+//    val state = viewModel.state.value
     
-    val predictionPercentage = ((state.predictionResult ?: 0f) * 100).toInt()
+    val predictionPercentage = viewModel.predictionResult.value?.let { (it * 100).toInt() } ?: 0
 
     Column(
         modifier = Modifier
@@ -132,18 +132,18 @@ fun WhatIfResultScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val riskFactors = getRiskFactorsFromState(state)
+//                    val riskFactors = getRiskFactorsFromState(state)
                     
-                    BarChartV2(
-                        entries = riskFactors.map { riskFactor ->
-                            BarChartEntry(
-                                label = riskFactor.name,
-                                abbreviation = riskFactor.abbreviation,
-                                value = riskFactor.percentage,
-                                isNegative = riskFactor.percentage < 0
-                            )
-                        }
-                    )
+//                    BarChartV2(
+//                        entries = riskFactors.map { riskFactor ->
+//                            BarChartEntry(
+//                                label = riskFactor.name,
+//                                abbreviation = riskFactor.abbreviation,
+//                                value = riskFactor.percentage,
+//                                isNegative = riskFactor.percentage < 0
+//                            )
+//                        }
+//                    )
                 }
             }
 
@@ -171,8 +171,8 @@ fun WhatIfResultScreen(
                     PrimaryButton(
                         text = "Beranda",
                         onClick = { viewModel.calculateWhatIfPrediction() },
-                        enabled = !state.isLoading,
-                        isLoading = state.isLoading,
+//                        enabled = !state.isLoading,
+//                        isLoading = state.isLoading,
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp)
@@ -184,100 +184,3 @@ fun WhatIfResultScreen(
         }
     }
 }
-
-data class RiskFactor(
-    val name: String,
-    val abbreviation: String,
-    val percentage: Float
-)
-
-private fun getRiskFactorsFromState(state: WhatIfState): List<RiskFactor> {
-    val factors = mutableListOf<RiskFactor>()
-    
-    // Age factor
-    if (state.age > 45) {
-        factors.add(RiskFactor("Usia", "U", 15f))
-    }
-    
-    // Weight/BMI factor
-    val weightValue = state.weight.toFloatOrNull() ?: 0f
-    if (weightValue > 25) {
-        factors.add(RiskFactor("Berat Badan", "BB", if (weightValue > 30) 25f else 15f))
-    }
-    
-    // Smoking factor
-    when (state.smokingStatus) {
-        1 -> factors.add(RiskFactor("Bekas Perokok", "BP", 8f))
-        2 -> factors.add(RiskFactor("Perokok Aktif", "PA", 18f))
-    }
-    
-    // Hypertension factor
-    if (state.isHypertension) {
-        factors.add(RiskFactor("Hipertensi", "H", 12f))
-    }
-    
-    // Cholesterol factor
-    if (state.isCholesterol) {
-        factors.add(RiskFactor("Kolesterol", "K", 10f))
-    }
-    
-    // Physical activity factor (protective)
-    val physicalActivityValue = state.physicalActivityFrequency.toFloatOrNull() ?: 0f
-    if (physicalActivityValue >= 3) {
-        factors.add(RiskFactor("Aktivitas Fisik", "AF", -8f))
-    }
-    
-    // Bloodline factor
-    if (state.isBloodline) {
-        factors.add(RiskFactor("Riwayat Keluarga", "RK", 14f))
-    }
-    
-    // Macrosomic baby factor
-    if (state.isMacrosomicBaby == 1) {
-        factors.add(RiskFactor("Bayi Makrosomik", "BM", 10f))
-    }
-    
-    return factors
-}
-
-private fun getSimulationSummary(state: WhatIfState): String {
-    val riskLevel = when {
-        ((state.predictionResult ?: 0f) * 100).toInt() <= 30 -> "rendah"
-        ((state.predictionResult ?: 0f) * 100).toInt() <= 50 -> "sedang"
-        ((state.predictionResult ?: 0f) * 100).toInt() <= 65 -> "tinggi"
-        else -> "sangat tinggi"
-    }
-    
-    val suggestions = mutableListOf<String>()
-    
-    if (state.smokingStatus == 2) {
-        suggestions.add("berhenti merokok")
-    }
-    
-    val physicalActivityValue = state.physicalActivityFrequency.toFloatOrNull() ?: 0f
-    if (physicalActivityValue < 3) {
-        suggestions.add("meningkatkan aktivitas fisik")
-    }
-    
-    val weightValue = state.weight.toFloatOrNull() ?: 0f
-    if (weightValue > 25) {
-        suggestions.add("menurunkan berat badan")
-    }
-    
-    if (state.isHypertension) {
-        suggestions.add("mengontrol tekanan darah")
-    }
-    
-    if (state.isCholesterol) {
-        suggestions.add("mengontrol kolesterol")
-    }
-    
-    val baseText = "Berdasarkan simulasi, risiko diabetes Anda tergolong $riskLevel dengan persentase ${((state.predictionResult ?: 0f) * 100).toInt()}%."
-    
-    return if (suggestions.isNotEmpty()) {
-        val suggestionText = suggestions.joinToString(", ")
-        "$baseText\n\nUntuk menurunkan risiko, disarankan untuk $suggestionText."
-    } else {
-        "$baseText\n\nPertahankan gaya hidup sehat Anda saat ini!"
-    }
-} 

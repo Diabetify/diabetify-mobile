@@ -67,6 +67,7 @@ import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
 import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.activity.GetActivityRepositoryUseCase
+import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionRepositoryUseCase
 import com.itb.diabetify.domain.usecases.prediction.WhatIfPredictionUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileRepositoryUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
@@ -294,6 +295,7 @@ object AppModule {
         repository: PredictionRepository,
     ): PredictionUseCases {
         return PredictionUseCases(
+            getLatestPredictionRepository = GetLatestPredictionRepositoryUseCase(repository),
             getLatestPrediction = GetLatestPredictionUseCase(repository),
             getPredictionByDate = GetPredictionByDateUseCase(repository),
             getPredictionScoreByDate = GetPredictionScoreByDateUseCase(repository),

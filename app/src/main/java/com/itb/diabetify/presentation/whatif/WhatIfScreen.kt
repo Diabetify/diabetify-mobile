@@ -48,8 +48,20 @@ fun WhatIfScreen(
     navController: NavController,
     viewModel: WhatIfViewModel
 ) {
+    val age = viewModel.age.value
+    val macrosomicBaby = viewModel.macrosomicBaby.value
+    val yearsSmoking = viewModel.yearsSmoking.value
+    val isBloodline = viewModel.isBloodline.value
+    val smokingStatus = viewModel.smokingStatus.value
+    val averageCigarettes = viewModel.averageCigarettes.value
+    val weight = viewModel.weight.value
+    val isHypertension = viewModel.isHypertension.value
+    val physicalActivityFrequency = viewModel.physicalActivityFrequency.value
+    val isCholesterol = viewModel.isCholesterol.value
+
+    val isLoading = viewModel.whatIfPredictionState.value.isLoading
+
     val scrollState = rememberScrollState()
-    val state = viewModel.state.value
     val navigationEvent = viewModel.navigationEvent.value
 
     LaunchedEffect(navigationEvent) {
@@ -151,7 +163,7 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = state.age.toString(),
+                value = age.toString(),
                 onValueChange = { },
                 placeholderText = "Usia",
                 iconResId = R.drawable.ic_baby,
@@ -170,7 +182,12 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = viewModel.getMacrosomicBabyText(state.isMacrosomicBaby),
+                value = when (macrosomicBaby) {
+                    0 -> "Tidak"
+                    1 -> "Pernah"
+                    2 -> "Tidak Pernah Melahirkan"
+                    else -> "Tidak"
+                },
                 onValueChange = { },
                 placeholderText = "Pernah melahirkan bayi > 4kg",
                 iconResId = R.drawable.ic_baby,
@@ -189,7 +206,7 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = state.yearsSmokingOriginal.toString(),
+                value = yearsSmoking.toString(),
                 onValueChange = { },
                 placeholderText = "Berapa tahun sudah merokok",
                 iconResId = R.drawable.ic_calendar,
@@ -208,7 +225,7 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = if (state.isBloodline) "Ya" else "Tidak",
+                value = if (isBloodline) "Ya" else "Tidak",
                 onValueChange = { },
                 placeholderText = "Riwayat keluarga diabetes",
                 iconResId = R.drawable.ic_family,
@@ -244,19 +261,26 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = viewModel.getSmokingStatusText(state.smokingStatus),
+                selectedOption = when (smokingStatus) {
+                    0 -> "Tidak Pernah Merokok"
+                    1 -> "Berhenti Merokok"
+                    2 -> "Aktif Merokok"
+                    else -> "Tidak Pernah Merokok"
+                },
                 onOptionSelected = { selectedText ->
                     val status = when (selectedText) {
                         "Tidak Pernah Merokok" -> 0
                         "Berhenti Merokok" -> 1
                         "Aktif Merokok" -> 2
-                        else -> state.smokingStatus
+                        else -> 0
                     }
-                    viewModel.updateSmokingStatus(status)
+//                    viewModel.updateSmokingStatus(status)
                 },
-                options = viewModel.getAllowedSmokingTransitionsPublic(state.originalSmokingStatus).map { 
-                    viewModel.getSmokingStatusText(it) 
-                },
+                options = listOf(
+                    "Tidak Pernah Merokok",
+                    "Berhenti Merokok",
+                    "Aktif Merokok"
+                ),
                 placeHolderText = "Status merokok",
                 iconResId = R.drawable.ic_smoking,
                 modifier = Modifier.fillMaxWidth()
@@ -265,7 +289,7 @@ fun WhatIfScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Average cigarettes
-            if (state.smokingStatus > 0) {
+            if (smokingStatus > 0) {
                 Text(
                     text = "Rata-rata rokok per hari",
                     fontFamily = poppinsFontFamily,
@@ -274,8 +298,8 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 InputField(
-                    value = state.averageCigarettes,
-                    onValueChange = { viewModel.updateAverageCigarettes(it) },
+                    value = averageCigarettes.toString(),
+                    onValueChange = { },
                     placeholderText = "Rata-rata rokok per hari",
                     iconResId = R.drawable.ic_smoking,
                     keyboardType = KeyboardType.Number,
@@ -294,8 +318,8 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = state.weight,
-                onValueChange = { viewModel.updateWeight(it) },
+                value = weight.toString(),
+                onValueChange = { },
                 placeholderText = "Berat badan (kg)",
                 iconResId = R.drawable.ic_weight,
                 keyboardType = KeyboardType.Decimal,
@@ -313,9 +337,9 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = if (state.isHypertension) "Ya" else "Tidak",
+                selectedOption = if (isHypertension) "Ya" else "Tidak",
                 onOptionSelected = { selectedText ->
-                    viewModel.updateHypertension(selectedText == "Ya")
+//                    viewModel.updateHypertension(selectedText == "Ya")
                 },
                 options = listOf("Tidak", "Ya"),
                 placeHolderText = "Hipertensi",
@@ -334,8 +358,8 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             InputField(
-                value = state.physicalActivityFrequency,
-                onValueChange = { viewModel.updatePhysicalActivity(it) },
+                value = physicalActivityFrequency.toString(),
+                onValueChange = { },
                 placeholderText = "Aktivitas fisik per minggu (hari)",
                 iconResId = R.drawable.ic_walk,
                 keyboardType = KeyboardType.Number,
@@ -353,9 +377,9 @@ fun WhatIfScreen(
                 color = colorResource(id = R.color.primary),
             )
             DropdownField(
-                selectedOption = if (state.isCholesterol) "Ya" else "Tidak",
+                selectedOption = if (isCholesterol) "Ya" else "Tidak",
                 onOptionSelected = { selectedText ->
-                    viewModel.updateCholesterol(selectedText == "Ya")
+//                    viewModel.updateCholesterol(selectedText == "Ya")
                 },
                 options = listOf("Tidak", "Ya"),
                 placeHolderText = "Kolesterol",
@@ -365,26 +389,6 @@ fun WhatIfScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Error message
-            if (state.errorMessage.isNotEmpty()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Red.copy(alpha = 0.1f)
-                    )
-                ) {
-                    Text(
-                        text = state.errorMessage,
-                        fontFamily = poppinsFontFamily,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
             // Action buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -392,7 +396,7 @@ fun WhatIfScreen(
             ) {
                 CustomizableButton(
                     text = "Reset",
-                    onClick = { viewModel.resetToOriginal() },
+                    onClick = { },
                     backgroundColor = Color.Gray,
                     modifier = Modifier
                         .weight(1f)
@@ -402,8 +406,8 @@ fun WhatIfScreen(
                 PrimaryButton(
                     text = "Hitung",
                     onClick = { viewModel.calculateWhatIfPrediction() },
-                    enabled = !state.isLoading,
-                    isLoading = state.isLoading,
+                    enabled = !isLoading,
+                    isLoading = isLoading,
                     modifier = Modifier
                         .weight(1f)
                         .height(50.dp)

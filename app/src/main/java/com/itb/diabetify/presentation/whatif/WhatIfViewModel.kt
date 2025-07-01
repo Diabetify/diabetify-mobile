@@ -1,239 +1,142 @@
 package com.itb.diabetify.presentation.whatif
 
+import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
+import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.presentation.common.FieldState
+import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class WhatIfState(
-    // Non-modifiable fields (displayed but disabled)
-    val age: Int = 0,
-    val isMacrosomicBaby: Int = 0, // 0=no, 1=yes, 2=male/never pregnant
-    val yearsSmokingOriginal: Int = 0,
-    val isBloodline: Boolean = false,
-    
-    // Modifiable fields
-    val smokingStatus: Int = 0, // 0=never, 1=quit, 2=active
-    val originalSmokingStatus: Int = 0, // To determine allowed transitions
-    val averageCigarettes: String = "",
-    val weight: String = "",
-    val isHypertension: Boolean = false,
-    val physicalActivityFrequency: String = "",
-    val isCholesterol: Boolean = false,
-    
-    // UI state
-    val isLoading: Boolean = false,
-    val predictionResult: Float? = null,
-    val showResult: Boolean = false,
-    val errorMessage: String = ""
-)
 
 @HiltViewModel
 class WhatIfViewModel @Inject constructor(
-    // TODO: Add use cases for getting current user data and prediction
+    private val predictionUseCases: PredictionUseCases,
+    private val profileUseCases: ProfileUseCases
 ): ViewModel() {
-    
-    private val _state = mutableStateOf(WhatIfState())
-    val state: State<WhatIfState> = _state
-    
+    // Navigation States
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
-    
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
+    // Operational States
+    private val _latestPredictionState = mutableStateOf(DataState())
+    val latestPredictionState: State<DataState> = _latestPredictionState
+
+    private var _profileState = mutableStateOf(DataState())
+    val profileState: State<DataState> = _profileState
+
+    private val _whatIfPredictionState = mutableStateOf(DataState())
+    val whatIfPredictionState: State<DataState> = _whatIfPredictionState
+
+    // States
+    private val _predictionResult = mutableStateOf<Float?>(null)
+    val predictionResult: State<Float?> = _predictionResult
+
+    private val _age = mutableIntStateOf(0)
+    val age: State<Int> = _age
+
+    private val _macrosomicBaby = mutableIntStateOf(0)
+    val macrosomicBaby: State<Int> = _macrosomicBaby
+
+    private val _yearsSmoking = mutableIntStateOf(0)
+    val yearsSmoking: State<Int> = _yearsSmoking
+
+    private val _isBloodline = mutableStateOf(false)
+    val isBloodline: State<Boolean> = _isBloodline
+
+    private val _smokingStatus = mutableIntStateOf(0) // 0=never, 1=quit, 2=active
+    val smokingStatus: State<Int> = _smokingStatus
+
+    private val _averageCigarettes = mutableIntStateOf(0)
+    val averageCigarettes: State<Int> = _averageCigarettes
+
+    private val _weight = mutableIntStateOf(0)
+    val weight: State<Int> = _weight
+
+    private val _isHypertension = mutableStateOf(false)
+    val isHypertension: State<Boolean> = _isHypertension
+
+    private val _physicalActivityFrequency = mutableIntStateOf(0)
+    val physicalActivityFrequency: State<Int> = _physicalActivityFrequency
+
+    private val _isCholesterol = mutableStateOf(false)
+    val isCholesterol: State<Boolean> = _isCholesterol
+
+    private val _smokingStatusFieldState = mutableStateOf(FieldState())
+    val smokingStatusFieldState: State<FieldState> = _smokingStatusFieldState
+
+    private val _averageCigarettesFieldState = mutableStateOf(FieldState())
+    val averageCigarettesFieldState: State<FieldState> = _averageCigarettesFieldState
+
+    private val _weightFieldState = mutableStateOf(FieldState())
+    val weightFieldState: State<FieldState> = _weightFieldState
+
+    private val _isHypertensionFieldState = mutableStateOf(FieldState())
+    val isHypertensionFieldState: State<FieldState> = _isHypertensionFieldState
+
+    private val _physicalActivityFieldState = mutableStateOf(FieldState())
+    val physicalActivityFieldState: State<FieldState> = _physicalActivityFieldState
+
+    private val _isCholesterolFieldState = mutableStateOf(FieldState())
+    val isCholesterolFieldState: State<FieldState> = _isCholesterolFieldState
+
     init {
-        loadCurrentUserData()
+        collectLatestPrediction()
+        collectProfileData()
     }
-    
-    private fun loadCurrentUserData() {
-        // TODO: Load current user data from repository
-        // For now, using mock data
-        _state.value = _state.value.copy(
-            age = 45,
-            isMacrosomicBaby = 0,
-            yearsSmokingOriginal = 10,
-            isBloodline = false,
-            smokingStatus = 1,
-            originalSmokingStatus = 1,
-            averageCigarettes = "10",
-            weight = "25.5",
-            isHypertension = false,
-            physicalActivityFrequency = "2",
-            isCholesterol = false
-        )
-    }
-    
-    fun updateSmokingStatus(newStatus: Int) {
-        val allowedTransitions = getAllowedSmokingTransitions(_state.value.originalSmokingStatus)
-        if (allowedTransitions.contains(newStatus)) {
-            _state.value = _state.value.copy(smokingStatus = newStatus)
-            updateBrinkmanIndex()
+
+    private fun collectLatestPrediction() {
+        viewModelScope.launch {
+            _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
+
+            predictionUseCases.getLatestPredictionRepository().onEach { prediction ->
+                _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
+
+                prediction?.let {
+                    _age.intValue = it.age?.toInt() ?: 0
+                    _averageCigarettes.intValue = it.avgSmokeCount?.toInt() ?: 0
+                    _physicalActivityFrequency.intValue = it.physicalActivityFrequency?.toInt() ?: 0
+                }
+
+                Log.d("WhatIfViewModel", "Latest Prediction: ${prediction?.isMacrosomicBaby}")
+            }.launchIn(viewModelScope)
         }
     }
-    
-    fun updateAverageCigarettes(value: String) {
-        _state.value = _state.value.copy(averageCigarettes = value)
-        updateBrinkmanIndex()
-    }
-    
-    fun updateWeight(value: String) {
-        _state.value = _state.value.copy(weight = value)
-    }
-    
-    fun updateHypertension(hasHypertension: Boolean) {
-        _state.value = _state.value.copy(isHypertension = hasHypertension)
-    }
-    
-    fun updatePhysicalActivity(minutes: String) {
-        _state.value = _state.value.copy(physicalActivityFrequency = minutes)
-    }
-    
-    fun updateCholesterol(hasCholesterol: Boolean) {
-        _state.value = _state.value.copy(isCholesterol = hasCholesterol)
-    }
-    
-    private fun updateBrinkmanIndex() {
-        val years = _state.value.yearsSmokingOriginal
-        val avgCigarettes = _state.value.averageCigarettes.toFloatOrNull() ?: 0f
-        val brinkmanValue = years * avgCigarettes
-        
-        val index = when {
-            _state.value.smokingStatus == 0 -> 0 // Never smoked
-            brinkmanValue == 0f -> 0
-            brinkmanValue <= 200 -> 1 // Mild
-            brinkmanValue <= 400 -> 2 // Moderate
-            else -> 3 // Severe
+
+    private fun collectProfileData() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            profileUseCases.getProfileRepository().onEach { profile ->
+                _profileState.value = profileState.value.copy(isLoading = false)
+
+                profile?.let {
+                    _macrosomicBaby.intValue = it.macrosomicBaby?.toInt() ?: 0
+                    _isBloodline.value = it.bloodline ?: false
+                    _smokingStatus.intValue = it.smoking?.toInt() ?: 0
+                    _yearsSmoking.intValue = it.yearOfSmoking?.toInt() ?: 0
+                    _weight.intValue = it.weight?.toInt() ?: 0
+                    _isHypertension.value = it.hypertension ?: false
+                    _isCholesterol.value = it.cholesterol ?: false
+                }
+            }.launchIn(viewModelScope)
         }
     }
-    
-    private fun getAllowedSmokingTransitions(originalStatus: Int): List<Int> {
-        return when (originalStatus) {
-            0 -> listOf(0, 1, 2) // Never -> can try quit(1) and active(2)
-            1 -> listOf(1, 2) // Quit -> can try active(2)
-            2 -> listOf(1, 2) // Active -> can try quit(1)
-            else -> listOf(originalStatus)
-        }
-    }
-    
+
     fun calculateWhatIfPrediction() {
-        _state.value = _state.value.copy(isLoading = true, errorMessage = "")
-        
-        // TODO: Implement actual prediction API call
-        // For now, using mock calculation
-        
-        // Validate inputs
-        val weightValue = _state.value.weight.toFloatOrNull()
-        val physicalActivityValue = _state.value.physicalActivityFrequency.toFloatOrNull()
-        val avgCigarettesValue = _state.value.averageCigarettes.toFloatOrNull()
-        
-        if (weightValue == null || weightValue <= 0) {
-            _state.value = _state.value.copy(
-                isLoading = false,
-                errorMessage = "BMI harus berupa angka yang valid"
-            )
-            return
-        }
-        
-        if (physicalActivityValue == null || physicalActivityValue < 0) {
-            _state.value = _state.value.copy(
-                isLoading = false,
-                errorMessage = "Aktivitas fisik harus berupa angka yang valid"
-            )
-            return
-        }
-        
-        if (_state.value.smokingStatus > 0 && (avgCigarettesValue == null || avgCigarettesValue < 0)) {
-            _state.value = _state.value.copy(
-                isLoading = false,
-                errorMessage = "Rata-rata rokok harus berupa angka yang valid"
-            )
-            return
-        }
-        
-        // Mock prediction calculation
-        var riskScore = 0.3f // Base risk
-        
-        // Age factor
-        if (_state.value.age > 45) riskScore += 0.1f
-        
-        // BMI factor
-        if (weightValue!! > 25) riskScore += 0.15f
-        if (weightValue > 30) riskScore += 0.1f
-        
-        // Smoking factor
-        when (_state.value.smokingStatus) {
-            1 -> riskScore += 0.05f // Quit
-            2 -> riskScore += 0.15f // Active
-        }
-        
-        // Hypertension factor
-        if (_state.value.isHypertension) riskScore += 0.1f
-        
-        // Cholesterol factor
-        if (_state.value.isCholesterol) riskScore += 0.08f
-        
-        // Physical activity factor (protective)
-        if (physicalActivityValue!! >= 150) riskScore -= 0.05f
-        
-        // Bloodline factor
-        if (_state.value.isBloodline) riskScore += 0.12f
-        
-        // Macrosomic baby factor
-        if (_state.value.isMacrosomicBaby == 1) riskScore += 0.08f
-        
-        // Ensure score is between 0 and 1
-        riskScore = riskScore.coerceIn(0f, 1f)
-        
-        _state.value = _state.value.copy(
-            isLoading = false,
-            predictionResult = riskScore,
-            showResult = true
-        )
-        
-        // Navigate to result screen
-        _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
     }
-    
-    fun resetToOriginal() {
-        loadCurrentUserData()
-        _state.value = _state.value.copy(
-            showResult = false,
-            predictionResult = null,
-            errorMessage = ""
-        )
-    }
-    
-    fun getSmokingStatusText(status: Int): String {
-        return when (status) {
-            0 -> "Tidak Pernah Merokok"
-            1 -> "Berhenti Merokok"
-            2 -> "Aktif Merokok"
-            else -> "Unknown"
-        }
-    }
-    
-    fun getBrinkmanIndexText(index: Int): String {
-        return when (index) {
-            0 -> "Tidak Pernah Merokok"
-            1 -> "Perokok Ringan"
-            2 -> "Perokok Sedang"
-            3 -> "Perokok Berat"
-            else -> "Unknown"
-        }
-    }
-    
-    fun getMacrosomicBabyText(status: Int): String {
-        return when (status) {
-            0 -> "Tidak"
-            1 -> "Pernah"
-            2 -> "Laki-laki/Tidak Pernah Hamil"
-            else -> "Unknown"
-        }
-    }
-    
-    fun getAllowedSmokingTransitionsPublic(originalStatus: Int): List<Int> {
-        return getAllowedSmokingTransitions(originalStatus)
-    }
-    
+
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }

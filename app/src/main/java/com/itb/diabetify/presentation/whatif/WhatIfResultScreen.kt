@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,9 +43,8 @@ fun WhatIfResultScreen(
     viewModel: WhatIfViewModel
 ) {
     val scrollState = rememberScrollState()
-//    val state = viewModel.state.value
-    
-    val predictionPercentage = viewModel.predictionResult.value?.let { (it * 100).toInt() } ?: 0
+    val predictionPercentage by viewModel.predictionScore
+    val riskFactors by viewModel.riskFactors
 
     Column(
         modifier = Modifier
@@ -87,8 +87,8 @@ fun WhatIfResultScreen(
         ) {
             // Risk Percentage Card
             HomeCard(
-                title = "Persentase Risiko Simulasi",
-                hasWarning = predictionPercentage > 30,
+                title = "Persentase Risiko",
+                hasWarning = true,
                 riskPercentage = predictionPercentage.toFloat()
             ) {
                 Column(
@@ -106,16 +106,16 @@ fun WhatIfResultScreen(
                     RiskCategory(
                         modifier = Modifier.padding(vertical = 5.dp),
                         color = when {
-                            predictionPercentage <= 30 -> Color(0xFF8BC34A) // Green
-                            predictionPercentage <= 50 -> Color(0xFFFFC107) // Yellow  
-                            predictionPercentage <= 65 -> Color(0xFFFA821F) // Orange
-                            else -> Color(0xFFF44336) // Red
+                            predictionPercentage <= 35 -> Color(0xFF8BC34A)
+                            predictionPercentage <= 55 -> Color(0xFFFFC107)
+                            predictionPercentage <= 70 -> Color(0xFFFA821F)
+                            else -> Color(0xFFF44336)
                         },
                         description = when {
-                            predictionPercentage <= 30 -> "Diperkirakan 14 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                            predictionPercentage <= 50 -> "Diperkirakan 26 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                            predictionPercentage <= 65 -> "Diperkirakan 43 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                            else -> "Diperkirakan 63 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            predictionPercentage <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            predictionPercentage <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            predictionPercentage <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
+                            else -> "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes"
                         },
                         isHighlighted = true
                     )
@@ -132,18 +132,16 @@ fun WhatIfResultScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-//                    val riskFactors = getRiskFactorsFromState(state)
-                    
-//                    BarChartV2(
-//                        entries = riskFactors.map { riskFactor ->
-//                            BarChartEntry(
-//                                label = riskFactor.name,
-//                                abbreviation = riskFactor.abbreviation,
-//                                value = riskFactor.percentage,
-//                                isNegative = riskFactor.percentage < 0
-//                            )
-//                        }
-//                    )
+                    BarChartV2(
+                        entries = riskFactors.map { riskFactor ->
+                            BarChartEntry(
+                                label = riskFactor.name,
+                                abbreviation = riskFactor.abbreviation,
+                                value = riskFactor.percentage,
+                                isNegative = riskFactor.percentage < 0
+                            )
+                        }
+                    )
                 }
             }
 

@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.whatif
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
@@ -9,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.presentation.common.FieldState
+import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactor
+import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,8 +43,21 @@ class WhatIfViewModel @Inject constructor(
     val whatIfPredictionState: State<DataState> = _whatIfPredictionState
 
     // States
-    private val _predictionResult = mutableStateOf<Float?>(null)
-    val predictionResult: State<Float?> = _predictionResult
+    private val _predictionScore = mutableIntStateOf(0)
+    val predictionScore: State<Int> = _predictionScore
+
+    private val _riskFactors = mutableStateOf(listOf(
+        RiskFactor("Indeks Massa Tubuh", "IMT", 0f),
+        RiskFactor("Hipertensi", "H", 0f),
+        RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0f),
+        RiskFactor("Aktivitas Fisik", "AF", 0f),
+        RiskFactor("Usia", "U", 0f),
+        RiskFactor("Status Merokok", "SM", 0f),
+        RiskFactor("Indeks Brinkman", "IB", 0f),
+        RiskFactor("Riwayat Keluarga", "RK", 0f),
+        RiskFactor("Kolesterol", "K", 0f),
+    ))
+    val riskFactors: State<List<RiskFactor>> = _riskFactors
 
     private val _age = mutableIntStateOf(0)
     val age: State<Int> = _age
@@ -167,6 +183,7 @@ class WhatIfViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     fun calculateWhatIfPrediction() {
         viewModelScope.launch {
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
@@ -207,7 +224,45 @@ class WhatIfViewModel @Inject constructor(
 
             when (whatIfPredictionResult.result) {
                 is Resource.Success -> {
-                    Log.d("WhatIfViewModel", "WhatIf Prediction Success: ${whatIfPredictionResult.result.data?.data?.riskPercentage}")
+                    val responseData = whatIfPredictionResult.result.data?.data
+
+                    responseData?.let { data ->
+                        _predictionScore.intValue = data.riskPercentage.toInt()
+
+                        val updatedRiskFactors = _riskFactors.value.map { riskFactor ->
+                            val featureKey = when (riskFactor.abbreviation) {
+                                "IMT" -> "BMI"
+                                "H" -> "is_hypertension"
+                                "RBM" -> "is_macrosomic_baby"
+                                "AF" -> "moderate_physical_activity_frequency"
+                                "U" -> "age"
+                                "SM" -> "smoking_status"
+                                "IB" -> "brinkman_index"
+                                "RK" -> "is_bloodline"
+                                "K" -> "is_cholesterol"
+                                else -> null
+                            }
+
+                            featureKey?.let { key ->
+                                data.featureExplanations[key]?.let { explanation ->
+                                    val adjustedContribution = if (explanation.impact == 0) {
+                                        -explanation.contribution.toFloat()
+                                    } else {
+                                        explanation.contribution.toFloat()
+                                    }
+                                    riskFactor.copy(
+                                        name = riskFactor.name,
+                                        abbreviation = riskFactor.abbreviation,
+                                        percentage = adjustedContribution * 100f
+                                    )
+                                }
+                            } ?: riskFactor
+                        }
+
+                        _riskFactors.value = updatedRiskFactors
+                    }
+
+                    _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
                 }
                 is Resource.Error -> {
                     _errorMessage.value = whatIfPredictionResult.result.message ?: "An error occurred"

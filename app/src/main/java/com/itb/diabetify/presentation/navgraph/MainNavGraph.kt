@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.navgraph
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,12 +43,14 @@ import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
 import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
+import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.presentation.survey.SurveyScreen
 import com.itb.diabetify.presentation.survey.SurveyViewModel
 import com.itb.diabetify.presentation.whatif.WhatIfResultScreen
 import com.itb.diabetify.presentation.whatif.WhatIfScreen
 import com.itb.diabetify.presentation.whatif.WhatIfViewModel
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun MainNavGraph(
     navController: NavController,
@@ -183,7 +186,9 @@ fun MainNavGraph(
             }
 
             composable(route = Route.WhatIfScreen.route) {
-                val whatIfViewModel: WhatIfViewModel = hiltViewModel()
+                val whatIfViewModel: WhatIfViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.MainNavigation.route)
+                )
                 WhatIfScreen(
                     navController = mainNavController,
                     viewModel = whatIfViewModel
@@ -191,7 +196,9 @@ fun MainNavGraph(
             }
 
             composable(route = Route.WhatIfResultScreen.route) {
-                val whatIfViewModel: WhatIfViewModel = hiltViewModel()
+                val whatIfViewModel: WhatIfViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.MainNavigation.route)
+                )
                 WhatIfResultScreen(
                     navController = mainNavController,
                     viewModel = whatIfViewModel

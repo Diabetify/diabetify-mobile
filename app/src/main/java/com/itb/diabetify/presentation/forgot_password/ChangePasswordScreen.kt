@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -65,14 +68,17 @@ fun ChangePasswordScreen(
     viewModel: ForgotPasswordViewModel
 ) {
     // States
-    val passwordState by viewModel.passwordState
-    val otpState by viewModel.otpState
+    val passwordFieldState by viewModel.passwordFieldState
+    val otpFieldState by viewModel.otpFieldState
+    val passwordVisible by viewModel.passwordVisible
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
     val isLoading = viewModel.changePasswordState.value.isLoading
     val isResendLoading = viewModel.sendVerificationState.value.isLoading
-    var passwordVisible by remember { mutableStateOf(false) }
     val maxLength = 6
+
+    // Get keyboard controller
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // Timer for resend code
     var resendTimerActive by remember { mutableStateOf(false) }
@@ -123,6 +129,7 @@ fun ChangePasswordScreen(
                 .background(colorResource(id = R.color.white)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 25.dp, bottom = 5.dp),
                 text = "Ubah Kata Sandi",
@@ -145,7 +152,7 @@ fun ChangePasswordScreen(
 
             // Password field
             InputField(
-                value = passwordState.text,
+                value = passwordFieldState.text,
                 onValueChange = {
                     viewModel.setPassword(it)
                 },
@@ -159,7 +166,7 @@ fun ChangePasswordScreen(
                 singleLine = true,
                 trailingIcon = {
                     IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
+                        onClick = { viewModel.togglePasswordVisibility() },
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
@@ -171,8 +178,8 @@ fun ChangePasswordScreen(
                         )
                     }
                 },
-                isError = passwordState.error != null,
-                errorMessage = passwordState.error ?: ""
+                isError = passwordFieldState.error != null,
+                errorMessage = passwordFieldState.error ?: ""
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -180,13 +187,21 @@ fun ChangePasswordScreen(
             // OTP Input Fields
             BasicTextField(
                 value = TextFieldValue(
-                    text = otpState.text,
-                    selection = TextRange(otpState.text.length)
+                    text = otpFieldState.text,
+                    selection = TextRange(otpFieldState.text.length)
                 ),
                 onValueChange = { newValue ->
                     viewModel.setOtp(newValue.text)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.NumberPassword,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                    }
+                ),
                 modifier = Modifier
                     .fillMaxWidth(),
                 textStyle = TextStyle(
@@ -200,7 +215,7 @@ fun ChangePasswordScreen(
                     ) {
                         for (i in 0 until maxLength) {
                             val char = when {
-                                i < otpState.text.length -> otpState.text[i].toString()
+                                i < otpFieldState.text.length -> otpFieldState.text[i].toString()
                                 else -> ""
                             }
 
@@ -214,7 +229,7 @@ fun ChangePasswordScreen(
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (i == otpState.text.length && otpState.text.length < maxLength)
+                                        color = if (i == otpFieldState.text.length)
                                             colorResource(id = R.color.primary)
                                         else
                                             Color.Transparent,
@@ -304,7 +319,7 @@ fun ChangePasswordScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = otpState.error == null && otpState.text.length == maxLength && passwordState.error == null && !isLoading,
+            enabled = otpFieldState.error == null && otpFieldState.text.length == maxLength && passwordFieldState.error == null && !isLoading,
             isLoading = isLoading
         )
 

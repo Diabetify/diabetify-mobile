@@ -65,7 +65,7 @@ fun OtpScreen(
     viewModel: RegisterViewModel
 ) {
     // States
-    val otpState by viewModel.otpFieldState
+    val otpFieldState by viewModel.otpFieldState
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
     val isLoading = viewModel.verifyOtpState.value.isLoading
@@ -153,8 +153,8 @@ fun OtpScreen(
             // OTP Input Fields
             BasicTextField(
                 value = TextFieldValue(
-                    text = otpState.text,
-                    selection = TextRange(otpState.text.length)
+                    text = otpFieldState.text,
+                    selection = TextRange(otpFieldState.text.length)
                 ),
                 onValueChange = { newValue ->
                     viewModel.setOtp(newValue.text)
@@ -182,7 +182,7 @@ fun OtpScreen(
                     ) {
                         for (i in 0 until maxLength) {
                             val char = when {
-                                i < otpState.text.length -> otpState.text[i].toString()
+                                i < otpFieldState.text.length -> otpFieldState.text[i].toString()
                                 else -> ""
                             }
 
@@ -196,7 +196,7 @@ fun OtpScreen(
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (i == otpState.text.length)
+                                        color = if (i == otpFieldState.text.length)
                                             colorResource(id = R.color.primary)
                                         else
                                             Color.Transparent,
@@ -286,7 +286,7 @@ fun OtpScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = otpState.error == null && otpState.text.length == maxLength && !isLoading,
+            enabled = otpFieldState.error == null && otpFieldState.text.length == maxLength && !isLoading,
             isLoading = isLoading
         )
 

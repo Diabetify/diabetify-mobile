@@ -35,43 +35,51 @@ class ForgotPasswordViewModel @Inject constructor(
     private var _changePasswordState = mutableStateOf(DataState())
     val changePasswordState: State<DataState> = _changePasswordState
 
+    // UI States
+    private val _passwordVisible = mutableStateOf(false)
+    val passwordVisible: State<Boolean> = _passwordVisible
+
     // Field States
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
+    private val _emailFieldState = mutableStateOf(FieldState())
+    val emailFieldState: State<FieldState> = _emailFieldState
 
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
+    private val _passwordFieldState = mutableStateOf(FieldState())
+    val passwordFieldState: State<FieldState> = _passwordFieldState
 
-    private val _otpState = mutableStateOf(FieldState())
-    val otpState: State<FieldState> = _otpState
+    private val _otpFieldState = mutableStateOf(FieldState())
+    val otpFieldState: State<FieldState> = _otpFieldState
+
+    // Setters for UI States
+    fun togglePasswordVisibility() {
+        _passwordVisible.value = !_passwordVisible.value
+    }
 
     // Setters for Field States
     fun setEmail(value: String) {
-        _emailState.value = emailState.value.copy(error = null)
-        _emailState.value = emailState.value.copy(text = value)
+        _emailFieldState.value = emailFieldState.value.copy(error = null)
+        _emailFieldState.value = emailFieldState.value.copy(text = value)
     }
 
     fun setPassword(value: String) {
-        _passwordState.value = passwordState.value.copy(error = null)
-        _passwordState.value = passwordState.value.copy(text = value)
+        _passwordFieldState.value = passwordFieldState.value.copy(error = null)
+        _passwordFieldState.value = passwordFieldState.value.copy(text = value)
     }
 
     fun setOtp(value: String) {
         if (value.length <= 6 && value.all { it.isDigit() }) {
-            _otpState.value = otpState.value.copy(error = null)
-            _otpState.value = otpState.value.copy(text = value)
+            _otpFieldState.value = otpFieldState.value.copy(error = null)
+            _otpFieldState.value = otpFieldState.value.copy(text = value)
         }
     }
 
-
     // Validation Functions
     fun validateForgotPasswordFields(): Boolean {
-        val email = emailState.value.text
+        val email = emailFieldState.value.text
 
         var isValid = true
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailState.value = emailState.value.copy(error = "Email tidak valid")
+            _emailFieldState.value = emailFieldState.value.copy(error = "Email tidak valid")
             isValid = false
         }
 
@@ -79,30 +87,30 @@ class ForgotPasswordViewModel @Inject constructor(
     }
 
     fun validateChangePasswordFields(): Boolean {
-        val password = passwordState.value.text
-        val code = otpState.value.text
+        val password = passwordFieldState.value.text
+        val code = otpFieldState.value.text
 
         var isValid = true
 
         if (password.length < 8) {
-            _passwordState.value = passwordState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
+            _passwordFieldState.value = passwordFieldState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
             isValid = false
         }
 
         if (code.isEmpty()) {
-            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
+            _otpFieldState.value = otpFieldState.value.copy(error = "Kode tidak boleh kosong")
             isValid = false
         }
 
         if (code.length != 6) {
-            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
+            _otpFieldState.value = otpFieldState.value.copy(error = "Kode harus 6 digit")
             isValid = false
         }
 
         return isValid
     }
 
-    // API Call Functions
+    // Use Case Calls
     fun sendVerification(
         isResend: Boolean = false
     ) {
@@ -110,14 +118,14 @@ class ForgotPasswordViewModel @Inject constructor(
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
             val sendVerificationResult = authUseCases.sendVerification(
-                email = emailState.value.text,
+                email = emailFieldState.value.text,
                 type = "reset-password"
             )
 
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = false)
 
             if (sendVerificationResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = sendVerificationResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = sendVerificationResult.emailError)
             }
 
             when (sendVerificationResult.result) {
@@ -129,17 +137,14 @@ class ForgotPasswordViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
-                    sendVerificationResult.result.message?.let { Log.d("ForgotPasswordViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("ForgotPasswordViewModel", "Loading")
+                    _errorMessage.value = sendVerificationResult.result.message ?: "Terjadi kesalahan saat mengirim kode verifikasi"
+                    sendVerificationResult.result.message?.let { Log.e("ForgotPasswordViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("ForgotPasswordViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat mengirim kode verifikasi"
+                    Log.e("ForgotPasswordViewModel", "Unexpected error")
                 }
             }
         }
@@ -150,23 +155,23 @@ class ForgotPasswordViewModel @Inject constructor(
             _changePasswordState.value = changePasswordState.value.copy(isLoading = true)
 
             val changePasswordResult = authUseCases.changePassword(
-                email = emailState.value.text,
-                newPassword = passwordState.value.text,
-                code = otpState.value.text
+                email = emailFieldState.value.text,
+                newPassword = passwordFieldState.value.text,
+                code = otpFieldState.value.text
             )
 
             _changePasswordState.value = changePasswordState.value.copy(isLoading = false)
 
             if (changePasswordResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = changePasswordResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = changePasswordResult.emailError)
             }
 
             if (changePasswordResult.newPasswordError != null) {
-                _passwordState.value = passwordState.value.copy(error = changePasswordResult.newPasswordError)
+                _passwordFieldState.value = passwordFieldState.value.copy(error = changePasswordResult.newPasswordError)
             }
 
             if (changePasswordResult.codeError != null) {
-                _otpState.value = otpState.value.copy(error = changePasswordResult.codeError)
+                _otpFieldState.value = otpFieldState.value.copy(error = changePasswordResult.codeError)
             }
 
             when (changePasswordResult.result) {
@@ -175,17 +180,14 @@ class ForgotPasswordViewModel @Inject constructor(
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = changePasswordResult.result.message ?: "Unknown error occurred"
-                    changePasswordResult.result.message?.let { Log.d("ForgotPasswordViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("ForgotPasswordViewModel", "Loading")
+                    _errorMessage.value = changePasswordResult.result.message ?: "Terjadi kesalahan saat mengubah kata sandi"
+                    changePasswordResult.result.message?.let { Log.e("ForgotPasswordViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("ForgotPasswordViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat mengubah kata sandi"
+                    Log.e("ForgotPasswordViewModel", "Unexpected error")
                 }
             }
         }
@@ -193,9 +195,9 @@ class ForgotPasswordViewModel @Inject constructor(
 
     // Helper Functions
     private fun resetValues() {
-        _emailState.value = FieldState()
-        _passwordState.value = FieldState()
-        _otpState.value = FieldState()
+        _emailFieldState.value = FieldState()
+        _passwordFieldState.value = FieldState()
+        _otpFieldState.value = FieldState()
     }
 
     fun onNavigationHandled() {

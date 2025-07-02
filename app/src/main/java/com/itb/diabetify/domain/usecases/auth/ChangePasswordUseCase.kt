@@ -15,7 +15,7 @@ class ChangePasswordUseCase(
     ): ChangePasswordResult {
         val emailError: String? = if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) "Email tidak valid" else null
         val newPasswordError: String? = if (newPassword.length < 8) "Password harus lebih dari 8 karakter" else null
-        val codeError: String? = if (code.isEmpty()) "Kode tidak boleh kosong" else null
+        val codeError: String? = if (code.length != 6) "Kode OTP harus terdiri dari 6 karakter" else null
 
         if (emailError != null) {
             return ChangePasswordResult(

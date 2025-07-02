@@ -39,7 +39,7 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel
 ) {
     // States
-    val emailState by viewModel.emailState
+    val emailFieldState by viewModel.emailFieldState
     val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.sendVerificationState.value.isLoading
 
@@ -78,6 +78,7 @@ fun ForgotPasswordScreen(
                 .background(colorResource(id = R.color.white)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 25.dp, bottom = 5.dp),
                 text = "Lupa Kata Sandi",
@@ -105,14 +106,14 @@ fun ForgotPasswordScreen(
             ) {
                 // Email field
                 InputField(
-                    value = emailState.text,
+                    value = emailFieldState.text,
                     onValueChange = { viewModel.setEmail(it) },
                     placeholderText = "Email",
                     iconResId = R.drawable.ic_message,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Email,
-                    isError = emailState.error != null,
-                    errorMessage = emailState.error ?: ""
+                    isError = emailFieldState.error != null,
+                    errorMessage = emailFieldState.error ?: ""
                 )
             }
         }
@@ -131,7 +132,7 @@ fun ForgotPasswordScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = emailState.error == null && !isLoading,
+            enabled = emailFieldState.error == null && !isLoading,
             isLoading = isLoading
         )
 

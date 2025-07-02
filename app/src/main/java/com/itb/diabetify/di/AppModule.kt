@@ -42,7 +42,6 @@ import com.itb.diabetify.domain.usecases.app_entry.SaveAppEntry
 import com.itb.diabetify.domain.usecases.auth.AuthUseCases
 import com.itb.diabetify.domain.usecases.auth.ChangePasswordUseCase
 import com.itb.diabetify.domain.usecases.auth.CreateAccountUseCase
-import com.itb.diabetify.domain.usecases.auth.GoogleLoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LoginUseCase
 import com.itb.diabetify.domain.usecases.auth.LogoutUseCase
 import com.itb.diabetify.domain.usecases.auth.SendVerificationUseCase
@@ -154,7 +153,6 @@ object AppModule {
         return AuthUseCases(
             changePassword = ChangePasswordUseCase(repository),
             createAccount = CreateAccountUseCase(repository),
-            googleLogin = GoogleLoginUseCase(repository),
             login = LoginUseCase(repository),
             logout = LogoutUseCase(repository),
             sendVerification = SendVerificationUseCase(repository),

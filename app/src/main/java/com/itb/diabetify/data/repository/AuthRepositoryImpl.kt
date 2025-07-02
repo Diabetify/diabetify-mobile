@@ -4,7 +4,6 @@ import android.util.Log
 import com.itb.diabetify.data.remote.auth.AuthApiService
 import com.itb.diabetify.data.remote.auth.request.ChangePasswordRequest
 import com.itb.diabetify.data.remote.auth.request.CreateAccountRequest
-import com.itb.diabetify.data.remote.auth.request.GoogleLoginRequest
 import com.itb.diabetify.data.remote.auth.request.LoginRequest
 import com.itb.diabetify.data.remote.auth.request.SendVerificationRequest
 import com.itb.diabetify.data.remote.auth.request.VerifyOtpRequest
@@ -86,22 +85,13 @@ class AuthRepositoryImpl(
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {
-            Resource.Error("${e.message}")
-        }
-    }
-
-    override suspend fun googleLogin(
-        googleLoginRequest: GoogleLoginRequest
-    ): Resource<Unit> {
-        return try {
-            val response = authApiService.googleLogin(googleLoginRequest)
-            Log.d("AuthRepositoryImpl", "Google login response: ${response.data.toString()}")
-            tokenManager.saveToken(response.data.toString())
-            Resource.Success(Unit)
-        } catch (e: IOException) {
-            Resource.Error("${e.message}")
-        } catch (e: HttpException) {
-            Resource.Error("${e.message}")
+            if (e.code() == 401) {
+                Resource.Error("Password salah")
+            } else if (e.code() == 404) {
+                Resource.Error("Akun tidak ditemukan")
+            } else {
+                Resource.Error("${e.message}")
+            }
         }
     }
 

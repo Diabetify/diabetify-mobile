@@ -29,65 +29,71 @@ class LoginViewModel @Inject constructor(
     private var _loginState = mutableStateOf(DataState())
     val loginState: State<DataState> = _loginState
 
-    private var _googleLoginState = mutableStateOf(DataState())
-    val googleLoginState: State<DataState> = _googleLoginState
+    // UI States
+    private val _passwordVisible = mutableStateOf(false)
+    val passwordVisible: State<Boolean> = _passwordVisible
 
     // Field States
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
+    private val _emailFieldState = mutableStateOf(FieldState())
+    val emailFieldState: State<FieldState> = _emailFieldState
 
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
+    private val _passwordFieldState = mutableStateOf(FieldState())
+    val passwordFieldState: State<FieldState> = _passwordFieldState
+
+    // Setters for UI States
+    fun togglePasswordVisibility() {
+        _passwordVisible.value = !_passwordVisible.value
+    }
 
     // Setters for Field States
     fun setEmail(value: String) {
-        _emailState.value = emailState.value.copy(error = null)
-        _emailState.value = emailState.value.copy(text = value)
+        _emailFieldState.value = emailFieldState.value.copy(error = null)
+        _emailFieldState.value = emailFieldState.value.copy(text = value)
     }
 
     fun setPassword(value: String) {
-        _passwordState.value = passwordState.value.copy(error = null)
-        _passwordState.value = passwordState.value.copy(text = value)
+        _passwordFieldState.value = passwordFieldState.value.copy(error = null)
+        _passwordFieldState.value = passwordFieldState.value.copy(text = value)
     }
 
     // Validation Functions
     fun validateLoginFields(): Boolean {
-        val email = emailState.value.text
-        val password = passwordState.value.text
+        val email = emailFieldState.value.text
+        val password = passwordFieldState.value.text
 
         var isValid = true
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailState.value = emailState.value.copy(error = "Email tidak valid")
+            _emailFieldState.value = emailFieldState.value.copy(error = "Email tidak valid")
             isValid = false
         }
 
         if (password.length < 8) {
-            _passwordState.value = passwordState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
+            _passwordFieldState.value = passwordFieldState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
             isValid = false
         }
 
         return isValid
     }
 
-    // API Call Functions
+    // Use Case Calls
     fun login() {
         viewModelScope.launch {
             _loginState.value = loginState.value.copy(isLoading = true)
 
             val loginResult = authUseCases.login(
-                email = emailState.value.text,
-                password = passwordState.value.text
+                email = emailFieldState.value.text,
+                password = passwordFieldState.value.text
             )
 
             _loginState.value = loginState.value.copy(isLoading = false)
 
             if (loginResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = loginResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = loginResult.emailError)
             }
 
             if (loginResult.passwordError != null) {
-                _passwordState.value = passwordState.value.copy(error = loginResult.passwordError)
+                _passwordFieldState.value = passwordFieldState.value.copy(error = loginResult.passwordError)
             }
 
             when (loginResult.result) {
@@ -96,48 +102,14 @@ class LoginViewModel @Inject constructor(
                     _navigationEvent.value = "HOME_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = loginResult.result.message ?: "Unknown error occurred"
-                    loginResult.result.message?.let { Log.d("LoginViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("LoginViewModel", "Loading")
+                    _errorMessage.value = loginResult.result.message ?: "Terjadi kesalahan saat masuk"
+                    loginResult.result.message?.let { Log.e("LoginViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("LoginViewModel", "Unexpected error")
-                }
-            }
-        }
-    }
-
-    fun googleLogin(token: String) {
-        viewModelScope.launch {
-            _googleLoginState.value = googleLoginState.value.copy(isLoading = true)
-
-            val googleLoginResult = authUseCases.googleLogin(
-                token = token
-            )
-
-            _googleLoginState.value = googleLoginState.value.copy(isLoading = false)
-
-            when (googleLoginResult.result) {
-                is Resource.Success -> {
-                    _navigationEvent.value = "HOME_SCREEN"
-                }
-                is Resource.Error -> {
-                    _errorMessage.value = googleLoginResult.result.message ?: "Unknown error occurred"
-                    googleLoginResult.result.message?.let { Log.d("RegisterViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("RegisterViewModel", "Loading")
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("RegisterViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat masuk"
+                    Log.e("LoginViewModel", "Unexpected error")
                 }
             }
         }
@@ -145,8 +117,8 @@ class LoginViewModel @Inject constructor(
 
     // Helper Functions
     private fun resetValues() {
-        _emailState.value = FieldState()
-        _passwordState.value = FieldState()
+        _emailFieldState.value = FieldState()
+        _passwordFieldState.value = FieldState()
     }
 
     fun onNavigationHandled() {

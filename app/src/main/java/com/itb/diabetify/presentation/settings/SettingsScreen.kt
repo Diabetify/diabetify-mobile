@@ -1,16 +1,13 @@
 package com.itb.diabetify.presentation.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -24,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,9 +33,10 @@ import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.presentation.settings.components.ConfirmationDialog
+import com.itb.diabetify.presentation.settings.components.NotificationCard
+import com.itb.diabetify.presentation.settings.components.NotificationItem
 import com.itb.diabetify.presentation.settings.components.ProfileCard
 import com.itb.diabetify.presentation.settings.components.SettingsCard
-import com.itb.diabetify.presentation.settings.components.StatisticItem
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -46,6 +45,9 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onLogout: () -> Unit
 ) {
+    // Get context
+    val context = LocalContext.current
+    
     // States
     val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.logoutState.value.isLoading
@@ -133,34 +135,21 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // User statistics section
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatisticItem(
-                        value = "85",
-                        label = "Entries",
-                        iconRes = R.drawable.ic_calendar,
-                        modifier = Modifier.weight(1f)
+                var dailyReminderEnabled by remember { mutableStateOf(true) }
+                NotificationCard(
+                    title = "Pengaturan Notifikasi",
+                    notificationItems = listOf(
+                        NotificationItem(
+                            icon = R.drawable.ic_notification,
+                            title = "Pengingat Harian",
+                            isEnabled = dailyReminderEnabled,
+                            onToggle = { dailyReminderEnabled = it }
+                        )
                     )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    StatisticItem(
-                        value = "14",
-                        label = "Days Streak",
-                        iconRes = R.drawable.ic_calendar,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                )
 
                 // Cards section
-                getSettingsCards().forEach { cardData ->
+                getSettingsCards(context).forEach { cardData ->
                     SettingsCard(cardData = cardData)
                     Spacer(modifier = Modifier.height(8.dp))
                 }

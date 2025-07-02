@@ -264,7 +264,8 @@ fun EditProfileScreen(
                                     viewModel.setDob(formatter.format(date))
                                 }
                             },
-                            onDismiss = { showDatePicker.value = false }
+                            onDismiss = { showDatePicker.value = false },
+                            minimumAgeYears = 20,
                         )
                     }
                 }

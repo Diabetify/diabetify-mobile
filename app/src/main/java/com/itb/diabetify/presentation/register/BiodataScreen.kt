@@ -195,6 +195,7 @@ fun BiodataScreen(
                             }
                         },
                         onDismiss = { viewModel.toggleDatePicker() },
+                        minimumAgeYears = 20,
                     )
                 }
 

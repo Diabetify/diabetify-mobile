@@ -28,7 +28,9 @@ import java.util.Locale
 @Composable
 fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    disableFutureDates: Boolean = true,
+    minimumAgeYears: Int = 0
 ) {
     val today = remember {
         Calendar.getInstance().apply {
@@ -39,10 +41,47 @@ fun DatePickerModal(
         }.timeInMillis
     }
 
+    val minimumDate = remember(minimumAgeYears) {
+        if (minimumAgeYears > 0) {
+            Calendar.getInstance().apply {
+                add(Calendar.YEAR, -minimumAgeYears)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+        } else {
+            Long.MIN_VALUE
+        }
+    }
+
+    val maxSelectableDate = remember(today, minimumDate, disableFutureDates, minimumAgeYears) {
+        when {
+            minimumAgeYears > 0 && disableFutureDates -> minOf(today, minimumDate)
+            minimumAgeYears > 0 -> minimumDate
+            disableFutureDates -> today
+            else -> today
+        }
+    }
+
     val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = maxSelectableDate,
+        initialDisplayedMonthMillis = maxSelectableDate,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis <= today
+                val isFutureDateValid = if (disableFutureDates) {
+                    utcTimeMillis <= today
+                } else {
+                    true
+                }
+
+                val isAgeValid = if (minimumAgeYears > 0) {
+                    utcTimeMillis <= minimumDate
+                } else {
+                    true
+                }
+
+                return isFutureDateValid && isAgeValid
             }
         }
     )

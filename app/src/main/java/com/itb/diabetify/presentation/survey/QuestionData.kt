@@ -1,5 +1,7 @@
 package com.itb.diabetify.presentation.survey
 
+import com.itb.diabetify.presentation.common.FieldState
+
 sealed class SurveyQuestionType {
     object Selection : SurveyQuestionType()
     object Numeric : SurveyQuestionType()
@@ -18,14 +20,6 @@ data class SurveyQuestion(
     val options: List<SurveyOption> = emptyList(),
     val numericUnit: String = "",
     val additionalInfo: String = ""
-)
-
-data class SurveyState(
-    val currentPageIndex: Int = 0,
-    val answers: Map<String, String> = emptyMap(),
-    val fieldErrors: Map<String, String> = emptyMap(),
-    val isComplete: Boolean = false,
-    val showReviewScreen: Boolean = false
 )
 
 val questions = listOf(

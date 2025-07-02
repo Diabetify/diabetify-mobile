@@ -44,7 +44,7 @@ fun SurveyScreen(
     }
 
     // States
-    val state = viewModel.state.value
+    val state = viewModel.surveyState.value
     val errorMessage = viewModel.errorMessage.value
 
     // Navigation Event
@@ -95,8 +95,8 @@ fun SurveyScreen(
                             onAnswerSelected = { questionId, answer ->
                                 viewModel.setAnswer(questionId, answer)
                             },
-                            selectedAnswer = state.answers[currentQuestion.id],
-                            errorMessage = state.fieldErrors[currentQuestion.id]
+                            selectedAnswer = state.fieldStates[currentQuestion.id]?.text,
+                            errorMessage = state.fieldStates[currentQuestion.id]?.error
                         )
                     }
                 }

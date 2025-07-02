@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
+import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,28 +40,32 @@ class SurveyViewModel @Inject constructor(
     private var _predictionState = mutableStateOf(DataState())
     val predictionState: State<DataState> = _predictionState
 
-    // Survey State
-    private val _state = mutableStateOf(SurveyState())
-    val state: State<SurveyState> = _state
+    // Survey States
+    data class SurveyState(
+        val currentPageIndex: Int = 0,
+        val fieldStates: Map<String, FieldState> = emptyMap(),
+        val isComplete: Boolean = false,
+        val showReviewScreen: Boolean = false
+    )
+
+    private val _surveyState = mutableStateOf(SurveyState())
+    val surveyState: State<SurveyState> = _surveyState
 
     private val surveyQuestions = questions
 
     // Setters for Survey State
     fun setAnswer(questionId: String, answer: String) {
-        val newAnswers = _state.value.answers.toMutableMap()
-        newAnswers[questionId] = answer
-
-        val newErrors = _state.value.fieldErrors.toMutableMap()
+        val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+        val currentFieldState = newFieldStates[questionId] ?: FieldState()
+        
         val validationError = validateField(questionId, answer)
-        if (validationError != null) {
-            newErrors[questionId] = validationError
-        } else {
-            newErrors.remove(questionId)
-        }
+        newFieldStates[questionId] = currentFieldState.copy(
+            text = answer,
+            error = validationError
+        )
 
-        _state.value = _state.value.copy(
-            answers = newAnswers,
-            fieldErrors = newErrors
+        _surveyState.value = _surveyState.value.copy(
+            fieldStates = newFieldStates
         )
     }
 
@@ -131,13 +136,13 @@ class SurveyViewModel @Inject constructor(
         get() {
             val filteredQuestions = surveyQuestions.filter { question ->
                 when (question.id) {
-                    "smoking_age", "smoking_amount" -> _state.value.answers["smoking_status"] == "1" || _state.value.answers["smoking_status"] == "2"
+                    "smoking_age", "smoking_amount" -> _surveyState.value.fieldStates["smoking_status"]?.text == "1" || _surveyState.value.fieldStates["smoking_status"]?.text == "2"
                     "pregnancy" -> {
                         val user = runBlocking { userUseCases.getUserRepository().first() }
                         user?.gender?.lowercase() != "laki-laki" && user?.gender?.lowercase() != "male"
                     }
-                    "systolic", "diastolic" -> _state.value.answers["bp_unknown"] == "yes"
-                    "hypertension" -> _state.value.answers["bp_unknown"] == "no"
+                    "systolic", "diastolic" -> _surveyState.value.fieldStates["bp_unknown"]?.text == "yes"
+                    "hypertension" -> _surveyState.value.fieldStates["bp_unknown"]?.text == "no"
                     else -> true
                 }
             }
@@ -145,31 +150,41 @@ class SurveyViewModel @Inject constructor(
         }
 
     fun nextPage() {
-        val currentQuestion = displayedSurveyQuestions[_state.value.currentPageIndex]
-        val answer = _state.value.answers[currentQuestion.id]
+        val currentQuestion = displayedSurveyQuestions[_surveyState.value.currentPageIndex]
+        val fieldState = _surveyState.value.fieldStates[currentQuestion.id]
+        val answer = fieldState?.text
 
         if (answer.isNullOrBlank()) {
-            val newErrors = _state.value.fieldErrors.toMutableMap()
-            newErrors[currentQuestion.id] = "Mohon jawab pertanyaan ini dahulu"
-            _state.value = _state.value.copy(fieldErrors = newErrors)
+            val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+            val currentFieldState = newFieldStates[currentQuestion.id] ?: FieldState()
+            newFieldStates[currentQuestion.id] = currentFieldState.copy(
+                error = "Mohon jawab pertanyaan ini dahulu"
+            )
+            _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
             return
         }
 
         val validationError = validateField(currentQuestion.id, answer)
         if (validationError != null) {
-            val newErrors = _state.value.fieldErrors.toMutableMap()
-            newErrors[currentQuestion.id] = validationError
-            _state.value = _state.value.copy(fieldErrors = newErrors)
+            val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+            val currentFieldState = newFieldStates[currentQuestion.id] ?: FieldState()
+            newFieldStates[currentQuestion.id] = currentFieldState.copy(
+                error = validationError
+            )
+            _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
             return
         }
 
-        val newErrors = _state.value.fieldErrors.toMutableMap()
-        newErrors.remove(currentQuestion.id)
-        _state.value = _state.value.copy(fieldErrors = newErrors)
+        val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+        val currentFieldState = newFieldStates[currentQuestion.id] ?: FieldState()
+        newFieldStates[currentQuestion.id] = currentFieldState.copy(
+            error = null
+        )
+        _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
 
-        if (currentQuestion.id == "diastolic" && _state.value.answers["bp_unknown"] == "yes") {
-            val systolic = _state.value.answers["systolic"]?.toIntOrNull()
-            val diastolic = _state.value.answers["diastolic"]?.toIntOrNull()
+        if (currentQuestion.id == "diastolic" && _surveyState.value.fieldStates["bp_unknown"]?.text == "yes") {
+            val systolic = _surveyState.value.fieldStates["systolic"]?.text?.toIntOrNull()
+            val diastolic = _surveyState.value.fieldStates["diastolic"]?.text?.toIntOrNull()
             
             if (systolic != null && diastolic != null) {
                 val hasHypertension = systolic >= 140 || diastolic >= 90
@@ -177,54 +192,54 @@ class SurveyViewModel @Inject constructor(
             }
         }
 
-        if (_state.value.currentPageIndex < displayedSurveyQuestions.size - 1) {
-            _state.value = _state.value.copy(
-                currentPageIndex = _state.value.currentPageIndex + 1
+        if (_surveyState.value.currentPageIndex < displayedSurveyQuestions.size - 1) {
+            _surveyState.value = _surveyState.value.copy(
+                currentPageIndex = _surveyState.value.currentPageIndex + 1
             )
         } else {
-            _state.value = _state.value.copy(
+            _surveyState.value = _surveyState.value.copy(
                 showReviewScreen = true
             )
         }
     }
 
     fun previousPage() {
-        if (_state.value.currentPageIndex > 0) {
-            _state.value = _state.value.copy(
-                currentPageIndex = _state.value.currentPageIndex - 1
+        if (_surveyState.value.currentPageIndex > 0) {
+            _surveyState.value = _surveyState.value.copy(
+                currentPageIndex = _surveyState.value.currentPageIndex - 1
             )
         }
     }
 
     fun getCurrentQuestion(): SurveyQuestion {
-        return displayedSurveyQuestions[_state.value.currentPageIndex]
+        return displayedSurveyQuestions[_surveyState.value.currentPageIndex]
     }
 
     fun getProgress(): Float {
-        return (_state.value.currentPageIndex + 1).toFloat() / displayedSurveyQuestions.size
+        return (_surveyState.value.currentPageIndex + 1).toFloat() / displayedSurveyQuestions.size
     }
 
     fun canGoNext(): Boolean {
         val currentQuestion = getCurrentQuestion()
-        val answer = _state.value.answers[currentQuestion.id]
-        val hasError = _state.value.fieldErrors[currentQuestion.id] != null
+        val fieldState = _surveyState.value.fieldStates[currentQuestion.id]
+        val answer = fieldState?.text
+        val hasError = fieldState?.error != null
         return answer?.isNotBlank() == true && !hasError
     }
 
     fun canGoPrevious(): Boolean {
-        return _state.value.currentPageIndex > 0
+        return _surveyState.value.currentPageIndex > 0
     }
 
-
     fun backToSurvey() {
-        _state.value = _state.value.copy(
+        _surveyState.value = _surveyState.value.copy(
             showReviewScreen = false
         )
     }
 
     fun getAnsweredQuestions(): List<Pair<SurveyQuestion, String>> {
         return displayedSurveyQuestions.mapNotNull { question ->
-            _state.value.answers[question.id]?.let { answer ->
+            _surveyState.value.fieldStates[question.id]?.text?.takeIf { it.isNotBlank() }?.let { answer ->
                 question to answer
             }
         }
@@ -241,46 +256,60 @@ class SurveyViewModel @Inject constructor(
         }
     }
 
-    // API Call Functions
+    // Use Case Calls
     fun submitSurvey() {
-        val errors = mutableMapOf<String, String>()
+        val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+        var hasErrors = false
         
         displayedSurveyQuestions.forEach { question ->
-            val answer = _state.value.answers[question.id]
+            val fieldState = _surveyState.value.fieldStates[question.id]
+            val answer = fieldState?.text
+            val currentFieldState = newFieldStates[question.id] ?: FieldState()
+            
             if (answer.isNullOrBlank()) {
-                errors[question.id] = "Mohon jawab pertanyaan ini"
+                newFieldStates[question.id] = currentFieldState.copy(
+                    error = "Mohon jawab pertanyaan ini"
+                )
+                hasErrors = true
             } else {
                 val validationError = validateField(question.id, answer)
                 if (validationError != null) {
-                    errors[question.id] = validationError
+                    newFieldStates[question.id] = currentFieldState.copy(
+                        error = validationError
+                    )
+                    hasErrors = true
+                } else {
+                    newFieldStates[question.id] = currentFieldState.copy(
+                        error = null
+                    )
                 }
             }
         }
         
-        if (errors.isNotEmpty()) {
-            _state.value = _state.value.copy(
-                fieldErrors = errors,
+        if (hasErrors) {
+            _surveyState.value = _surveyState.value.copy(
+                fieldStates = newFieldStates,
                 showReviewScreen = false
             )
             _errorMessage.value = "Harap perbaiki kesalahan pada form sebelum melanjutkan"
             return
         }
         
-        _state.value = _state.value.copy(fieldErrors = emptyMap())
+        _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
         
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            val weight = _state.value.answers["weight"]?.toIntOrNull() ?: 0
-            val height = _state.value.answers["height"]?.toIntOrNull() ?: 0
-            val hypertension = _state.value.answers["hypertension"]?.toBoolean() ?: false
-            val macrosomicBaby = _state.value.answers["pregnancy"]?.toIntOrNull() ?: 2
-            val smoking = _state.value.answers["smoking_status"]?.toIntOrNull() ?: 0
-            val yearOfSmoking = _state.value.answers["smoking_age"]?.toIntOrNull() ?: 0
-            val cholesterol = _state.value.answers["cholesterol"]?.toBoolean() ?: false
-            val bloodline = _state.value.answers["bloodline"]?.toBoolean() ?: false
-            val physicalActivityFrequency = _state.value.answers["activity"]?.toIntOrNull() ?: 0
-            val smokingAmount = _state.value.answers["smoking_amount"]?.toIntOrNull() ?: 0
+            val weight = _surveyState.value.fieldStates["weight"]?.text?.toIntOrNull() ?: 0
+            val height = _surveyState.value.fieldStates["height"]?.text?.toIntOrNull() ?: 0
+            val hypertension = _surveyState.value.fieldStates["hypertension"]?.text?.toBoolean() ?: false
+            val macrosomicBaby = _surveyState.value.fieldStates["pregnancy"]?.text?.toIntOrNull() ?: 2
+            val smoking = _surveyState.value.fieldStates["smoking_status"]?.text?.toIntOrNull() ?: 0
+            val yearOfSmoking = _surveyState.value.fieldStates["smoking_age"]?.text?.toIntOrNull() ?: 0
+            val cholesterol = _surveyState.value.fieldStates["cholesterol"]?.text?.toBoolean() ?: false
+            val bloodline = _surveyState.value.fieldStates["bloodline"]?.text?.toBoolean() ?: false
+            val physicalActivityFrequency = _surveyState.value.fieldStates["activity"]?.text?.toIntOrNull() ?: 0
+            val smokingAmount = _surveyState.value.fieldStates["smoking_amount"]?.text?.toIntOrNull() ?: 0
 
             val addProfileResult = profileUseCases.addProfile(
                 weight = weight,
@@ -297,41 +326,39 @@ class SurveyViewModel @Inject constructor(
 
             _profileState.value = profileState.value.copy(isLoading = false)
 
+            val updatedFieldStates = _surveyState.value.fieldStates.toMutableMap()
+
             if (addProfileResult.weightError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("weight" to addProfileResult.weightError)
-                )
+                val currentFieldState = updatedFieldStates["weight"] ?: FieldState()
+                updatedFieldStates["weight"] = currentFieldState.copy(error = addProfileResult.weightError)
             }
 
             if (addProfileResult.heightError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("height" to addProfileResult.heightError)
-                )
+                val currentFieldState = updatedFieldStates["height"] ?: FieldState()
+                updatedFieldStates["height"] = currentFieldState.copy(error = addProfileResult.heightError)
             }
 
             if (addProfileResult.hypertensionError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("hypertension" to addProfileResult.hypertensionError)
-                )
+                val currentFieldState = updatedFieldStates["hypertension"] ?: FieldState()
+                updatedFieldStates["hypertension"] = currentFieldState.copy(error = addProfileResult.hypertensionError)
             }
 
             if (addProfileResult.yearOfSmokingError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("smoking_age" to addProfileResult.yearOfSmokingError)
-                )
+                val currentFieldState = updatedFieldStates["smoking_age"] ?: FieldState()
+                updatedFieldStates["smoking_age"] = currentFieldState.copy(error = addProfileResult.yearOfSmokingError)
             }
 
             if (addProfileResult.smokeCountError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("smoking_amount" to addProfileResult.smokeCountError)
-                )
+                val currentFieldState = updatedFieldStates["smoking_amount"] ?: FieldState()
+                updatedFieldStates["smoking_amount"] = currentFieldState.copy(error = addProfileResult.smokeCountError)
             }
 
             if (addProfileResult.physicalActivityFrequencyError != null) {
-                _state.value = _state.value.copy(
-                    fieldErrors = _state.value.fieldErrors + ("activity" to addProfileResult.physicalActivityFrequencyError)
-                )
+                val currentFieldState = updatedFieldStates["activity"] ?: FieldState()
+                updatedFieldStates["activity"] = currentFieldState.copy(error = addProfileResult.physicalActivityFrequencyError)
             }
+
+            _surveyState.value = _surveyState.value.copy(fieldStates = updatedFieldStates)
 
             when (addProfileResult.result) {
                 is Resource.Success -> {

@@ -4,23 +4,23 @@ import com.google.gson.annotations.SerializedName
 
 data class AddProfileRequest (
     @SerializedName("weight")
-    val weight: Int? = null,
+    val weight: Int,
     @SerializedName("height")
-    val height: Int? = null,
+    val height: Int,
     @SerializedName("hypertension")
-    val hypertension: Boolean? = null,
+    val hypertension: Boolean,
     @SerializedName("macrosomic_baby")
-    val macrosomicBaby: Int? = null,
+    val macrosomicBaby: Int,
     @SerializedName("smoking")
-    val smoking: Int? = null,
+    val smoking: Int,
     @SerializedName("year_of_smoking")
-    val yearOfSmoking: Int? = null,
+    val yearOfSmoking: Int,
     @SerializedName("cholesterol")
-    val cholesterol: Boolean? = null,
+    val cholesterol: Boolean,
     @SerializedName("bloodline")
-    val bloodline: Boolean? = null,
+    val bloodline: Boolean,
     @SerializedName("physical_activity_frequency")
-    val physicalActivityFrequency: Int? = null,
+    val physicalActivityFrequency: Int,
     @SerializedName("smoke_count")
-    val smokeCount: Int? = null
+    val smokeCount: Int
 )

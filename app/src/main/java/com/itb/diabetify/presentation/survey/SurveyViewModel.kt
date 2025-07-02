@@ -300,8 +300,8 @@ class SurveyViewModel @Inject constructor(
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
-            val weight = _surveyState.value.fieldStates["weight"]?.text?.toIntOrNull() ?: 0
-            val height = _surveyState.value.fieldStates["height"]?.text?.toIntOrNull() ?: 0
+            val weight = _surveyState.value.fieldStates["weight"]?.text?.toIntOrNull() ?: 60
+            val height = _surveyState.value.fieldStates["height"]?.text?.toIntOrNull() ?: 170
             val hypertension = _surveyState.value.fieldStates["hypertension"]?.text?.toBoolean() ?: false
             val macrosomicBaby = _surveyState.value.fieldStates["pregnancy"]?.text?.toIntOrNull() ?: 2
             val smoking = _surveyState.value.fieldStates["smoking_status"]?.text?.toIntOrNull() ?: 0
@@ -343,19 +343,39 @@ class SurveyViewModel @Inject constructor(
                 updatedFieldStates["hypertension"] = currentFieldState.copy(error = addProfileResult.hypertensionError)
             }
 
+            if (addProfileResult.macrosomicBabyError != null) {
+                val currentFieldState = updatedFieldStates["pregnancy"] ?: FieldState()
+                updatedFieldStates["pregnancy"] = currentFieldState.copy(error = addProfileResult.macrosomicBabyError)
+            }
+
+            if (addProfileResult.smokingError != null) {
+                val currentFieldState = updatedFieldStates["smoking_status"] ?: FieldState()
+                updatedFieldStates["smoking_status"] = currentFieldState.copy(error = addProfileResult.smokingError)
+            }
+
             if (addProfileResult.yearOfSmokingError != null) {
                 val currentFieldState = updatedFieldStates["smoking_age"] ?: FieldState()
                 updatedFieldStates["smoking_age"] = currentFieldState.copy(error = addProfileResult.yearOfSmokingError)
             }
 
-            if (addProfileResult.smokeCountError != null) {
-                val currentFieldState = updatedFieldStates["smoking_amount"] ?: FieldState()
-                updatedFieldStates["smoking_amount"] = currentFieldState.copy(error = addProfileResult.smokeCountError)
+            if (addProfileResult.cholesterolError != null) {
+                val currentFieldState = updatedFieldStates["cholesterol"] ?: FieldState()
+                updatedFieldStates["cholesterol"] = currentFieldState.copy(error = addProfileResult.cholesterolError)
+            }
+
+            if (addProfileResult.bloodlineError != null) {
+                val currentFieldState = updatedFieldStates["bloodline"] ?: FieldState()
+                updatedFieldStates["bloodline"] = currentFieldState.copy(error = addProfileResult.bloodlineError)
             }
 
             if (addProfileResult.physicalActivityFrequencyError != null) {
                 val currentFieldState = updatedFieldStates["activity"] ?: FieldState()
                 updatedFieldStates["activity"] = currentFieldState.copy(error = addProfileResult.physicalActivityFrequencyError)
+            }
+
+            if (addProfileResult.smokeCountError != null) {
+                val currentFieldState = updatedFieldStates["smoking_amount"] ?: FieldState()
+                updatedFieldStates["smoking_amount"] = currentFieldState.copy(error = addProfileResult.smokeCountError)
             }
 
             _surveyState.value = _surveyState.value.copy(fieldStates = updatedFieldStates)
@@ -366,10 +386,7 @@ class SurveyViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _errorMessage.value = addProfileResult.result.message ?: "Terjadi kesalahan saat mengirimkan profil"
-                    addProfileResult.result.message?.let { Log.d("SurveyViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("SurveyViewModel", "Profile submission loading")
+                    addProfileResult.result.message?.let { Log.e("SurveyViewModel", it) }
                 }
 
                 else -> {
@@ -394,16 +411,14 @@ class SurveyViewModel @Inject constructor(
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
-                    Log.d("SurveyViewModel", "Prediction error: ${predictionResult.result.message}")
-                    _errorMessage.value = predictionResult.result.message ?: "Terjadi kesalahan saat memprediksi"
+                    Log.e("SurveyViewModel", "Prediction error: ${predictionResult.result.message}")
+                    _navigationEvent.value = "SUCCESS_SCREEN"
                 }
-                is Resource.Loading -> {
-                    Log.d("SurveyViewModel", "Prediction loading")
-                }
+
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Terjadi kesalahan saat memprediksi"
                     Log.e("SurveyViewModel", "Unexpected error in prediction")
+                    _navigationEvent.value = "SUCCESS_SCREEN"
                 }
             }
         }

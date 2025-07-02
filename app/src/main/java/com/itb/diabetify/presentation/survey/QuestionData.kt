@@ -1,7 +1,5 @@
 package com.itb.diabetify.presentation.survey
 
-import com.itb.diabetify.presentation.common.FieldState
-
 sealed class SurveyQuestionType {
     object Selection : SurveyQuestionType()
     object Numeric : SurveyQuestionType()

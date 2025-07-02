@@ -29,10 +29,6 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun SuccessScreen(
     navController: NavController
 ) {
-    BackHandler {
-        // Do nothing
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -82,5 +78,13 @@ fun SuccessScreen(
                 .offset(y = (-30).dp),
             enabled = true
         )
+    }
+
+    BackHandler {
+        navController.navigate(Route.HomeScreen.route) {
+            popUpTo(Route.MainNavigation.route) {
+                saveState = false
+            }
+        }
     }
 }

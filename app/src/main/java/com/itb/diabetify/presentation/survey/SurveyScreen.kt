@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.activity.compose.BackHandler
 import com.itb.diabetify.R
@@ -37,14 +36,14 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 @Composable
 fun SurveyScreen(
     navController: NavController,
-    viewModel: SurveyViewModel = hiltViewModel()
+    viewModel: SurveyViewModel
 ) {
     BackHandler {
         // Do nothing
     }
 
     // States
-    val state = viewModel.surveyState.value
+    val surveyState = viewModel.surveyState.value
     val errorMessage = viewModel.errorMessage.value
 
     // Navigation Event
@@ -79,7 +78,8 @@ fun SurveyScreen(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                if (state.showReviewScreen) {
+                if (surveyState.showReviewScreen) {
+                    // Review Screen
                     ReviewScreen(
                         answeredQuestions = viewModel.getAnsweredQuestions(),
                         onConfirm = { 
@@ -92,6 +92,7 @@ fun SurveyScreen(
                         viewModel = viewModel
                     )
                 } else {
+                    // Survey Page
                     if (viewModel.displayedSurveyQuestions.isNotEmpty()) {
                         val currentQuestion = viewModel.getCurrentQuestion()
                         SurveyPage(
@@ -99,14 +100,15 @@ fun SurveyScreen(
                             onAnswerSelected = { questionId, answer ->
                                 viewModel.setAnswer(questionId, answer)
                             },
-                            selectedAnswer = state.fieldStates[currentQuestion.id]?.text,
-                            errorMessage = state.fieldStates[currentQuestion.id]?.error
+                            selectedAnswer = surveyState.fieldStates[currentQuestion.id]?.text,
+                            errorMessage = surveyState.fieldStates[currentQuestion.id]?.error
                         )
                     }
                 }
             }
 
-            if (!state.showReviewScreen) {
+            if (!surveyState.showReviewScreen) {
+                // Bottom Navigation
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,7 +116,7 @@ fun SurveyScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Pertanyaan ${state.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
+                        text = "Pertanyaan ${surveyState.currentPageIndex + 1} dari ${viewModel.displayedSurveyQuestions.size}",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Medium,
                         fontSize = 14.sp,
@@ -142,6 +144,7 @@ fun SurveyScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Previous Button
                         PrimaryButton(
                             text = "<",
                             onClick = { viewModel.previousPage() },
@@ -151,6 +154,7 @@ fun SurveyScreen(
                                 .height(50.dp),
                         )
 
+                        // Next Button
                         PrimaryButton(
                             text = ">",
                             onClick = { viewModel.nextPage() },

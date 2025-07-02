@@ -32,9 +32,10 @@ fun ReviewScreen(
     answeredQuestions: List<Pair<SurveyQuestion, String>>,
     onConfirm: () -> Unit,
     onBack: () -> Unit,
-    isLoading: Boolean = false,
     viewModel: SurveyViewModel
 ) {
+    val isLoading = viewModel.profileState.value.isLoading || viewModel.activityState.value.isLoading || viewModel.predictionState.value.isLoading
+
     Column(
         modifier = Modifier
             .fillMaxSize()

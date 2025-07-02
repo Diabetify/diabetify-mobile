@@ -82,9 +82,13 @@ fun SurveyScreen(
                 if (state.showReviewScreen) {
                     ReviewScreen(
                         answeredQuestions = viewModel.getAnsweredQuestions(),
-                        onConfirm = { viewModel.submitSurvey() },
+                        onConfirm = { 
+                            val isValid = viewModel.validateSurveyFields()
+                            if (isValid) {
+                                viewModel.submitSurvey()
+                            }
+                        },
                         onBack = { viewModel.backToSurvey() },
-                        isLoading = viewModel.profileState.value.isLoading || viewModel.activityState.value.isLoading || viewModel.predictionState.value.isLoading,
                         viewModel = viewModel
                     )
                 } else {

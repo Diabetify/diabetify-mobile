@@ -131,6 +131,45 @@ class SurveyViewModel @Inject constructor(
         return null
     }
 
+    fun validateSurveyFields(): Boolean {
+        val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
+        var hasErrors = false
+
+        displayedSurveyQuestions.forEach { question ->
+            val fieldState = _surveyState.value.fieldStates[question.id]
+            val answer = fieldState?.text
+            val currentFieldState = newFieldStates[question.id] ?: FieldState()
+
+            if (answer.isNullOrBlank()) {
+                newFieldStates[question.id] = currentFieldState.copy(
+                    error = "Mohon jawab pertanyaan ini"
+                )
+                hasErrors = true
+            } else {
+                val validationError = validateField(question.id, answer)
+                if (validationError != null) {
+                    newFieldStates[question.id] = currentFieldState.copy(
+                        error = validationError
+                    )
+                    hasErrors = true
+                } else {
+                    newFieldStates[question.id] = currentFieldState.copy(
+                        error = null
+                    )
+                }
+            }
+        }
+
+        _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
+
+        if (hasErrors) {
+            _surveyState.value = _surveyState.value.copy(showReviewScreen = false)
+            _errorMessage.value = "Harap perbaiki kesalahan pada form sebelum melanjutkan"
+        }
+
+        return !hasErrors
+    }
+
     // Survey Helper Functions
     val displayedSurveyQuestions: List<SurveyQuestion>
         get() {
@@ -258,45 +297,6 @@ class SurveyViewModel @Inject constructor(
 
     // Use Case Calls
     fun submitSurvey() {
-        val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
-        var hasErrors = false
-        
-        displayedSurveyQuestions.forEach { question ->
-            val fieldState = _surveyState.value.fieldStates[question.id]
-            val answer = fieldState?.text
-            val currentFieldState = newFieldStates[question.id] ?: FieldState()
-            
-            if (answer.isNullOrBlank()) {
-                newFieldStates[question.id] = currentFieldState.copy(
-                    error = "Mohon jawab pertanyaan ini"
-                )
-                hasErrors = true
-            } else {
-                val validationError = validateField(question.id, answer)
-                if (validationError != null) {
-                    newFieldStates[question.id] = currentFieldState.copy(
-                        error = validationError
-                    )
-                    hasErrors = true
-                } else {
-                    newFieldStates[question.id] = currentFieldState.copy(
-                        error = null
-                    )
-                }
-            }
-        }
-        
-        if (hasErrors) {
-            _surveyState.value = _surveyState.value.copy(
-                fieldStates = newFieldStates,
-                showReviewScreen = false
-            )
-            _errorMessage.value = "Harap perbaiki kesalahan pada form sebelum melanjutkan"
-            return
-        }
-        
-        _surveyState.value = _surveyState.value.copy(fieldStates = newFieldStates)
-        
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 

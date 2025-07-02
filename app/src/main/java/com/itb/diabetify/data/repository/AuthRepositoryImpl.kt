@@ -27,7 +27,11 @@ class AuthRepositoryImpl(
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {
-            Resource.Error("${e.message}")
+            if (e.code() == 400) {
+                Resource.Error("Akun dengan email ini sudah terdaftar")
+            } else {
+                Resource.Error("${e.message}")
+            }
         }
     }
 
@@ -64,7 +68,11 @@ class AuthRepositoryImpl(
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {
-            Resource.Error("${e.message}")
+            if (e.code() == 401) {
+                Resource.Error("Kode OTP salah atau sudah kadaluarsa")
+            } else {
+                Resource.Error("${e.message}")
+            }
         }
     }
 

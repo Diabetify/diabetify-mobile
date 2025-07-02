@@ -32,98 +32,111 @@ class RegisterViewModel @Inject constructor(
     private var _createAccountState = mutableStateOf(DataState())
     val createAccountState: State<DataState> = _createAccountState
 
-    private var _googleLoginState = mutableStateOf(DataState())
-    val googleLoginState: State<DataState> = _googleLoginState
-
     private var _sendVerificationState = mutableStateOf(DataState())
     val sendVerificationState: State<DataState> = _sendVerificationState
 
     private var _verifyOtpState = mutableStateOf(DataState())
     val verifyOtpState: State<DataState> = _verifyOtpState
 
+    // UI States
+    private val _name = mutableStateOf("")
+    val name: State<String> = _name
+
+    private val _passwordVisible = mutableStateOf(false)
+    val passwordVisible: State<Boolean> = _passwordVisible
+
+    private val _privacyPolicyChecked = mutableStateOf(false)
+    val privacyPolicyChecked: State<Boolean> = _privacyPolicyChecked
+
+    private val _showDatePicker = mutableStateOf(false)
+    val showDatePicker: State<Boolean> = _showDatePicker
+
     // Field States
-    private val _nameState = mutableStateOf(FieldState())
-    val nameState: State<FieldState> = _nameState
+    private val _nameFieldState = mutableStateOf(FieldState())
+    val nameFieldState: State<FieldState> = _nameFieldState
 
-    private val _nameStateCopy = mutableStateOf(FieldState())
-    val nameStateCopy: State<FieldState> = _nameStateCopy
+    private val _emailFieldState = mutableStateOf(FieldState())
+    val emailFieldState: State<FieldState> = _emailFieldState
 
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
+    private val _passwordFieldState = mutableStateOf(FieldState())
+    val passwordFieldState: State<FieldState> = _passwordFieldState
 
-    private val _passwordState = mutableStateOf(FieldState())
-    val passwordState: State<FieldState> = _passwordState
+    private val _genderFieldState = mutableStateOf(FieldState())
+    val genderFieldState: State<FieldState> = _genderFieldState
 
-    private val _privacyPolicyState = mutableStateOf(false)
-    val privacyPolicyState: State<Boolean> = _privacyPolicyState
+    private val _dobFieldState = mutableStateOf(FieldState())
+    val dobFieldState: State<FieldState> = _dobFieldState
 
-    private val _genderState = mutableStateOf(FieldState())
-    val genderState: State<FieldState> = _genderState
+    private val _otpFieldState = mutableStateOf(FieldState())
+    val otpFieldState: State<FieldState> = _otpFieldState
 
-    private val _dobState = mutableStateOf(FieldState())
-    val dobState: State<FieldState> = _dobState
+    // Setters for UI States
+    fun setPrivacyPolicy(value: Boolean) {
+        _privacyPolicyChecked.value = value
+    }
 
-    private val _otpState = mutableStateOf(FieldState())
-    val otpState: State<FieldState> = _otpState
+    fun togglePasswordVisibility() {
+        _passwordVisible.value = !_passwordVisible.value
+    }
+
+    fun toggleDatePicker() {
+        _showDatePicker.value = !_showDatePicker.value
+    }
 
     // Setters for Field States
     fun setName(value: String) {
-        _nameState.value = nameState.value.copy(error = null)
-        _nameStateCopy.value = nameState.value.copy(text = value)
-        _nameState.value = nameState.value.copy(text = value)
+        _nameFieldState.value = nameFieldState.value.copy(error = null)
+        _nameFieldState.value = nameFieldState.value.copy(text = value)
+        _name.value = value
     }
 
     fun setEmail(value: String) {
-        _emailState.value = emailState.value.copy(error = null)
-        _emailState.value = emailState.value.copy(text = value)
+        _emailFieldState.value = emailFieldState.value.copy(error = null)
+        _emailFieldState.value = emailFieldState.value.copy(text = value)
     }
 
     fun setPassword(value: String) {
-        _passwordState.value = passwordState.value.copy(error = null)
-        _passwordState.value = passwordState.value.copy(text = value)
-    }
-
-    fun setPrivacyPolicy(value: Boolean) {
-        _privacyPolicyState.value = value
+        _passwordFieldState.value = passwordFieldState.value.copy(error = null)
+        _passwordFieldState.value = passwordFieldState.value.copy(text = value)
     }
 
     fun setGender(value: String) {
-        _genderState.value = genderState.value.copy(error = null)
-        _genderState.value = genderState.value.copy(text = value)
+        _genderFieldState.value = genderFieldState.value.copy(error = null)
+        _genderFieldState.value = genderFieldState.value.copy(text = value)
     }
 
     fun setDob(value: String) {
-        _dobState.value = dobState.value.copy(error = null)
-        _dobState.value = dobState.value.copy(text = value)
+        _dobFieldState.value = dobFieldState.value.copy(error = null)
+        _dobFieldState.value = dobFieldState.value.copy(text = value)
     }
 
     fun setOtp(value: String) {
         if (value.length <= 6 && value.all { it.isDigit() }) {
-            _otpState.value = otpState.value.copy(error = null)
-            _otpState.value = otpState.value.copy(text = value)
+            _otpFieldState.value = otpFieldState.value.copy(error = null)
+            _otpFieldState.value = otpFieldState.value.copy(text = value)
         }
     }
 
     // Validation Functions
     fun validateRegisterFields(): Boolean {
-        val name = nameState.value.text
-        val email = emailState.value.text
-        val password = passwordState.value.text
+        val name = nameFieldState.value.text
+        val email = emailFieldState.value.text
+        val password = passwordFieldState.value.text
 
         var isValid = true
 
         if (name.isEmpty()) {
-            _nameState.value = nameState.value.copy(error = "Nama tidak boleh kosong")
+            _nameFieldState.value = nameFieldState.value.copy(error = "Nama tidak boleh kosong")
             isValid = false
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailState.value = emailState.value.copy(error = "Email tidak valid")
+            _emailFieldState.value = emailFieldState.value.copy(error = "Email tidak valid")
             isValid = false
         }
 
         if (password.length < 8) {
-            _passwordState.value = passwordState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
+            _passwordFieldState.value = passwordFieldState.value.copy(error = "Kata sandi harus lebih dari 8 karakter")
             isValid = false
         }
 
@@ -131,18 +144,18 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun validateBiodataFields(): Boolean {
-        val gender = genderState.value.text
-        val birthDate = dobState.value.text
+        val gender = genderFieldState.value.text
+        val birthDate = dobFieldState.value.text
 
         var isValid = true
 
         if (gender.isEmpty()) {
-            _genderState.value = genderState.value.copy(error = "Jenis kelamin tidak boleh kosong")
+            _genderFieldState.value = genderFieldState.value.copy(error = "Jenis kelamin tidak boleh kosong")
             isValid = false
         }
 
         if (birthDate.isEmpty()) {
-            _dobState.value = dobState.value.copy(error = "Tanggal lahir tidak boleh kosong")
+            _dobFieldState.value = dobFieldState.value.copy(error = "Tanggal lahir tidak boleh kosong")
             isValid = false
         }
 
@@ -150,39 +163,39 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun validateOtpFields(): Boolean {
-        val code = otpState.value.text
+        val code = otpFieldState.value.text
 
         var isValid = true
 
         if (code.isEmpty()) {
-            _otpState.value = otpState.value.copy(error = "Kode tidak boleh kosong")
+            _otpFieldState.value = otpFieldState.value.copy(error = "Kode tidak boleh kosong")
             isValid = false
         }
 
         if (code.length != 6) {
-            _otpState.value = otpState.value.copy(error = "Kode harus 6 digit")
+            _otpFieldState.value = otpFieldState.value.copy(error = "Kode harus 6 digit")
             isValid = false
         }
 
         return isValid
     }
 
-    // API Call Functions
+    // Use Case Calls
     fun createAccount() {
         viewModelScope.launch {
             _createAccountState.value = createAccountState.value.copy(isLoading = true)
 
-            val dob = dobState.value.text
+            val dob = dobFieldState.value.text
             val dobParts = dob.split("/")
             val dobFormatted = "${dobParts[2]}-${dobParts[1]}-${dobParts[0]}"
 
-            val gender = genderState.value.text
+            val gender = genderFieldState.value.text
             val genderFormatted = if (gender == "Laki-laki") { "male" } else { "female" }
 
             val createAccountResult = authUseCases.createAccount(
-                name = nameState.value.text,
-                email = emailState.value.text,
-                password = passwordState.value.text,
+                name = nameFieldState.value.text,
+                email = emailFieldState.value.text,
+                password = passwordFieldState.value.text,
                 dob = dobFormatted,
                 gender = genderFormatted,
             )
@@ -190,23 +203,23 @@ class RegisterViewModel @Inject constructor(
             _createAccountState.value = createAccountState.value.copy(isLoading = false)
 
             if (createAccountResult.nameError != null) {
-                _nameState.value = nameState.value.copy(error = createAccountResult.nameError)
+                _nameFieldState.value = nameFieldState.value.copy(error = createAccountResult.nameError)
             }
 
             if (createAccountResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = createAccountResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = createAccountResult.emailError)
             }
 
             if (createAccountResult.passwordError != null) {
-                _passwordState.value = passwordState.value.copy(error = createAccountResult.passwordError)
+                _passwordFieldState.value = passwordFieldState.value.copy(error = createAccountResult.passwordError)
             }
 
             if (createAccountResult.dobError != null) {
-                _dobState.value = dobState.value.copy(error = createAccountResult.dobError)
+                _dobFieldState.value = dobFieldState.value.copy(error = createAccountResult.dobError)
             }
 
             if (createAccountResult.genderError != null) {
-                _genderState.value = genderState.value.copy(error = createAccountResult.genderError)
+                _genderFieldState.value = genderFieldState.value.copy(error = createAccountResult.genderError)
             }
 
             when (createAccountResult.result) {
@@ -214,48 +227,14 @@ class RegisterViewModel @Inject constructor(
                     sendVerification()
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = createAccountResult.result.message ?: "Unknown error occurred"
-                    createAccountResult.result.message?.let { Log.d("RegisterViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("RegisterViewModel", "Loading")
+                    _errorMessage.value = createAccountResult.result.message ?: "Terjadi kesalahan saat membuat akun"
+                    createAccountResult.result.message?.let { Log.e("RegisterViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("RegisterViewModel", "Unexpected error")
-                }
-            }
-        }
-    }
-
-    fun googleLogin(token: String) {
-        viewModelScope.launch {
-            _googleLoginState.value = googleLoginState.value.copy(isLoading = true)
-
-            val googleLoginResult = authUseCases.googleLogin(
-                token = token
-            )
-
-            _googleLoginState.value = googleLoginState.value.copy(isLoading = false)
-
-            when (googleLoginResult.result) {
-                is Resource.Success -> {
-                    _navigationEvent.value = "HOME_SCREEN"
-                }
-                is Resource.Error -> {
-                    _errorMessage.value = googleLoginResult.result.message ?: "Unknown error occurred"
-                    googleLoginResult.result.message?.let { Log.d("RegisterViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("RegisterViewModel", "Loading")
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("RegisterViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat membuat akun"
+                    Log.e("RegisterViewModel", "Unexpected error")
                 }
             }
         }
@@ -268,14 +247,14 @@ class RegisterViewModel @Inject constructor(
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = true)
 
             val sendVerificationResult = authUseCases.sendVerification(
-                email = emailState.value.text,
+                email = emailFieldState.value.text,
                 type = "register"
             )
 
             _sendVerificationState.value = sendVerificationState.value.copy(isLoading = false)
 
             if (sendVerificationResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = sendVerificationResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = sendVerificationResult.emailError)
             }
 
             when (sendVerificationResult.result) {
@@ -287,16 +266,13 @@ class RegisterViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = sendVerificationResult.result.message ?: "Unknown error occurred"
-                    sendVerificationResult.result.message?.let { Log.d("RegisterViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("RegisterViewModel", "Loading")
+                    _errorMessage.value = sendVerificationResult.result.message ?: "Terjadi kesalahan saat mengirim verifikasi"
+                    sendVerificationResult.result.message?.let { Log.e("RegisterViewModel", it) }
                 }
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("RegisterViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat mengirim verifikasi"
+                    Log.e("RegisterViewModel", "Unexpected error")
                 }
             }
         }
@@ -307,18 +283,18 @@ class RegisterViewModel @Inject constructor(
             _verifyOtpState.value = verifyOtpState.value.copy(isLoading = true)
 
             val verifyOtpResult = authUseCases.verifyOtp(
-                email = emailState.value.text,
-                code = otpState.value.text
+                email = emailFieldState.value.text,
+                code = otpFieldState.value.text
             )
 
             _verifyOtpState.value = verifyOtpState.value.copy(isLoading = false)
 
             if (verifyOtpResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = verifyOtpResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = verifyOtpResult.emailError)
             }
 
             if (verifyOtpResult.codeError != null) {
-                _otpState.value = otpState.value.copy(error = verifyOtpResult.codeError)
+                _otpFieldState.value = otpFieldState.value.copy(error = verifyOtpResult.codeError)
             }
 
             when (verifyOtpResult.result) {
@@ -327,17 +303,14 @@ class RegisterViewModel @Inject constructor(
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = verifyOtpResult.result.message ?: "Unknown error occurred"
-                    verifyOtpResult.result.message?.let { Log.d("RegisterViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("RegisterViewModel", "Loading")
+                    _errorMessage.value = verifyOtpResult.result.message ?: "Terjadi kesalahan saat verifikasi OTP"
+                    verifyOtpResult.result.message?.let { Log.e("RegisterViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("RegisterViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat verifikasi OTP"
+                    Log.e("RegisterViewModel", "Unexpected error")
                 }
             }
         }
@@ -345,13 +318,13 @@ class RegisterViewModel @Inject constructor(
 
     // Helper Functions
     private fun resetValues() {
-        _nameState.value = FieldState()
-        _emailState.value = FieldState()
-        _passwordState.value = FieldState()
-        _privacyPolicyState.value = false
-        _genderState.value = FieldState()
-        _dobState.value = FieldState()
-        _otpState.value = FieldState()
+        _nameFieldState.value = FieldState()
+        _emailFieldState.value = FieldState()
+        _passwordFieldState.value = FieldState()
+        _privacyPolicyChecked.value = false
+        _genderFieldState.value = FieldState()
+        _dobFieldState.value = FieldState()
+        _otpFieldState.value = FieldState()
     }
 
     fun onNavigationHandled() {

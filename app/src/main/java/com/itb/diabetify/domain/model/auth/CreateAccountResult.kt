@@ -7,12 +7,6 @@ data class CreateAccountResult(
     val emailError: String? = null,
     val passwordError: String? = null,
     val dobError: String? = null,
-    val hypertensionError: String? = null,
     val genderError: String? = null,
-    val cholesterolError: String? = null,
-    val disturbedVisionError: String? = null,
-    val weightError: String? = null,
-    val heightError: String? = null,
-    val verifyError: String? = null,
     val result:Resource<Unit>? = null
 )

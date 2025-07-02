@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,9 +56,9 @@ fun BiodataScreen(
     viewModel: RegisterViewModel
 ) {
     // States
-    val genderState by viewModel.genderState
-    val birthDateState by viewModel.dobState
-    val showDatePicker = remember { mutableStateOf(false) }
+    val genderFieldState by viewModel.genderFieldState
+    val birthDateFieldState by viewModel.dobFieldState
+    val showDatePicker by viewModel.showDatePicker
     val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.createAccountState.value.isLoading || viewModel.sendVerificationState.value.isLoading
 
@@ -141,21 +140,21 @@ fun BiodataScreen(
 
                 // Gender dropdown
                 DropdownField(
-                    selectedOption = genderState.text,
+                    selectedOption = genderFieldState.text,
                     onOptionSelected = { viewModel.setGender(it) },
                     options = options,
                     placeHolderText = "Pilih Jenis Kelamin",
                     iconResId = R.drawable.ic_users,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = genderState.error != null,
-                    errorMessage = genderState.error ?: ""
+                    isError = genderFieldState.error != null,
+                    errorMessage = genderFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Birth date field
                 InputField(
-                    value = birthDateState.text,
+                    value = birthDateFieldState.text,
                     onValueChange = { },
                     placeholderText = "Tanggal Lahir",
                     iconResId = R.drawable.ic_calendar,
@@ -163,11 +162,11 @@ fun BiodataScreen(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
                     ) {
-                        showDatePicker.value = true
+                        viewModel.toggleDatePicker()
                     },
                     enabled = false,
                     trailingIcon = {
-                        if (birthDateState.text.isNotEmpty()) {
+                        if (birthDateFieldState.text.isNotEmpty()) {
                             IconButton(
                                 onClick = { viewModel.setDob("") },
                                 modifier = Modifier.size(24.dp)
@@ -181,12 +180,12 @@ fun BiodataScreen(
                             }
                         }
                     },
-                    isError = birthDateState.error != null,
-                    errorMessage = birthDateState.error ?: ""
+                    isError = birthDateFieldState.error != null,
+                    errorMessage = birthDateFieldState.error ?: ""
                 )
 
                 // Date picker dialog
-                if (showDatePicker.value) {
+                if (showDatePicker) {
                     DatePickerModal(
                         onDateSelected = { dateMillis ->
                             dateMillis?.let {
@@ -195,7 +194,7 @@ fun BiodataScreen(
                                 viewModel.setDob(formatter.format(date))
                             }
                         },
-                        onDismiss = { showDatePicker.value = false }
+                        onDismiss = { viewModel.toggleDatePicker() },
                     )
                 }
 
@@ -203,6 +202,7 @@ fun BiodataScreen(
             }
         }
 
+        // Next button
         PrimaryButton(
             text = "Lanjut",
             onClick = {
@@ -216,7 +216,7 @@ fun BiodataScreen(
                 .padding(start = 30.dp, end = 30.dp)
                 .align(Alignment.BottomCenter)
                 .offset(y = (-30).dp),
-            enabled = genderState.error == null && birthDateState.error == null && !isLoading,
+            enabled = genderFieldState.error == null && birthDateFieldState.error == null && !isLoading,
             rightImageResId = R.drawable.ic_chevron_right,
             isLoading = isLoading
         )

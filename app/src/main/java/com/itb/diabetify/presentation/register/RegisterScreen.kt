@@ -1,12 +1,8 @@
 package com.itb.diabetify.presentation.register
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,14 +18,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.itb.diabetify.presentation.common.InputField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,13 +45,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
-import com.itb.diabetify.presentation.common.Divider
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.navgraph.Route
-import com.itb.diabetify.util.AuthResultContract
 import com.itb.diabetify.BuildConfig
 
 @Composable
@@ -67,11 +57,11 @@ fun RegisterScreen(
     viewModel: RegisterViewModel
 ) {
     // States
-    val nameState by viewModel.nameState
-    val emailState by viewModel.emailState
-    val passwordState by viewModel.passwordState
-    val privacyPolicyState by viewModel.privacyPolicyState
-    var passwordVisible by remember { mutableStateOf(false) }
+    val nameFieldState by viewModel.nameFieldState
+    val emailFieldState by viewModel.emailFieldState
+    val passwordFieldState by viewModel.passwordFieldState
+    val privacyPolicyChecked by viewModel.privacyPolicyChecked
+    val passwordVisible by viewModel.passwordVisible
 
     // Navigation event
     val navigationEvent by viewModel.navigationEvent
@@ -84,18 +74,6 @@ fun RegisterScreen(
                 }
             }
         }
-    }
-
-    // Google Sign-In client setup
-    val context = LocalContext.current
-    val googleSignInClient = remember {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestProfile()
-            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
-            .build()
-
-        GoogleSignIn.getClient(context, gso)
     }
 
     Box(
@@ -111,6 +89,7 @@ fun RegisterScreen(
                 .background(colorResource(id = R.color.white)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 25.dp, bottom = 5.dp),
                 text = "Halo,",
@@ -137,35 +116,35 @@ fun RegisterScreen(
             ) {
                 // Name field
                 InputField(
-                    value = nameState.text,
+                    value = nameFieldState.text,
                     onValueChange = { viewModel.setName(it) },
                     placeholderText = "Nama Anda",
                     iconResId = R.drawable.ic_profile,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Text,
-                    isError = nameState.error != null,
-                    errorMessage = nameState.error ?: ""
+                    isError = nameFieldState.error != null,
+                    errorMessage = nameFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Email field
                 InputField(
-                    value = emailState.text,
+                    value = emailFieldState.text,
                     onValueChange = { viewModel.setEmail(it) },
                     placeholderText = "Email",
                     iconResId = R.drawable.ic_message,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Email,
-                    isError = emailState.error != null,
-                    errorMessage = emailState.error ?: ""
+                    isError = emailFieldState.error != null,
+                    errorMessage = emailFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Password field
                 InputField(
-                    value = passwordState.text,
+                    value = passwordFieldState.text,
                     onValueChange = { viewModel.setPassword(it) },
                     placeholderText = "Kata Sandi",
                     iconResId = R.drawable.ic_lock,
@@ -175,7 +154,7 @@ fun RegisterScreen(
                     singleLine = true,
                     trailingIcon = {
                         IconButton(
-                            onClick = { passwordVisible = !passwordVisible },
+                            onClick = { viewModel.togglePasswordVisibility() },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
@@ -187,8 +166,8 @@ fun RegisterScreen(
                             )
                         }
                     },
-                    isError = passwordState.error != null,
-                    errorMessage = passwordState.error ?: ""
+                    isError = passwordFieldState.error != null,
+                    errorMessage = passwordFieldState.error ?: ""
                 )
 
                 // Privacy Policy Checkbox
@@ -199,7 +178,7 @@ fun RegisterScreen(
                         .padding(bottom = 16.dp, top = 5.dp)
                 ) {
                     Checkbox(
-                        checked = privacyPolicyState,
+                        checked = privacyPolicyChecked,
                         onCheckedChange = { viewModel.setPrivacyPolicy(it) },
                     )
                     Text(
@@ -229,6 +208,19 @@ fun RegisterScreen(
                         modifier = Modifier.clickable { /* TODO: Open privacy policy link */ }
                     )
                 }
+
+                // Register Button
+                PrimaryButton(
+                    text = "Daftar",
+                    onClick = {
+                        val isValid = viewModel.validateRegisterFields()
+                        if (isValid && privacyPolicyChecked) {
+                            navController.navigate(Route.BiodataScreen.route)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                    enabled = nameFieldState.error == null && emailFieldState.error == null && passwordFieldState.error == null && privacyPolicyChecked
+                )
             }
         }
 
@@ -237,84 +229,7 @@ fun RegisterScreen(
                 .align(Alignment.BottomCenter)
                 .padding(start = 30.dp, end = 30.dp)
         ) {
-            PrimaryButton(
-                text = "Daftar",
-                onClick = {
-                    val isValid = viewModel.validateRegisterFields()
-                    if (isValid && privacyPolicyState) {
-                        navController.navigate(Route.BiodataScreen.route)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = nameState.error == null && emailState.error == null && passwordState.error == null && privacyPolicyState
-            )
-
-            Divider(
-                text = "Atau",
-                modifier = Modifier.padding(vertical = 10.dp)
-            )
-
-            // Login with google and facebook
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                val signInRequestCode = 1
-                val authResultLauncher =
-                    rememberLauncherForActivityResult(contract = AuthResultContract(googleSignInClient)) {
-                        try {
-                            val account = it?.getResult(ApiException::class.java)
-                            if (account == null) {
-                                Log.e("GoogleSignIn", "Account is null")
-                            } else {
-                                viewModel.googleLogin(account.idToken!!)
-                            }
-                        } catch (e: ApiException) {
-                            Log.d("GoogleSignIn", "signInResult:failed code=" + e.statusCode)
-                        }
-                    }
-
-                Surface(
-                    onClick = { authResultLauncher.launch(signInRequestCode) },
-                    modifier = Modifier.size(50.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_google),
-                            contentDescription = "Google icon",
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(25.dp))
-
-                Surface(
-                    onClick = { /* TODO: Handle Facebook login */ },
-                    modifier = Modifier.size(50.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, colorResource(id = R.color.gray_3))
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_facebook),
-                            contentDescription = "Facebook icon",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-                }
-            }
-
+            // Login Button
             Text(
                 text = buildAnnotatedString {
                     append("Sudah memiliki akun? ")

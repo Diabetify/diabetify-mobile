@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -30,6 +31,9 @@ fun SuccessScreen(
     navController: NavController,
     viewModel: RegisterViewModel
 ) {
+    // States
+    val name  by viewModel.name
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +51,7 @@ fun SuccessScreen(
 
             Text(
                 modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 5.dp),
-                text = "Selamat Datang, ${viewModel.nameStateCopy.value.text}!",
+                text = "Selamat Datang, ${name}!",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,

@@ -57,7 +57,7 @@ fun BottomSheet(
     viewModel: AddActivityViewModel
 ) {
     // States
-    val surveyQuestions = questions
+    val surveyQuestions = viewModel.surveyQuestions
     val currentQuestion = surveyQuestions.find { it.id == questionType } ?: surveyQuestions.first()
 
     if (isVisible) {
@@ -178,14 +178,14 @@ fun NumericInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
-    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading || viewModel.predictionState.value.isLoading
     var inputValue by remember { mutableStateOf(currentValue ?: "") }
     var hasSubmitted by remember { mutableStateOf(false) }
     
     val fieldState = when (question.id) {
-        "cigarette" -> viewModel.smokeValueState.value
-        "weight" -> viewModel.weightValueState.value
-        "height" -> viewModel.heightValueState.value
+        "cigarette" -> viewModel.smokeFieldState.value
+        "weight" -> viewModel.weightFieldState.value
+        "height" -> viewModel.heightFieldState.value
         else -> null
     }
     
@@ -268,8 +268,18 @@ fun NumericInput(
             onClick = { 
                 hasSubmitted = true
                 when (question.id) {
-                    "cigarette" -> viewModel.handleSmoking()
-                    "weight", "height" -> viewModel.updateProfile(question.id)
+                    "cigarette" -> {
+                        val isValid = viewModel.validateSmokingField()
+                        if (isValid) {
+                            viewModel.handleSmoking()
+                        }
+                    }
+                    "weight", "height" -> {
+                        val isValid = viewModel.validateProfileFields()
+                        if (isValid) {
+                            viewModel.updateProfile(question.id)
+                        }
+                    }
                 }
             },
             enabled = canSubmit && !isLoading,
@@ -289,7 +299,7 @@ fun SelectionInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
-    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading || viewModel.predictionState.value.isLoading
     val initialValue = when (currentValue?.lowercase()) {
         "true" -> "yes"
         "false" -> "no"
@@ -299,10 +309,10 @@ fun SelectionInput(
     var selectedOption by remember { mutableStateOf(initialValue) }
     var hasSubmitted by remember { mutableStateOf(false) }
     val fieldState = when (question.id) {
-        "hypertension" -> viewModel.hypertensionValueState.value
-        "cholesterol" -> viewModel.cholesterolValueState.value
-        "bloodline" -> viewModel.bloodlineValueState.value
-        "activity" -> viewModel.workoutValueState.value
+        "hypertension" -> viewModel.hypertensionFieldState.value
+        "cholesterol" -> viewModel.cholesterolFieldState.value
+        "bloodline" -> viewModel.bloodlineFieldState.value
+        "activity" -> viewModel.workoutFieldState.value
         else -> null
     }
     
@@ -395,8 +405,18 @@ fun SelectionInput(
             onClick = { 
                 hasSubmitted = true
                 when (question.id) {
-                    "hypertension", "cholesterol", "bloodline" -> viewModel.updateProfile(question.id)
-                    "activity" -> viewModel.handleWorkout()
+                    "hypertension", "cholesterol", "bloodline" -> {
+                        val isValid = viewModel.validateProfileFields()
+                        if (isValid) {
+                            viewModel.updateProfile(question.id)
+                        }
+                    }
+                    "activity" -> {
+                        val isValid = viewModel.validateWorkoutField()
+                        if (isValid) {
+                            viewModel.handleWorkout()
+                        }
+                    }
                 }
             },
             enabled = canSubmit && !isLoading,
@@ -416,11 +436,11 @@ fun PregnancyInput(
     onSave: (String) -> Unit,
     viewModel: AddActivityViewModel
 ) {
-    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading || viewModel.predictionState.value.isLoading
     var selectedOption by remember { mutableStateOf(currentValue) }
     var hasSubmitted by remember { mutableStateOf(false) }
     
-    val fieldState = viewModel.birthValueState.value
+    val fieldState = viewModel.birthFieldState.value
     val errorMessage = fieldState.error
     val canSubmit = viewModel.isFieldValid("birth")
     
@@ -496,7 +516,10 @@ fun PregnancyInput(
             text = "Simpan",
             onClick = { 
                 hasSubmitted = true
-                viewModel.updateProfile("birth")
+                val isValid = viewModel.validateProfileFields()
+                if (isValid) {
+                    viewModel.updateProfile("birth")
+                }
             },
             enabled = canSubmit && !isLoading,
             modifier = Modifier
@@ -513,13 +536,13 @@ fun HypertensionInput(
     viewModel: AddActivityViewModel,
     onSave: (String) -> Unit
 ) {
-    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading
+    val isLoading = viewModel.addActivityState.value.isLoading || viewModel.updateActivityState.value.isLoading || viewModel.updateProfileState.value.isLoading || viewModel.predictionState.value.isLoading
     var knowsBPValue by remember { mutableStateOf<String?>(null) }
     var hasSubmitted by remember { mutableStateOf(false) }
     
     LaunchedEffect(isLoading, hasSubmitted) {
         if (hasSubmitted && !isLoading) {
-            onSave(viewModel.hypertensionValueState.value.text)
+            onSave(viewModel.hypertensionFieldState.value.text)
             hasSubmitted = false
         }
     }
@@ -597,13 +620,13 @@ fun HypertensionInput(
                         .padding(horizontal = 16.dp)
                 ) {
                     OutlinedTextField(
-                        value = viewModel.systolicValueState.value.text,
+                        value = viewModel.systolicFieldState.value.text,
                         onValueChange = { newValue ->
                             if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                                 viewModel.setSystolicValue(newValue)
-                                if (newValue.isNotEmpty() && viewModel.diastolicValueState.value.text.isNotEmpty()) {
+                                if (newValue.isNotEmpty() && viewModel.diastolicFieldState.value.text.isNotEmpty()) {
                                     val systolic = newValue.toIntOrNull() ?: 0
-                                    val diastolic = viewModel.diastolicValueState.value.text.toIntOrNull() ?: 0
+                                    val diastolic = viewModel.diastolicFieldState.value.text.toIntOrNull() ?: 0
                                     val hasHypertension = systolic >= 140 || diastolic >= 90
                                     viewModel.setHypertensionValue(hasHypertension.toString())
                                 }
@@ -626,10 +649,10 @@ fun HypertensionInput(
                                 fontWeight = FontWeight.Medium,
                             )
                         },
-                        isError = viewModel.systolicValueState.value.error != null
+                        isError = viewModel.systolicFieldState.value.error != null
                     )
                     
-                    viewModel.systolicValueState.value.error?.let { error ->
+                    viewModel.systolicFieldState.value.error?.let { error ->
                         Text(
                             text = error,
                             color = colorResource(R.color.red),
@@ -657,12 +680,12 @@ fun HypertensionInput(
                         .padding(horizontal = 16.dp)
                 ) {
                     OutlinedTextField(
-                        value = viewModel.diastolicValueState.value.text,
+                        value = viewModel.diastolicFieldState.value.text,
                         onValueChange = { newValue ->
                             if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                                 viewModel.setDiastolicValue(newValue)
-                                if (newValue.isNotEmpty() && viewModel.systolicValueState.value.text.isNotEmpty()) {
-                                    val systolic = viewModel.systolicValueState.value.text.toIntOrNull() ?: 0
+                                if (newValue.isNotEmpty() && viewModel.systolicFieldState.value.text.isNotEmpty()) {
+                                    val systolic = viewModel.systolicFieldState.value.text.toIntOrNull() ?: 0
                                     val diastolic = newValue.toIntOrNull() ?: 0
                                     val hasHypertension = systolic >= 140 || diastolic >= 90
                                     viewModel.setHypertensionValue(hasHypertension.toString())
@@ -686,10 +709,10 @@ fun HypertensionInput(
                                 fontWeight = FontWeight.Medium,
                             )
                         },
-                        isError = viewModel.diastolicValueState.value.error != null
+                        isError = viewModel.diastolicFieldState.value.error != null
                     )
                     
-                    viewModel.diastolicValueState.value.error?.let { error ->
+                    viewModel.diastolicFieldState.value.error?.let { error ->
                         Text(
                             text = error,
                             color = colorResource(R.color.red),
@@ -725,11 +748,11 @@ fun HypertensionInput(
                             .clickable { viewModel.setHypertensionValue("true") }
                     ) {
                         RadioButton(
-                            selected = viewModel.hypertensionValueState.value.text == "true",
+                            selected = viewModel.hypertensionFieldState.value.text == "true",
                             onClick = { viewModel.setHypertensionValue("true") },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
-                                unselectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                                selectedColor = if (viewModel.hypertensionFieldState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                                unselectedColor = if (viewModel.hypertensionFieldState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -750,11 +773,11 @@ fun HypertensionInput(
                             .clickable { viewModel.setHypertensionValue("false") }
                     ) {
                         RadioButton(
-                            selected = viewModel.hypertensionValueState.value.text == "false",
+                            selected = viewModel.hypertensionFieldState.value.text == "false",
                             onClick = { viewModel.setHypertensionValue("false") },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
-                                unselectedColor = if (viewModel.hypertensionValueState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
+                                selectedColor = if (viewModel.hypertensionFieldState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.primary),
+                                unselectedColor = if (viewModel.hypertensionFieldState.value.error != null) colorResource(R.color.red) else colorResource(id = R.color.black)
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -767,7 +790,7 @@ fun HypertensionInput(
                         )
                     }
                     
-                    viewModel.hypertensionValueState.value.error?.let { error ->
+                    viewModel.hypertensionFieldState.value.error?.let { error ->
                         Text(
                             text = error,
                             color = colorResource(R.color.red),
@@ -785,7 +808,10 @@ fun HypertensionInput(
             text = "Simpan",
             onClick = { 
                 hasSubmitted = true
-                viewModel.updateProfile("hypertension")
+                val isValid = viewModel.validateProfileFields()
+                if (isValid) {
+                    viewModel.updateProfile("hypertension")
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

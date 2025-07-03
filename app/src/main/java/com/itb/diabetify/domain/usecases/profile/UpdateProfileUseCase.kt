@@ -8,15 +8,16 @@ class UpdateProfileUseCase(
     private val repository: ProfileRepository
 ) {
     suspend operator fun invoke(
-        weight: String,
-        height: String,
+        weight: Int,
+        height: Int,
         hypertension: Boolean,
         macrosomicBaby: Int,
         bloodline: Boolean,
         cholesterol: Boolean,
     ): UpdateProfileResult {
-        val weightError = if (weight.isBlank()) "Weight cannot be empty" else null
-        val heightError = if (height.isBlank()) "Height cannot be empty" else null
+        val weightError: String? = if (weight < 30 || weight > 300) "Berat badan tidak valid" else null
+        val heightError: String? = if (height < 100 || height > 250) "Tinggi badan tidak valid" else null
+        val macrosomicBabyError: String? = if (macrosomicBaby < 0 || macrosomicBaby > 2) "Status bayi makrosomia tidak valid" else null
 
         if (weightError != null) {
             return UpdateProfileResult(
@@ -30,9 +31,15 @@ class UpdateProfileUseCase(
             )
         }
 
+        if (macrosomicBabyError != null) {
+            return UpdateProfileResult(
+                macrosomicBabyError = macrosomicBabyError
+            )
+        }
+
         val updateProfileResult = UpdateProfileRequest(
-            weight = weight.toIntOrNull(),
-            height = height.toIntOrNull(),
+            weight = weight,
+            height = height,
             hypertension = hypertension,
             macrosomicBaby = macrosomicBaby,
             bloodline = bloodline,

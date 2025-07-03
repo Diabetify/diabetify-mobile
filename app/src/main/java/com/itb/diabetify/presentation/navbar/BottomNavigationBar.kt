@@ -57,13 +57,13 @@ fun BottomNavigationBar(
     val selectedItem = viewModel.selectedItem.value
     val items = viewModel.navigationItems
     val middleIndex = items.size / 2
+    val showPopup by viewModel.showPopUp
 
     // Popup
-    var showPopup by remember { mutableStateOf(false) }
     if (showPopup) {
         AddActionPopup(
             isVisible = showPopup,
-            onDismissRequest = { showPopup = false },
+            onDismissRequest = { viewModel.setShowPopUp(false) },
             viewModel = addActivityViewModel
         )
     }
@@ -155,9 +155,7 @@ fun BottomNavigationBar(
         }
 
         FloatingActionButton(
-            onClick = {
-                showPopup = true
-            },
+            onClick = { viewModel.setShowPopUp(true) },
             modifier = Modifier
                 .align(Alignment.Center)
                 .shadow(8.dp, CircleShape),

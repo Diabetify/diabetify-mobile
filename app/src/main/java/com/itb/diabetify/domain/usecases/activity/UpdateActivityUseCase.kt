@@ -1,12 +1,16 @@
 package com.itb.diabetify.domain.usecases.activity
 
+import android.annotation.SuppressLint
 import com.itb.diabetify.data.remote.activity.request.UpdateActivityRequest
 import com.itb.diabetify.domain.model.activity.UpdateActivityResult
 import com.itb.diabetify.domain.repository.ActivityRepository
+import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
 
 class UpdateActivityUseCase(
     private val repository: ActivityRepository
 ) {
+    @SuppressLint("NewApi")
     suspend operator fun invoke(
         activityId: String,
         activityDate: String,
@@ -14,9 +18,21 @@ class UpdateActivityUseCase(
         value: Int,
     ): UpdateActivityResult {
         val activityIdError: String? = if (activityId.isEmpty()) "ID aktivitas tidak boleh kosong" else null
-        val activityDateError: String? = if (activityDate.isEmpty()) "Tanggal aktivitas tidak boleh kosong" else null
-        val activityTypeError: String? = if (activityType.isEmpty()) "Jenis aktivitas tidak boleh kosong" else null
-        val valueError: String? = if (value < 0) "Nilai aktivitas harus lebih dari 0" else null
+        val activityDateError: String? = when {
+            try {
+                ZonedDateTime.parse(activityDate)
+                false
+            } catch (e: DateTimeParseException) {
+                true
+            } -> "Format tanggal tidak valid"
+            else -> null
+        }
+        val activityTypeError: String? = if (activityType != "workout" && activityType != "smoke") "Jenis aktivitas tidak valid" else null
+        val valueError: String? = when {
+            activityType == "smoke" && (value < 0 || value > 60) -> "Jumlah rokok tidak valid"
+            activityType == "workout" && (value < 0 || value > 1) -> "Nilai aktivitas tidak valid"
+            else -> null
+        }
 
         if (activityIdError != null) {
             return UpdateActivityResult(

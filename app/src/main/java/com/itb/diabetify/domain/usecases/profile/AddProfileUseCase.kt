@@ -21,7 +21,7 @@ class AddProfileUseCase(
     ): AddProfileResult {
         val weightError: String? = if (weight < 30 || weight > 300) "Berat badan tidak valid" else null
         val heightError: String? = if (height < 100 || height > 250) "Tinggi badan tidak valid" else null
-        val macrosomicBabyError: String? = if (macrosomicBaby < 0 || macrosomicBaby > 2) "Jumlah bayi makrosomia tidak valid" else null
+        val macrosomicBabyError: String? = if (macrosomicBaby < 0 || macrosomicBaby > 2) "Status bayi makrosomia tidak valid" else null
         val smokingError: String? = if (smoking < 0 || smoking > 2) "Status merokok tidak valid" else null
         val yearOfSmokingError: String? = if (yearOfSmoking != 0 && (yearOfSmoking < 10 || yearOfSmoking > 80)) "Tahun merokok tidak valid" else null
         val physicalActivityFrequencyError: String? = if (physicalActivityFrequency < 0 || physicalActivityFrequency > 7) "Frekuensi aktivitas fisik tidak valid" else null

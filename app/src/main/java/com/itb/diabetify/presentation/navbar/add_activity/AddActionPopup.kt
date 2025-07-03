@@ -28,9 +28,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,38 +54,38 @@ fun AddActionPopup(
     viewModel: AddActivityViewModel
 ) {
     // States
-    val smokeValueState by viewModel.smokeValueState
-    val workoutValueState by viewModel.workoutValueState
-    val weightValueState by viewModel.weightValueState
-    val heightValueState by viewModel.heightValueState
-    val birthValueState by viewModel.birthValueState
-    val hypertensionValueState by viewModel.hypertensionValueState
-    val cholesterolValueState by viewModel.cholesterolValueState
-    val bloodlineValueState by viewModel.bloodlineValueState
+    val smokeFieldState by viewModel.smokeFieldState
+    val workoutFieldState by viewModel.workoutFieldState
+    val weightFieldState by viewModel.weightFieldState
+    val heightFieldState by viewModel.heightFieldState
+    val birthFieldState by viewModel.birthFieldState
+    val hypertensionFieldState by viewModel.hypertensionFieldState
+    val cholesterolFieldState by viewModel.cholesterolFieldState
+    val bloodlineFieldState by viewModel.bloodlineFieldState
     val userGender by viewModel.userGender
     val isFemale = userGender?.lowercase() == "perempuan" || userGender?.lowercase() == "female"
     val currentValues = mapOf(
-        "weight" to weightValueState.text,
-        "height" to heightValueState.text,
-        "cigarette" to smokeValueState.text,
-        "activity" to workoutValueState.text,
-        "birth" to birthValueState.text,
-        "hypertension" to hypertensionValueState.text,
-        "cholesterol" to cholesterolValueState.text,
-        "bloodline" to bloodlineValueState.text
+        "weight" to weightFieldState.text,
+        "height" to heightFieldState.text,
+        "cigarette" to smokeFieldState.text,
+        "activity" to workoutFieldState.text,
+        "birth" to birthFieldState.text,
+        "hypertension" to hypertensionFieldState.text,
+        "cholesterol" to cholesterolFieldState.text,
+        "bloodline" to bloodlineFieldState.text
     )
+    val currentQuestionType by viewModel.currentQuestionType
+    val showBottomSheet by viewModel.showBottomSheet
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
-    var currentQuestionType by remember { mutableStateOf("weight") }
 
     // Bottom Sheet
-    var showBottomSheet by remember { mutableStateOf(false) }
     if (showBottomSheet) {
         val isNumericQuestion = listOf("weight", "height", "cigarette").contains(currentQuestionType)
 
         BottomSheet(
-            isVisible = showBottomSheet,
-            onDismissRequest = { showBottomSheet = false },
+            isVisible = true,
+            onDismissRequest = { viewModel.setShowBottomSheet(false) },
             questionType = currentQuestionType,
             currentNumericValue = if (isNumericQuestion) currentValues[currentQuestionType] else null,
             currentSelectionValue = if (!isNumericQuestion) currentValues[currentQuestionType] else null,
@@ -123,7 +120,7 @@ fun AddActionPopup(
                         verticalArrangement = Arrangement.spacedBy(18.dp),
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
-                        // Monthly tracking options
+                        // Non-daily tracking options
                         AnimatedVisibility(
                             visible = true,
                             enter = fadeIn(animationSpec = tween(300, delayMillis = 120)) +
@@ -165,8 +162,8 @@ fun AddActionPopup(
                                 label = "Berat",
                                 delayMillis = 150,
                                 onClick = {
-                                    currentQuestionType = "weight"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("weight")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
 
@@ -175,8 +172,8 @@ fun AddActionPopup(
                                 label = "Tinggi",
                                 delayMillis = 200,
                                 onClick = {
-                                    currentQuestionType = "height"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("height")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
                         }
@@ -190,8 +187,8 @@ fun AddActionPopup(
                                 label = "Hipertensi",
                                 delayMillis = 300,
                                 onClick = {
-                                    currentQuestionType = "hypertension"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("hypertension")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
 
@@ -200,8 +197,8 @@ fun AddActionPopup(
                                 label = "Kolesterol",
                                 delayMillis = 250,
                                 onClick = {
-                                    currentQuestionType = "cholesterol"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("cholesterol")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
                         }
@@ -215,8 +212,8 @@ fun AddActionPopup(
                                 label = "Keluarga",
                                 delayMillis = 250,
                                 onClick = {
-                                    currentQuestionType = "bloodline"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("bloodline")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
 
@@ -226,8 +223,8 @@ fun AddActionPopup(
                                     label = "Kehamilan",
                                     delayMillis = 300,
                                     onClick = {
-                                        currentQuestionType = "birth"
-                                        showBottomSheet = true
+                                        viewModel.setCurrentQuestionType("birth")
+                                        viewModel.setShowBottomSheet(true)
                                     }
                                 )
                             }
@@ -275,8 +272,8 @@ fun AddActionPopup(
                                 label = "Rokok",
                                 delayMillis = 50,
                                 onClick = {
-                                    currentQuestionType = "cigarette"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("cigarette")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
 
@@ -285,8 +282,8 @@ fun AddActionPopup(
                                 label = "Aktivitas",
                                 delayMillis = 100,
                                 onClick = {
-                                    currentQuestionType = "activity"
-                                    showBottomSheet = true
+                                    viewModel.setCurrentQuestionType("activity")
+                                    viewModel.setShowBottomSheet(true)
                                 }
                             )
                         }

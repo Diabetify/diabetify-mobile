@@ -87,7 +87,6 @@ fun TipsDetailScreen(
                 )
             }
 
-            // Content
             if (tipsDetail != null) {
                 Column(
                     modifier = Modifier
@@ -184,7 +183,7 @@ private fun TipsSection(
             text = section.title,
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             color = colorResource(id = R.color.primary)
         )
 
@@ -207,19 +206,19 @@ private fun FormattedContent(content: String) {
 
                 line.trimStart().startsWith("•") -> {
                     val cleanText = line.trimStart().removePrefix("•").trim()
-                    BulletPoint(
+                    Point(
                         text = cleanText,
                         level = 0,
-                        bulletChar = "•"
+                        symbol = "•"
                     )
                 }
 
                 line.trimStart().startsWith("  -") || line.trimStart().startsWith("- ") -> {
                     val cleanText = line.trimStart().removePrefix("-").trim()
-                    BulletPoint(
+                    Point(
                         text = cleanText,
                         level = 1,
-                        bulletChar = "–"
+                        symbol = "-"
                     )
                 }
 
@@ -252,9 +251,9 @@ private fun FormattedContent(content: String) {
                             text = line.trim(),
                             fontFamily = poppinsFontFamily,
                             fontWeight = if (line.trim().endsWith(":")) FontWeight.Medium else FontWeight.Normal,
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             color = Color.Black.copy(alpha = 0.8f),
-                            lineHeight = 24.sp,
+                            lineHeight = 20.sp,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -265,10 +264,10 @@ private fun FormattedContent(content: String) {
 }
 
 @Composable
-private fun BulletPoint(
+private fun Point(
     text: String,
     level: Int,
-    bulletChar: String
+    symbol: String = "•"
 ) {
     Row(
         modifier = Modifier
@@ -277,25 +276,21 @@ private fun BulletPoint(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
-        Box(
-            modifier = Modifier
-                .size(6.dp)
-                .background(
-                    color = colorResource(id = R.color.primary),
-                    shape = CircleShape
-                )
-                .align(Alignment.CenterVertically)
+        Text(
+            text = symbol,
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            color = Color.Black.copy(alpha = 0.6f),
+            modifier = Modifier.width(16.dp)
         )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
         Text(
             text = text,
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             color = Color.Black.copy(alpha = 0.8f),
-            lineHeight = 24.sp,
+            lineHeight = 20.sp,
             modifier = Modifier.weight(1f)
         )
     }
@@ -317,7 +312,7 @@ private fun ReadMoreSection(
             text = "Baca Selengkapnya",
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             color = colorResource(id = R.color.primary)
         )
 

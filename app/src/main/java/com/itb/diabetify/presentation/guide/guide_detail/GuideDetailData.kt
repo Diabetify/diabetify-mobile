@@ -171,7 +171,7 @@ Dalam konteks Diabetify, XAI membantu menjelaskan bagaimana berbagai faktor berk
 • Narasi tentang pengaruh masing-masing faktor risiko"""
             ),
             GuideSection(
-                title = "Cara Kerja Prediksi",
+                title = "Validitas Hasil Prediksi",
                 content = """Diabetify menggunakan model AI canggih yang telah dilatih dengan data kesehatan dari ribuan individu. Model ini menganalisis berbagai faktor risiko untuk memberikan prediksi risiko diabetes yang akurat dan personal.
                     
 Proses prediksi melibatkan:
@@ -180,18 +180,6 @@ Proses prediksi melibatkan:
 3. Perhitungan skor risiko
 4. Penjelasan kontribusi setiap faktor
                 """
-            ),
-            GuideSection(
-                title = "Interpretasi Hasil",
-                content = """Skor Risiko:
-• 0-35%: Risiko Rendah
-• 35-55%: Risiko Sedang
-• 55-70%: Risiko Tinggi
-• >70%: Risiko Sangat Tinggi
-
-Setiap faktor risiko ditampilkan dengan:
-• Persentase kontribusi
-• Penjelasan pengaruh"""
             ),
             GuideSection(
                 title = "Menggunakan Hasil Prediksi",

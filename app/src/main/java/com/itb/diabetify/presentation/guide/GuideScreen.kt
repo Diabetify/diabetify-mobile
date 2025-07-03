@@ -125,7 +125,6 @@ fun GuideScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Divider
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -227,7 +226,6 @@ fun GuideScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Divider
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -250,8 +248,11 @@ fun GuideScreen(
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
 
-                faqCards.forEach{ faqCardData ->
-                    FAQCard(faqCardData)
+                faqCards.forEachIndexed { index, faqCardData ->
+                    FAQCard(
+                        faqCardData = faqCardData,
+                        initiallyExpanded = index == 0
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 

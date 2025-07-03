@@ -8,17 +8,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NotificationReceiver : BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver() {
     
     @Inject
     lateinit var notificationManager: NotificationManager
     
     override fun onReceive(context: Context?, intent: Intent?) {
-        context?.let {
-            if (notificationManager.isDailyReminderEnabled()) {
-                notificationManager.showDailyReminder()
-                notificationManager.rescheduleNextNotification()
+        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+            context?.let {
+                if (notificationManager.isDailyReminderEnabled()) {
+                    notificationManager.scheduleDailyNotification()
+                }
             }
         }
     }
-} 
+}

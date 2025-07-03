@@ -6,4 +6,5 @@ interface NotificationManager {
     fun cancelDailyNotification()
     fun isDailyReminderEnabled(): Boolean
     fun setDailyReminderEnabled(enabled: Boolean)
-} 
+    fun rescheduleNextNotification()
+}

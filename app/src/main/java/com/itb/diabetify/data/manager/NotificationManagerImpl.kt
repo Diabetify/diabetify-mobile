@@ -104,20 +104,21 @@ class NotificationManagerImpl @Inject constructor(
         if (calendar.timeInMillis <= System.currentTimeMillis()) {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
-        
+
         try {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-            
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                pendingIntent
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+            }
         } catch (e: SecurityException) {
             alarmManager.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,
@@ -160,6 +161,12 @@ class NotificationManagerImpl @Inject constructor(
         }
     }
     
+    override fun rescheduleNextNotification() {
+        if (isDailyReminderEnabled()) {
+            scheduleDailyNotification()
+        }
+    }
+    
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -176,4 +183,4 @@ class NotificationManagerImpl @Inject constructor(
             notificationManager.createNotificationChannel(channel)
         }
     }
-} 
+}

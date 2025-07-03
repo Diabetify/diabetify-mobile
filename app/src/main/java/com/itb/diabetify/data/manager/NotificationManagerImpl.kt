@@ -32,7 +32,11 @@ class NotificationManagerImpl @Inject constructor(
         const val CHANNEL_NAME = "Daily Health Reminder"
         const val CHANNEL_DESCRIPTION = "Daily reminders for health monitoring"
         const val ALARM_REQUEST_CODE = 2001
+        const val PREFS_NAME = "diabetify_notifications"
+        const val DAILY_REMINDER_KEY = "daily_reminder_enabled"
     }
+    
+    private val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     
     override fun showDailyReminder() {
         createNotificationChannel()
@@ -137,6 +141,22 @@ class NotificationManagerImpl @Inject constructor(
         pendingIntent?.let {
             alarmManager.cancel(it)
             it.cancel()
+        }
+    }
+    
+    override fun isDailyReminderEnabled(): Boolean {
+        return sharedPreferences.getBoolean(DAILY_REMINDER_KEY, true)
+    }
+    
+    override fun setDailyReminderEnabled(enabled: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean(DAILY_REMINDER_KEY, enabled)
+            .apply()
+            
+        if (enabled) {
+            scheduleDailyNotification()
+        } else {
+            cancelDailyNotification()
         }
     }
     

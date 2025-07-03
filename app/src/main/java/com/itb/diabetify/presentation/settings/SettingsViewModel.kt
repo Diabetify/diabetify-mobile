@@ -6,10 +6,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.itb.diabetify.domain.repository.UserRepository
 import com.itb.diabetify.domain.usecases.auth.AuthUseCases
-import com.itb.diabetify.domain.usecases.user.EditUserUseCase
 import com.itb.diabetify.domain.usecases.user.UserUseCases
+import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -22,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val userUseCases: UserUseCases,
-    private val authUseCases: AuthUseCases
+    private val authUseCases: AuthUseCases,
+    private val notificationUseCases: NotificationUseCases
 ): ViewModel() {
     // Navigation, Error, and Success States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -44,71 +44,96 @@ class SettingsViewModel @Inject constructor(
     private var _logoutState = mutableStateOf(DataState())
     val logoutState: State<DataState> = _logoutState
 
+    // UI States
+    private val _dailyReminderEnabled = mutableStateOf(true)
+    val dailyReminderEnabled: State<Boolean> = _dailyReminderEnabled
+
+    private val _showLogoutDialog = mutableStateOf(false)
+    val showLogoutDialog: State<Boolean> = _showLogoutDialog
+
+    private val _showDatePicker = mutableStateOf(false)
+    val showDatePicker: State<Boolean> = _showDatePicker
+
     // Field States
-    private val _nameState = mutableStateOf(FieldState())
-    val nameState: State<FieldState> = _nameState
+    private val _nameFieldState = mutableStateOf(FieldState())
+    val nameFieldState: State<FieldState> = _nameFieldState
 
-    private val _emailState = mutableStateOf(FieldState())
-    val emailState: State<FieldState> = _emailState
+    private val _emailFieldState = mutableStateOf(FieldState())
+    val emailFieldState: State<FieldState> = _emailFieldState
 
-    private val _genderState = mutableStateOf(FieldState())
-    val genderState: State<FieldState> = _genderState
+    private val _genderFieldState = mutableStateOf(FieldState())
+    val genderFieldState: State<FieldState> = _genderFieldState
 
-    private val _dobState = mutableStateOf(FieldState())
-    val dobState: State<FieldState> = _dobState
+    private val _dobFieldState = mutableStateOf(FieldState())
+    val dobFieldState: State<FieldState> = _dobFieldState
 
     // Initialization
     init {
         collectUserData()
+        loadNotificationPreferences()
+    }
+
+    // Setters for UI States
+    fun setDailyReminderEnabled(enabled: Boolean) {
+        _dailyReminderEnabled.value = enabled
+        notificationUseCases.setNotificationPreferences(enabled)
+    }
+
+    fun setShowLogoutDialog(show: Boolean) {
+        _showLogoutDialog.value = show
+    }
+
+    fun setShowDatePicker(show: Boolean) {
+        _showDatePicker.value = show
     }
 
     // Setters for Field States
     fun setName(value: String) {
-        _nameState.value = nameState.value.copy(error = null)
-        _nameState.value = nameState.value.copy(text = value)
+        _nameFieldState.value = nameFieldState.value.copy(error = null)
+        _nameFieldState.value = nameFieldState.value.copy(text = value)
     }
 
     fun setEmail(value: String) {
-        _emailState.value = emailState.value.copy(error = null)
-        _emailState.value = emailState.value.copy(text = value)
+        _emailFieldState.value = emailFieldState.value.copy(error = null)
+        _emailFieldState.value = emailFieldState.value.copy(text = value)
     }
 
     fun setGender(value: String) {
-        _genderState.value = genderState.value.copy(error = null)
-        _genderState.value = genderState.value.copy(text = value)
+        _genderFieldState.value = genderFieldState.value.copy(error = null)
+        _genderFieldState.value = genderFieldState.value.copy(text = value)
     }
 
     fun setDob(value: String) {
-        _dobState.value = dobState.value.copy(error = null)
-        _dobState.value = dobState.value.copy(text = value)
+        _dobFieldState.value = dobFieldState.value.copy(error = null)
+        _dobFieldState.value = dobFieldState.value.copy(text = value)
     }
 
     // Validation Functions
     fun validateEditProfileFields(): Boolean {
-        val name = nameState.value.text
-        val email = emailState.value.text
-        val gender = genderState.value.text
-        val dob = dobState.value.text
+        val name = nameFieldState.value.text
+        val email = emailFieldState.value.text
+        val gender = genderFieldState.value.text
+        val dob = dobFieldState.value.text
 
         var isValid = true
 
         if (name.isEmpty()) {
-            _nameState.value = nameState.value.copy(error = "Nama tidak boleh kosong")
+            _nameFieldState.value = nameFieldState.value.copy(error = "Nama tidak boleh kosong")
             isValid = false
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailState.value = emailState.value.copy(error = "Email tidak valid")
+            _emailFieldState.value = emailFieldState.value.copy(error = "Email tidak valid")
             isValid = false
         }
 
         if (gender.isEmpty()) {
-            _genderState.value = genderState.value.copy(error = "Jenis kelamin tidak boleh kosong")
+            _genderFieldState.value = genderFieldState.value.copy(error = "Jenis kelamin tidak boleh kosong")
             isValid = false
         }
 
         if (dob.isEmpty()) {
-            _dobState.value = dobState.value.copy(error = "Tanggal lahir tidak boleh kosong")
+            _dobFieldState.value = dobFieldState.value.copy(error = "Tanggal lahir tidak boleh kosong")
             isValid = false
         }
 
@@ -116,25 +141,29 @@ class SettingsViewModel @Inject constructor(
     }
 
     // Use Case Calls
+    private fun loadNotificationPreferences() {
+        _dailyReminderEnabled.value = notificationUseCases.getNotificationPreferences()
+    }
+
     private fun collectUserData() {
         viewModelScope.launch {
             _userState.value = userState.value.copy(isLoading = true)
 
             userUseCases.getUserRepository().onEach { user ->
                 user?.let {
-                    _nameState.value = nameState.value.copy(
+                    _nameFieldState.value = nameFieldState.value.copy(
                         text = it.name,
                         error = null
                     )
-                    _emailState.value = emailState.value.copy(
+                    _emailFieldState.value = emailFieldState.value.copy(
                         text = it.email,
                         error = null
                     )
-                    _genderState.value = genderState.value.copy(
+                    _genderFieldState.value = genderFieldState.value.copy(
                         text = it.gender,
                         error = null
                     )
-                    _dobState.value = dobState.value.copy(
+                    _dobFieldState.value = dobFieldState.value.copy(
                         text = it.dob,
                         error = null
                     )
@@ -149,16 +178,16 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _editProfileState.value = editProfileState.value.copy(isLoading = true)
 
-            val dob = dobState.value.text
+            val dob = dobFieldState.value.text
             val dobParts = dob.split("/")
             val dobFormatted = "${dobParts[2]}-${dobParts[1]}-${dobParts[0]}"
 
-            val gender = genderState.value.text
+            val gender = genderFieldState.value.text
             val genderFormatted = if (gender == "Laki-laki") { "male" } else { "female" }
 
             val editUserResult = userUseCases.editUser(
-                name = nameState.value.text,
-                email = emailState.value.text,
+                name = nameFieldState.value.text,
+                email = emailFieldState.value.text,
                 dob = dobFormatted,
                 gender = genderFormatted
             )
@@ -166,19 +195,19 @@ class SettingsViewModel @Inject constructor(
             _editProfileState.value = editProfileState.value.copy(isLoading = false)
 
             if (editUserResult.nameError != null) {
-                _nameState.value = nameState.value.copy(error = editUserResult.nameError)
+                _nameFieldState.value = nameFieldState.value.copy(error = editUserResult.nameError)
             }
 
             if (editUserResult.emailError != null) {
-                _emailState.value = emailState.value.copy(error = editUserResult.emailError)
+                _emailFieldState.value = emailFieldState.value.copy(error = editUserResult.emailError)
             }
 
             if (editUserResult.genderError != null) {
-                _genderState.value = genderState.value.copy(error = editUserResult.genderError)
+                _genderFieldState.value = genderFieldState.value.copy(error = editUserResult.genderError)
             }
 
             if (editUserResult.dobError != null) {
-                _dobState.value = dobState.value.copy(error = editUserResult.dobError)
+                _dobFieldState.value = dobFieldState.value.copy(error = editUserResult.dobError)
             }
 
             when (editUserResult.result) {
@@ -187,17 +216,14 @@ class SettingsViewModel @Inject constructor(
                     Log.d("SettingsViewModel", "Profile updated successfully")
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = editUserResult.result.message ?: "Unknown error occurred"
-                    editUserResult.result.message?.let { Log.d("SettingsViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("SettingsViewModel", "Loading")
+                    _errorMessage.value = editUserResult.result.message ?: "Terjadi kesalahan saat memperbarui profil"
+                    editUserResult.result.message?.let { Log.e("SettingsViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("SettingsViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat memperbarui profil"
+                    Log.e("SettingsViewModel", "Unexpected error")
                 }
             }
         }
@@ -216,17 +242,14 @@ class SettingsViewModel @Inject constructor(
                     _navigationEvent.value = "LOGIN_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = logoutResult.result.message ?: "Unknown error occurred"
-                    logoutResult.result.message?.let { Log.d("HomeViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("HomeViewModel", "Loading")
+                    _errorMessage.value = logoutResult.result.message ?: "Terjadi kesalahan saat logout"
+                    logoutResult.result.message?.let { Log.e("SettingsViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HomeViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat logout"
+                    Log.e("SettingsViewModel", "Unexpected error")
                 }
             }
         }

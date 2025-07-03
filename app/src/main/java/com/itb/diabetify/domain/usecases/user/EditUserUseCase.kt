@@ -43,7 +43,6 @@ class EditUserUseCase(
             )
         }
 
-
         val editUserRequest = EditUserRequest(
             name = name.trim(),
             email = email.trim(),

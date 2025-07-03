@@ -58,12 +58,11 @@ fun EditProfileScreen(
     viewModel: SettingsViewModel
 ) {
     // States
-    val nameState by viewModel.nameState
-    val emailState by viewModel.emailState
-    val genderState by viewModel.genderState
-    val birthDateState by viewModel.dobState
-    var showImagePicker by remember { mutableStateOf(false) }
-    val showDatePicker = remember { mutableStateOf(false) }
+    val nameFieldState by viewModel.nameFieldState
+    val emailFieldState by viewModel.emailFieldState
+    val genderFieldState by viewModel.genderFieldState
+    val birthDateFieldState by viewModel.dobFieldState
+    val showDatePicker by viewModel.showDatePicker
     val isLoading = viewModel.editProfileState.value.isLoading
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
@@ -129,8 +128,7 @@ fun EditProfileScreen(
                                 modifier = Modifier
                                     .size(150.dp)
                                     .clip(CircleShape)
-                                    .background(colorResource(id = R.color.primary).copy(alpha = 0.1f))
-                                    .clickable { showImagePicker = true },
+                                    .background(colorResource(id = R.color.primary).copy(alpha = 0.1f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Image(
@@ -157,14 +155,14 @@ fun EditProfileScreen(
                         textAlign = TextAlign.Start
                     )
                     InputField(
-                        value = nameState.text,
+                        value = nameFieldState.text,
                         onValueChange = { viewModel.setName(it) },
                         placeholderText = "Nama Anda",
                         iconResId = R.drawable.ic_profile,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardType = KeyboardType.Text,
-                        isError = nameState.error != null,
-                        errorMessage = nameState.error ?: ""
+                        isError = nameFieldState.error != null,
+                        errorMessage = nameFieldState.error ?: ""
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
@@ -179,14 +177,15 @@ fun EditProfileScreen(
                         textAlign = TextAlign.Start
                     )
                     InputField(
-                        value = emailState.text,
+                        value = emailFieldState.text,
                         onValueChange = { viewModel.setEmail(it) },
                         placeholderText = "Email",
                         iconResId = R.drawable.ic_message,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardType = KeyboardType.Email,
-                        isError = emailState.error != null,
-                        errorMessage = emailState.error ?: ""
+                        isError = emailFieldState.error != null,
+                        errorMessage = emailFieldState.error ?: "",
+                        enabled = false
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
@@ -202,14 +201,14 @@ fun EditProfileScreen(
                         textAlign = TextAlign.Start
                     )
                     DropdownField(
-                        selectedOption = genderState.text,
+                        selectedOption = genderFieldState.text,
                         onOptionSelected = { viewModel.setGender(it) },
                         options = options,
                         placeHolderText = "Pilih Jenis Kelamin",
                         iconResId = R.drawable.ic_users,
                         modifier = Modifier.fillMaxWidth(),
-                        isError = genderState.error != null,
-                        errorMessage = genderState.error ?: ""
+                        isError = genderFieldState.error != null,
+                        errorMessage = genderFieldState.error ?: ""
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
@@ -224,7 +223,7 @@ fun EditProfileScreen(
                         textAlign = TextAlign.Start
                     )
                     InputField(
-                        value = birthDateState.text,
+                        value = birthDateFieldState.text,
                         onValueChange = { },
                         placeholderText = "Tanggal Lahir",
                         iconResId = R.drawable.ic_calendar,
@@ -232,11 +231,11 @@ fun EditProfileScreen(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-                            showDatePicker.value = true
+                            viewModel.setShowDatePicker(true)
                         },
                         enabled = false,
                         trailingIcon = {
-                            if (birthDateState.text.isNotEmpty()) {
+                            if (birthDateFieldState.text.isNotEmpty()) {
                                 IconButton(
                                     onClick = { viewModel.setDob("") },
                                     modifier = Modifier.size(24.dp)
@@ -250,12 +249,12 @@ fun EditProfileScreen(
                                 }
                             }
                         },
-                        isError = birthDateState.error != null,
-                        errorMessage = birthDateState.error ?: ""
+                        isError = birthDateFieldState.error != null,
+                        errorMessage = birthDateFieldState.error ?: ""
                     )
 
                     // Date picker dialog
-                    if (showDatePicker.value) {
+                    if (showDatePicker) {
                         DatePickerModal(
                             onDateSelected = { dateMillis ->
                                 dateMillis?.let {
@@ -264,7 +263,7 @@ fun EditProfileScreen(
                                     viewModel.setDob(formatter.format(date))
                                 }
                             },
-                            onDismiss = { showDatePicker.value = false },
+                            onDismiss = { viewModel.setShowDatePicker(false) },
                             minimumAgeYears = 20,
                         )
                     }
@@ -284,7 +283,7 @@ fun EditProfileScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp),
-                enabled = nameState.error == null && emailState.error == null && genderState.error == null && birthDateState.error == null,
+                enabled = nameFieldState.error == null && emailFieldState.error == null && genderFieldState.error == null && birthDateFieldState.error == null,
                 isLoading = isLoading
             )
         }

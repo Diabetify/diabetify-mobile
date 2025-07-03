@@ -14,9 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -45,12 +42,11 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onLogout: () -> Unit
 ) {
-    // Get context
-    val context = LocalContext.current
-    
     // States
+    val showLogoutDialog by viewModel.showLogoutDialog
     val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.logoutState.value.isLoading
+    val context = LocalContext.current
 
     // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
@@ -66,14 +62,13 @@ fun SettingsScreen(
     }
 
     // Logout Dialog
-    var showLogoutDialog by remember { mutableStateOf(false) }
     if (showLogoutDialog) {
         ConfirmationDialog(
             onConfirm = {
                 viewModel.logout()
-                showLogoutDialog = false
+                viewModel.setShowLogoutDialog(false)
             },
-            onDismiss = { showLogoutDialog = false }
+            onDismiss = { viewModel.setShowLogoutDialog(false) }
         )
     }
 
@@ -124,8 +119,8 @@ fun SettingsScreen(
 
                 // User profile card
                 ProfileCard(
-                    name = viewModel.nameState.value.text,
-                    email = viewModel.emailState.value.text,
+                    name = viewModel.nameFieldState.value.text,
+                    email = viewModel.emailFieldState.value.text,
                     onEditClick = {
                         navController.navigate(Route.EditProfileScreen.route) {
                             launchSingleTop = true
@@ -135,18 +130,20 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                var dailyReminderEnabled by remember { mutableStateOf(true) }
+                // Notification settings
                 NotificationCard(
                     title = "Pengaturan Notifikasi",
                     notificationItems = listOf(
                         NotificationItem(
                             icon = R.drawable.ic_notification,
                             title = "Pengingat Harian",
-                            isEnabled = dailyReminderEnabled,
-                            onToggle = { dailyReminderEnabled = it }
+                            isEnabled = viewModel.dailyReminderEnabled.value,
+                            onToggle = { enabled -> viewModel.setDailyReminderEnabled(enabled) }
                         )
                     )
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Cards section
                 getSettingsCards(context).forEach { cardData ->
@@ -159,7 +156,7 @@ fun SettingsScreen(
                 // Logout button
                 PrimaryButton(
                     text = "Logout",
-                    onClick = { showLogoutDialog = true },
+                    onClick = { viewModel.setShowLogoutDialog(true) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

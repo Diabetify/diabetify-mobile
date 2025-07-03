@@ -15,7 +15,9 @@ class NotificationReceiver : BroadcastReceiver() {
     
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
-            notificationManager.showDailyReminder()
+            if (notificationManager.isDailyReminderEnabled()) {
+                notificationManager.showDailyReminder()
+            }
         }
     }
 } 

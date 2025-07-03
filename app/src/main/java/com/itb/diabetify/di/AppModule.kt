@@ -62,6 +62,8 @@ import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.domain.usecases.notification.NotificationUseCases
 import com.itb.diabetify.domain.usecases.notification.ScheduleNotificationUseCase
 import com.itb.diabetify.domain.usecases.notification.CancelNotificationUseCase
+import com.itb.diabetify.domain.usecases.notification.GetNotificationPreferencesUseCase
+import com.itb.diabetify.domain.usecases.notification.SetNotificationPreferencesUseCase
 import com.itb.diabetify.domain.manager.NotificationManager
 import com.itb.diabetify.data.manager.NotificationManagerImpl
 import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
@@ -361,7 +363,9 @@ object AppModule {
     ): NotificationUseCases {
         return NotificationUseCases(
             scheduleNotification = ScheduleNotificationUseCase(notificationManager),
-            cancelNotification = CancelNotificationUseCase(notificationManager)
+            cancelNotification = CancelNotificationUseCase(notificationManager),
+            getNotificationPreferences = GetNotificationPreferencesUseCase(notificationManager),
+            setNotificationPreferences = SetNotificationPreferencesUseCase(notificationManager)
         )
     }
 

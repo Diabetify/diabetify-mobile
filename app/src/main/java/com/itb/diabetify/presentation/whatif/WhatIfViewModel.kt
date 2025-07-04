@@ -12,7 +12,6 @@ import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactor
-import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,12 +25,15 @@ class WhatIfViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases,
     private val profileUseCases: ProfileUseCases
 ): ViewModel() {
-    // Navigation States
+    // Navigation and Error States
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
+
+    private val _successMessage = mutableStateOf<String?>(null)
+    val successMessage: State<String?> = _successMessage
 
     // Operational States
     private val _latestPredictionState = mutableStateOf(DataState())
@@ -43,7 +45,7 @@ class WhatIfViewModel @Inject constructor(
     private val _whatIfPredictionState = mutableStateOf(DataState())
     val whatIfPredictionState: State<DataState> = _whatIfPredictionState
 
-    // States
+    // UI States
     private val _predictionScore = mutableDoubleStateOf(0.0)
     val predictionScore: State<Double> = _predictionScore
 
@@ -72,6 +74,7 @@ class WhatIfViewModel @Inject constructor(
     private val _isBloodline = mutableStateOf(false)
     val isBloodline: State<Boolean> = _isBloodline
 
+    // Field States
     private val _smokingStatusFieldState = mutableStateOf(FieldState())
     val smokingStatusFieldState: State<FieldState> = _smokingStatusFieldState
 
@@ -92,7 +95,7 @@ class WhatIfViewModel @Inject constructor(
 
     // Initialization
     init {
-        collectLatestPrediction()
+        collectLatestPredictionData()
         collectProfileData()
     }
 
@@ -127,8 +130,45 @@ class WhatIfViewModel @Inject constructor(
         _isCholesterolFieldState.value = isCholesterolFieldState.value.copy(text = value)
     }
 
+    // Validation Functions
+    fun validateFields(): Boolean {
+        var isValid = true
+
+        if (smokingStatusFieldState.value.text.isBlank()) {
+            _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = "Status merokok tidak boleh kosong")
+            isValid = false
+        }
+
+        if (averageCigarettesFieldState.value.text.toInt() < 0 || averageCigarettesFieldState.value.text.toInt() > 60) {
+            _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(error = "Jumlah rokok harus antara 0-60 batang")
+            isValid = false
+        }
+
+        if (weightFieldState.value.text.toInt() < 30 || weightFieldState.value.text.toInt() > 300) {
+            _weightFieldState.value = weightFieldState.value.copy(error = "Berat badan harus antara 30-300 kg")
+            isValid = false
+        }
+
+        if (isHypertensionFieldState.value.text.isBlank()) {
+            _isHypertensionFieldState.value = isHypertensionFieldState.value.copy(error = "Hipertensi tidak boleh kosong")
+            isValid = false
+        }
+
+        if (physicalActivityFieldState.value.text.toInt() < 0 || physicalActivityFieldState.value.text.toInt() > 7) {
+            _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(error = "Aktivitas fisik harus antara 0-7 hari")
+            isValid = false
+        }
+
+        if (isCholesterolFieldState.value.text.isBlank()) {
+            _isCholesterolFieldState.value = isCholesterolFieldState.value.copy(error = "Kolesterol tidak boleh kosong")
+            isValid = false
+        }
+
+        return isValid
+    }
+
     // Use Case Calls
-    private fun collectLatestPrediction() {
+    private fun collectLatestPredictionData() {
         viewModelScope.launch {
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
 
@@ -136,7 +176,7 @@ class WhatIfViewModel @Inject constructor(
                 _latestPredictionState.value = latestPredictionState.value.copy(isLoading = false)
 
                 prediction?.let {
-                    _age.intValue = it.age?.toInt() ?: 0
+                    _age.intValue = it.age
 
                     _averageCigarettesFieldState.value = FieldState(
                         text = it.avgSmokeCount.toString(),
@@ -159,24 +199,24 @@ class WhatIfViewModel @Inject constructor(
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let {
-                    _macrosomicBaby.intValue = it.macrosomicBaby ?: 0
-                    _yearsSmoking.intValue = it.yearOfSmoking?.toInt() ?: 0
-                    _isBloodline.value = it.bloodline ?: false
+                    _macrosomicBaby.intValue = it.macrosomicBaby
+                    _yearsSmoking.intValue = it.yearOfSmoking
+                    _isBloodline.value = it.bloodline
 
                     _smokingStatusFieldState.value = FieldState(
-                        text = it.smoking?.toString() ?: "0",
+                        text = it.smoking.toString(),
                         error = null
                     )
                     _weightFieldState.value = FieldState(
-                        text = it.weight ?: "0",
+                        text = it.weight.toString(),
                         error = null
                     )
                     _isHypertensionFieldState.value = FieldState(
-                        text = it.hypertension?.toString() ?: "false",
+                        text = it.hypertension.toString(),
                         error = null
                     )
                     _isCholesterolFieldState.value = FieldState(
-                        text = it.cholesterol?.toString() ?: "false",
+                        text = it.cholesterol.toString(),
                         error = null
                     )
                 }
@@ -189,20 +229,20 @@ class WhatIfViewModel @Inject constructor(
         viewModelScope.launch {
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
 
-            val smokingStatus = smokingStatusFieldState.value.text.toIntOrNull()
-            val averageCigarettes = averageCigarettesFieldState.value.text.toIntOrNull()
-            val weight = weightFieldState.value.text.toIntOrNull()
-            val isHypertension = isHypertensionFieldState.value.text.toBooleanStrictOrNull()
-            val physicalActivity = physicalActivityFieldState.value.text.toIntOrNull()
-            val isCholesterol = isCholesterolFieldState.value.text.toBooleanStrictOrNull()
+            val smokingStatus = smokingStatusFieldState.value.text.toInt()
+            val averageCigarettes = averageCigarettesFieldState.value.text.toInt()
+            val weight = weightFieldState.value.text.toInt()
+            val isHypertension = isHypertensionFieldState.value.text.toBoolean()
+            val physicalActivity = physicalActivityFieldState.value.text.toInt()
+            val isCholesterol = isCholesterolFieldState.value.text.toBoolean()
 
             val whatIfPredictionResult = predictionUseCases.whatIfPrediction(
-                smokingStatus = smokingStatus ?: 0,
-                avgSmokeCount = averageCigarettes ?: 0,
-                weight = weight ?: 0,
-                isHypertension = isHypertension ?: false,
-                physicalActivityFrequency = physicalActivity ?: 0,
-                isCholesterol = isCholesterol ?: false
+                smokingStatus = smokingStatus,
+                avgSmokeCount = averageCigarettes,
+                weight = weight,
+                isHypertension = isHypertension,
+                physicalActivityFrequency = physicalActivity,
+                isCholesterol = isCholesterol
             )
 
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
@@ -254,7 +294,7 @@ class WhatIfViewModel @Inject constructor(
                                     riskFactor.copy(
                                         name = riskFactor.name,
                                         abbreviation = riskFactor.abbreviation,
-                                        percentage = adjustedContribution
+                                        percentage = adjustedContribution * 100
                                     )
                                 }
                             } ?: riskFactor
@@ -266,25 +306,36 @@ class WhatIfViewModel @Inject constructor(
                     _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = whatIfPredictionResult.result.message ?: "An error occurred"
+                    _errorMessage.value = whatIfPredictionResult.result.message ?: "Terjadi kesalahan saat melakukan prediksi"
                     whatIfPredictionResult.result.message?.let { Log.e("WhatIfViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
+                    _errorMessage.value = "Terjadi kesalahan saat melakukan prediksi"
                     Log.e("WhatIfViewModel", "Unknown error occurred")
                 }
             }
         }
     }
 
+    // Helper Functions
     fun resetFields() {
-        collectLatestPrediction()
+        collectLatestPredictionData()
         collectProfileData()
+
+        _successMessage.value = "Data berhasil di-reset"
     }
 
     fun onNavigationHandled() {
         _navigationEvent.value = null
+    }
+
+    fun onErrorShown() {
+        _errorMessage.value = null
+    }
+
+    fun onSuccessShown() {
+        _successMessage.value = null
     }
 }

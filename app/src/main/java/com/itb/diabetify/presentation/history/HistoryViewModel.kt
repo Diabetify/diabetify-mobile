@@ -31,7 +31,7 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases
 ) : ViewModel() {
-    // Navigation and Error States
+    // Error State
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 

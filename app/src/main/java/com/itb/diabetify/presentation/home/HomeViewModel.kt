@@ -2,6 +2,8 @@ package com.itb.diabetify.presentation.home
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -57,7 +59,7 @@ class HomeViewModel @Inject constructor(
     private val _lastPredictionAt = mutableStateOf("Belum ada prediksi")
     val lastPredictionAt: State<String> = _lastPredictionAt
 
-    private val _latestPredictionScoreState = mutableStateOf(0.0)
+    private val _latestPredictionScoreState = mutableDoubleStateOf(0.0)
     val latestPredictionScoreState: State<Double> = _latestPredictionScoreState
 
     private val _riskFactors = mutableStateOf(listOf(
@@ -150,41 +152,41 @@ class HomeViewModel @Inject constructor(
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
 
-    private val _bmiValueState = mutableStateOf("0.0")
-    val bmiValueState: State<String> = _bmiValueState
+    private val _bmi = mutableDoubleStateOf(0.0)
+    val bmi: State<Double> = _bmi
 
-    private val _weightValueState = mutableStateOf("0")
-    val weightValueState: State<String> = _weightValueState
+    private val _weight = mutableIntStateOf(0)
+    val weight: State<Int> = _weight
 
-    private val _heightValueState = mutableStateOf("0")
-    val heightValueState: State<String> = _heightValueState
+    private val _height = mutableIntStateOf(0)
+    val height: State<Int> = _height
 
-    private val _isHypertensionState = mutableStateOf("false")
-    val isHypertensionState: State<String> = _isHypertensionState
+    private val _isHypertension = mutableStateOf(false)
+    val isHypertension: State<Boolean> = _isHypertension
 
-    private val _isMacrosomicBabyState = mutableStateOf("false")
-    val isMacrosomicBabyState: State<String> = _isMacrosomicBabyState
+    private val _macrosomicBaby = mutableIntStateOf(0)
+    val macrosomicBaby: State<Int> = _macrosomicBaby
 
-    private val _smokeValueState = mutableStateOf("0")
-    val smokeValueState: State<String> = _smokeValueState
+    private val _smoke = mutableStateOf("0")
+    val smoke: State<String> = _smoke
 
-    private val _physicalActivityValueState = mutableStateOf("0")
-    val physicalActivityValueState: State<String> = _physicalActivityValueState
+    private val _physicalActivity = mutableStateOf("0")
+    val physicalActivity: State<String> = _physicalActivity
 
-    private val _isBloodlineValueState = mutableStateOf("false")
-    val isBloodlineValueState: State<String> = _isBloodlineValueState
+    private val _isBloodline = mutableStateOf(false)
+    val isBloodline: State<Boolean> = _isBloodline
 
-    private val _isCholesterolValueState = mutableStateOf("false")
-    val isCholesterolValueState: State<String> = _isCholesterolValueState
+    private val _isCholesterol = mutableStateOf(false)
+    val isCholesterol: State<Boolean> = _isCholesterol
 
-    private val _brinkmanIndexValueState = mutableStateOf("0.0")
-    val brinkmanIndexValueState: State<String> = _brinkmanIndexValueState
+    private val _brinkmanIndex = mutableStateOf("0.0")
+    val brinkmanIndex: State<String> = _brinkmanIndex
 
-    private val _smokingStatusValueState = mutableStateOf("0")
-    val smokingStatusValueState: State<String> = _smokingStatusValueState
+    private val _smokingStatus = mutableStateOf("0")
+    val smokingStatus: State<String> = _smokingStatus
 
-    private val _physicalActivityAverageValueState = mutableStateOf("0")
-    val physicalActivityAverageValueState: State<String> = _physicalActivityAverageValueState
+    private val _physicalActivityAverage = mutableStateOf("0")
+    val physicalActivityAverage: State<String> = _physicalActivityAverage
 
     // Initialization
     init {
@@ -245,7 +247,7 @@ class HomeViewModel @Inject constructor(
 
             when (getLatestPredictionResult.result) {
                 is Resource.Success -> {
-                    collectLatestPrediction()
+                    collectLatestPredictionData()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getLatestPredictionResult.result.message ?: "Terjadi kesalahan saat mengambil data prediksi terbaru"
@@ -261,7 +263,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectLatestPrediction() {
+    private fun collectLatestPredictionData() {
         viewModelScope.launch {
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
 
@@ -275,7 +277,7 @@ class HomeViewModel @Inject constructor(
 
                 prediction.let { latestPrediction ->
                     _lastPredictionAt.value = latestPrediction.createdAt
-                    _latestPredictionScoreState.value = latestPrediction.riskScore
+                    _latestPredictionScoreState.doubleValue = latestPrediction.riskScore
 
                     _riskFactors.value = listOf(
                         RiskFactor("Indeks Massa Tubuh", "IMT", latestPrediction.bmiContribution),
@@ -368,9 +370,62 @@ class HomeViewModel @Inject constructor(
                         )
                     )
 
-                    _brinkmanIndexValueState.value = latestPrediction.brinkmanScore.toString()
-                    _smokingStatusValueState.value = latestPrediction.smokingStatus
-                    _physicalActivityAverageValueState.value = latestPrediction.physicalActivityFrequency.toString()
+                    _brinkmanIndex.value = latestPrediction.brinkmanScore.toString()
+                    _smokingStatus.value = latestPrediction.smokingStatus
+                    _physicalActivityAverage.value = latestPrediction.physicalActivityFrequency.toString()
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun loadProfileData() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            val getProfileResult = profileUseCases.getProfile()
+
+            _profileState.value = profileState.value.copy(isLoading = false)
+
+            when (getProfileResult.result) {
+                is Resource.Success -> {
+                    collectProfile()
+                }
+                is Resource.Error -> {
+                    if (getProfileResult.result.message?.contains("404") == true) {
+                        Log.d("HomeViewModel", "Profile not found, navigating to survey screen")
+                        resetToDefaultValues()
+                        _navigationEvent.value = "SURVEY_SCREEN"
+                    } else {
+                        _errorMessage.value = getProfileResult.result.message ?: "Terjadi kesalahan saat mengambil data profil"
+                        getProfileResult.result.message?.let { Log.e("HomeViewModel", it) }
+                    }
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Terjadi kesalahan saat mengambil data profil"
+                    Log.e("HomeViewModel", "Unexpected error loading profile data")
+                }
+            }
+        }
+    }
+
+
+    private fun collectProfile() {
+        viewModelScope.launch {
+            _profileState.value = profileState.value.copy(isLoading = true)
+
+            profileUseCases.getProfileRepository().onEach { profile ->
+                _profileState.value = profileState.value.copy(isLoading = false)
+
+                profile?.let { userProfile ->
+                    _bmi.value = userProfile.bmi
+                    _weight.value = userProfile.weight
+                    _height.value = userProfile.height
+                    _isHypertension.value = userProfile.hypertension
+                    _macrosomicBaby.value = userProfile.macrosomicBaby
+                    _isBloodline.value = userProfile.bloodline
+                    _isCholesterol.value = userProfile.cholesterol
                 }
             }.launchIn(viewModelScope)
         }
@@ -406,52 +461,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadProfileData() {
-        viewModelScope.launch {
-            _profileState.value = profileState.value.copy(isLoading = true)
-
-            val getProfileResult = profileUseCases.getProfile()
-
-            _profileState.value = profileState.value.copy(isLoading = false)
-
-            when (getProfileResult.result) {
-                is Resource.Success -> {
-                    Log.d("HomeViewModel", "Profile data loaded successfully")
-                    collectProfile()
-                }
-                is Resource.Error -> {
-                    if (getProfileResult.result.message?.contains("404") == true) {
-                        Log.d("HomeViewModel", "Profile not found, navigating to survey screen")
-                        resetToDefaultValues()
-                        _navigationEvent.value = "SURVEY_SCREEN"
-                    } else {
-                        _errorMessage.value = getProfileResult.result.message ?: "Unknown error occurred"
-                        getProfileResult.result.message?.let { Log.d("HomeViewModel", it) }
-                    }
-                }
-                is Resource.Loading -> {
-                    Log.d("HomeViewModel", "Loading profile data")
-                }
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HomeViewModel", "Unexpected error loading profile data")
-                }
-            }
-        }
-    }
-
     private fun resetToDefaultValues() {
         _latestPredictionScoreState.value = 0.0
-        _bmiValueState.value = "0.0"
-        _weightValueState.value = "0"
-        _heightValueState.value = "0"
-        _isHypertensionState.value = "false"
-        _isMacrosomicBabyState.value = "false"
-        _smokeValueState.value = "0"
-        _physicalActivityValueState.value = "0"
-        _isBloodlineValueState.value = "false"
-        _isCholesterolValueState.value = "false"
+        _bmi.value = 0.0
+        _weight.value = 0
+        _height.value = 0
+        _isHypertension.value = false
+        _macrosomicBaby.value = 0
+        _smoke.value = "0"
+        _physicalActivity.value = "0"
+        _isBloodline.value = false
+        _isCholesterol.value = false
         
         _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0.0) }
         
@@ -471,26 +491,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectProfile() {
-        viewModelScope.launch {
-            _profileState.value = profileState.value.copy(isLoading = true)
-
-            profileUseCases.getProfileRepository().collect { profile ->
-                _profileState.value = profileState.value.copy(isLoading = false)
-
-                profile?.let { userProfile ->
-                    _bmiValueState.value = userProfile.bmi ?: "0.0"
-                    _weightValueState.value = userProfile.weight ?: "0"
-                    _heightValueState.value = userProfile.height ?: "0"
-                    _isHypertensionState.value = userProfile.hypertension.toString() ?: "false"
-                    _isMacrosomicBabyState.value = userProfile.macrosomicBaby.toString() ?: "false"
-                    _isBloodlineValueState.value = userProfile.bloodline.toString() ?: "false"
-                    _isCholesterolValueState.value = userProfile.cholesterol.toString() ?: "false"
-                }
-            }
-        }
-    }
-
     private fun collectActivityToday() {
         viewModelScope.launch {
             _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
@@ -499,8 +499,8 @@ class HomeViewModel @Inject constructor(
                 _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
                 activity?.let { todayActivity ->
-                    _smokeValueState.value = todayActivity.smokingValue ?: "0"
-                    _physicalActivityValueState.value = todayActivity.workoutValue ?: "0"
+                    _smoke.value = todayActivity.smokingValue ?: "0"
+                    _physicalActivity.value = todayActivity.workoutValue ?: "0"
                 }
             }
         }

@@ -439,8 +439,8 @@ fun HomeScreen(
                     containerColor = colorResource(id = R.color.white)
                 )
             ) {
-                val bmi = viewModel.bmiValueState.value
-                val bmiValue = bmi.toDoubleOrNull() ?: 0.0
+                val bmi = viewModel.bmi.value
+                val bmiValue = bmi
                 val bmiCategory = getBmiCategory(bmiValue)
                 val bmiColor = getBmiCategoryColor(bmiValue)
 
@@ -562,7 +562,7 @@ fun HomeScreen(
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Berat",
-                    value = viewModel.weightValueState.value,
+                    value = viewModel.weight.value,
                     unit = "kg",
                     changeIndicator = "+0.5",
                     trend = "up"
@@ -571,7 +571,7 @@ fun HomeScreen(
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Tinggi",
-                    value = viewModel.heightValueState.value,
+                    value = viewModel.height.value,
                     unit = "cm",
                     changeIndicator = "0",
                     trend = "stable"
@@ -610,14 +610,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isHypertension = viewModel.isHypertensionState.value
+                        val isHypertension = viewModel.isHypertension.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (isHypertension != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
-                                contentDescription = if (isHypertension != "false") "Warning" else "Check",
-                                tint = if (isHypertension != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                imageVector = if (isHypertension) Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isHypertension) "Warning" else "Check",
+                                tint = if (isHypertension) Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -632,13 +632,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (!isHypertension.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (!isHypertension) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (isHypertension.toBoolean()) "Ya" else "Tidak",
-                                color = if (!isHypertension.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (isHypertension) "Ya" else "Tidak",
+                                color = if (!isHypertension) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -659,14 +659,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isCholesterol = viewModel.isCholesterolValueState.value
+                        val isCholesterol = viewModel.isCholesterol.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (isCholesterol != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
-                                contentDescription = if (isCholesterol != "false") "Warning" else "Check",
-                                tint = if (isCholesterol != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                imageVector = if (isCholesterol) Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isCholesterol) "Warning" else "Check",
+                                tint = if (isCholesterol) Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -681,13 +681,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (!isCholesterol.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (!isCholesterol) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (isCholesterol.toBoolean()) "Ya" else "Tidak",
-                                color = if (!isCholesterol.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (isCholesterol) "Ya" else "Tidak",
+                                color = if (!isCholesterol) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -730,14 +730,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isBloodline = viewModel.isBloodlineValueState.value
+                        val isBloodline = viewModel.isBloodline.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (isBloodline != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
-                                contentDescription = if (isBloodline != "false") "Warning" else "Check",
-                                tint = if (isBloodline != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                imageVector = if (isBloodline) Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isBloodline) "Warning" else "Check",
+                                tint = if (isBloodline) Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -752,13 +752,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (!isBloodline.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (!isBloodline) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (isBloodline.toBoolean()) "Ya" else "Tidak",
-                                color = if (!isBloodline.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (isBloodline) "Ya" else "Tidak",
+                                color = if (!isBloodline) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -779,14 +779,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isMacrosomicBaby = viewModel.isMacrosomicBabyState.value
+                        val isMacrosomicBaby = viewModel.macrosomicBaby.value
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (isMacrosomicBaby != "false") Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
-                                contentDescription = if (isMacrosomicBaby != "false") "Warning" else "Check",
-                                tint = if (isMacrosomicBaby != "false") Color(0xFFD97706) else colorResource(id = R.color.primary),
+                                imageVector = if (isMacrosomicBaby == 1) Icons.Outlined.Warning else Icons.Outlined.CheckCircle,
+                                contentDescription = if (isMacrosomicBaby == 1) "Warning" else "Check",
+                                tint = if (isMacrosomicBaby == 1) Color(0xFFD97706) else colorResource(id = R.color.primary),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -801,13 +801,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (!isMacrosomicBaby.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (isMacrosomicBaby != 2) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (isMacrosomicBaby.toBoolean()) "Ya" else "Tidak",
-                                color = if (!isMacrosomicBaby.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (isMacrosomicBaby == 2) "Ya" else "Tidak",
+                                color = if (isMacrosomicBaby != 2) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -862,7 +862,7 @@ fun HomeScreen(
                             )
                         }
 
-                        val smokingValue = viewModel.smokeValueState.value
+                        val smokingValue = viewModel.smoke.value
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = getSmokingBackgroundColor(smokingValue.toIntOrNull() ?: 0)
@@ -888,8 +888,8 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val smokingStatus = viewModel.smokingStatusValueState.value
-                        val brinkmanIndex = viewModel.brinkmanIndexValueState.value
+                        val smokingStatus = viewModel.smokingStatus.value
+                        val brinkmanIndex = viewModel.brinkmanIndex.value
 
                         Column(
                             modifier = Modifier.weight(1f)
@@ -948,7 +948,7 @@ fun HomeScreen(
                     )
 
                     // Physical Activity Section
-                    val workoutValue = viewModel.physicalActivityValueState.value
+                    val workoutValue = viewModel.physicalActivity.value
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -981,7 +981,7 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    val physicalActivityAverage = viewModel.physicalActivityAverageValueState.value
+                    val physicalActivityAverage = viewModel.physicalActivityAverage.value
                     val averageValue = physicalActivityAverage.toIntOrNull() ?: 0
 
                     Column(

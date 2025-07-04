@@ -59,11 +59,11 @@ class ProfileRepositoryImpl(
                         cholesterol = profile.cholesterol,
                         bloodline = profile.bloodline,
                         hypertension = profile.hypertension,
-                        weight = profile.weight.toString(),
-                        height = profile.height.toString(),
-                        bmi = profile.bmi.toString(),
+                        weight = profile.weight,
+                        height = profile.height,
+                        bmi = profile.bmi,
                         smoking = profile.smoking,
-                        yearOfSmoking = profile.yearOfSmoking.toString(),
+                        yearOfSmoking = profile.yearOfSmoking,
                         macrosomicBaby = profile.macrosomicBaby
                     )
                 )

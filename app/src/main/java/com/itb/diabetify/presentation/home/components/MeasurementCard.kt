@@ -27,7 +27,7 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun MeasurementCard(
     modifier: Modifier = Modifier,
     label: String,
-    value: String,
+    value: Int,
     unit: String,
     changeIndicator: String,
     trend: String // "up", "down", or "stable"
@@ -65,7 +65,7 @@ fun MeasurementCard(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = value,
+                    text = value.toString(),
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,

@@ -31,7 +31,7 @@ import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.CustomizableButton
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.home.components.BarChartEntry
-import com.itb.diabetify.presentation.home.components.BarChartV2
+import com.itb.diabetify.presentation.home.components.BarChart
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.RiskCategory
@@ -132,7 +132,7 @@ fun WhatIfResultScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    BarChartV2(
+                    BarChart(
                         entries = riskFactors.map { riskFactor ->
                             BarChartEntry(
                                 label = riskFactor.name,

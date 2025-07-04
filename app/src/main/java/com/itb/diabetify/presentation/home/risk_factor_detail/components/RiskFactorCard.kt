@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.home.risk_factor_detail.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun RiskFactorCard(
     riskFactor: RiskFactorDetails,
@@ -66,6 +68,7 @@ fun RiskFactorCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
+                // Name and Impact Percentage
                 Text(
                     text = "${riskFactor.name}: ${riskFactor.fullName}",
                     fontFamily = poppinsFontFamily,

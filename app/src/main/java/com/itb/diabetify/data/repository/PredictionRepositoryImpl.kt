@@ -110,32 +110,50 @@ class PredictionRepositoryImpl (
                         riskScore = prediction.riskScore * 100,
                         age = prediction.age,
                         ageContribution = ageContribution * 100,
-                        ageExplanation = prediction.ageExplanation,
+                        ageExplanation = prediction.ageExplanation.ifEmpty {
+                            "TODO"
+                        },
                         bmi = prediction.bmi,
                         bmiContribution = bmiContribution * 100,
-                        bmiExplanation = prediction.bmiExplanation,
+                        bmiExplanation = prediction.bmiExplanation.ifEmpty {
+                            "TODO"
+                        },
                         brinkmanScore = prediction.brinkmanScore,
                         brinkmanScoreContribution = brinkmanContribution * 100,
-                        brinkmanScoreExplanation = prediction.brinkmanScoreExplanation,
+                        brinkmanScoreExplanation = prediction.brinkmanScoreExplanation.ifEmpty {
+                            "TODO"
+                        },
                         isHypertension = prediction.isHypertension,
                         isHypertensionContribution = isHypertensionContribution * 100,
-                        isHypertensionExplanation = prediction.isHypertensionExplanation,
+                        isHypertensionExplanation = prediction.isHypertensionExplanation.ifEmpty {
+                            "TODO"
+                        },
                         isCholesterol = prediction.isCholesterol,
                         isCholesterolContribution = isCholesterolContribution * 100,
-                        isCholesterolExplanation = prediction.isCholesterolExplanation,
+                        isCholesterolExplanation = prediction.isCholesterolExplanation.ifEmpty {
+                            "TODO"
+                        },
                         isBloodline = prediction.isBloodline,
                         isBloodlineContribution = isBloodlineContribution * 100,
-                        isBloodlineExplanation = prediction.isBloodlineExplanation,
+                        isBloodlineExplanation = prediction.isBloodlineExplanation.ifEmpty {
+                            "TODO"
+                        },
                         isMacrosomicBaby = prediction.isMacrosomicBaby,
                         isMacrosomicBabyContribution = isMacrosomicBabyContribution * 100,
-                        isMacrosomicBabyExplanation = prediction.isMacrosomicBabyExplanation,
+                        isMacrosomicBabyExplanation = prediction.isMacrosomicBabyExplanation.ifEmpty {
+                            "TODO"
+                        },
                         smokingStatus = prediction.smokingStatus,
                         smokingStatusContribution = smokingStatusContribution * 100,
                         avgSmokeCount = prediction.avgSmokeCount,
-                        smokingStatusExplanation = prediction.smokingStatusExplanation,
+                        smokingStatusExplanation = prediction.smokingStatusExplanation.ifEmpty {
+                            "TODO"
+                        },
                         physicalActivityFrequency = prediction.physicalActivityFrequency,
                         physicalActivityFrequencyContribution = physicalActivityContribution * 100,
-                        physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation,
+                        physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation.ifEmpty {
+                            "TODO"
+                        },
                         createdAt = prediction.createdAt
                     )
                 )

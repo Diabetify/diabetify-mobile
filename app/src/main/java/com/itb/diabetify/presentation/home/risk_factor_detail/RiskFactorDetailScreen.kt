@@ -1,8 +1,11 @@
 package com.itb.diabetify.presentation.home.risk_factor_detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,16 +24,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.home.HomeViewModel
+import com.itb.diabetify.presentation.home.components.BarChart
+import com.itb.diabetify.presentation.home.components.BarChartEntry
 import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.risk_factor_detail.components.RiskFactorCard
 import com.itb.diabetify.ui.theme.poppinsFontFamily
@@ -124,12 +135,71 @@ fun SummarySection(riskFactors: List<HomeViewModel.RiskFactor>) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            // Risk Pie Chart
-            PieChart(
-                riskFactors = riskFactors,
-                centerText = "Faktor\nRisiko",
-                modifier = Modifier.fillMaxWidth()
-            )
+            var selectedTabIndex by remember { mutableIntStateOf(0) }
+            val tabTitles = listOf("Grafik Batang", "Grafik Lingkaran")
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                selectedTabIndex = index
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selectedTabIndex == index) {
+                                colorResource(id = R.color.primary)
+                            } else {
+                                Color(0xFFF3F4F6)
+                            }
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = title,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = if (selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Medium,
+                            fontSize = 12.sp,
+                            color = if (selectedTabIndex == index) {
+                                Color.White
+                            } else {
+                                Color(0xFF6B7280)
+                            },
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            when (selectedTabIndex) {
+                0 -> {
+                    BarChart(
+                        entries = riskFactors.mapIndexed { _, riskFactor ->
+                            BarChartEntry(
+                                label = riskFactor.name,
+                                abbreviation = riskFactor.abbreviation,
+                                value = riskFactor.percentage,
+                                isNegative = riskFactor.percentage < 0
+                            )
+                        }
+                    )
+                }
+                1 -> {
+                    PieChart(
+                        riskFactors = riskFactors,
+                        centerText = "Faktor\nRisiko",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -140,7 +210,6 @@ fun SummarySection(riskFactors: List<HomeViewModel.RiskFactor>) {
                 fontSize = 14.sp,
                 color = colorResource(id = R.color.primary)
             )
-
 
             Text(
                 text = "🟢 Hijau = Menurunkan risiko (faktor pelindung)\n🔴 Merah = Meningkatkan risiko (faktor berbahaya)",

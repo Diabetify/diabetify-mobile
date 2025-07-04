@@ -78,7 +78,7 @@ class HomeViewModel @Inject constructor(
             name = "IMT",
             fullName = "Indeks Massa Tubuh",
             impactPercentage = 0.0,
-            explanation = "Indeks Massa Tubuh adalah pengukuran yang menggunakan berat dan tinggi badan untuk mengestimasikan jumlah lemak tubuh. IMT yang lebih tinggi dikaitkan dengan risiko yang lebih besar untuk berbagai penyakit.",
+            explanation = "",
             idealValue = "18.5 - 24.9 kg/m²",
             currentValue = "0 kg/m²"
         ),
@@ -86,7 +86,7 @@ class HomeViewModel @Inject constructor(
             name = "H",
             fullName = "Hipertensi",
             impactPercentage = 0.0,
-            explanation = "Hipertensi atau tekanan darah tinggi adalah kondisi medis kronis dengan tekanan darah di arteri meningkat. Tanpa pengobatan, hipertensi meningkatkan risiko penyakit jantung dan stroke.",
+            explanation = "",
             idealValue = "< 120/80 mmHg",
             currentValue = "0/0 mmHg"
         ),
@@ -94,7 +94,7 @@ class HomeViewModel @Inject constructor(
             name = "RBM",
             fullName = "Riwayat Bayi Makrosomia",
             impactPercentage = 0.0,
-            explanation = "Faktor riwayat kelahiran termasuk berat badan lahir, kelahiran prematur, atau komplikasi kelahiran lainnya yang dapat memengaruhi risiko kesehatan di masa depan.",
+            explanation = "",
             idealValue = "Berat lahir normal, kelahiran cukup bulan",
             currentValue = "-"
         ),
@@ -102,7 +102,7 @@ class HomeViewModel @Inject constructor(
             name = "AF",
             fullName = "Aktivitas Fisik",
             impactPercentage = 0.0,
-            explanation = "Aktivitas fisik mengacu pada tingkat olahraga dan gerakan fisik yang dilakukan secara rutin. Aktivitas fisik yang cukup membantu mengurangi risiko berbagai penyakit kronis.",
+            explanation = "",
             idealValue = "Min. 150 menit aktivitas sedang per minggu",
             currentValue = "0 menit"
         ),
@@ -110,7 +110,7 @@ class HomeViewModel @Inject constructor(
             name = "U",
             fullName = "Usia",
             impactPercentage = 0.0,
-            explanation = "Usia adalah faktor risiko yang tidak dapat dimodifikasi namun memiliki pengaruh signifikan terhadap risiko kesehatan. Risiko berbagai penyakit meningkat seiring bertambahnya usia.",
+            explanation = "",
             idealValue = "-",
             currentValue = "0 tahun",
             isModifiable = false
@@ -119,7 +119,7 @@ class HomeViewModel @Inject constructor(
             name = "SM",
             fullName = "Status Merokok",
             impactPercentage = 0.0,
-            explanation = "Status Merokok mengukur kebiasaan merokok seseorang termasuk jumlah dan durasi merokok. Merokok meningkatkan risiko berbagai penyakit kardiovaskular dan kanker.",
+            explanation = "",
             idealValue = "0 (tidak merokok)",
             currentValue = "0 batang per hari"
         ),
@@ -127,7 +127,7 @@ class HomeViewModel @Inject constructor(
             name = "IB",
             fullName = "Indeks Brinkman",
             impactPercentage = 0.0,
-            explanation = "Indeks Brinkman mengukur jumlah rokok yang dihisap per hari dikalikan dengan jumlah tahun merokok. Ini digunakan untuk menilai risiko kesehatan terkait merokok.",
+            explanation = "",
             idealValue = "0 (tidak merokok)",
             currentValue = "0 batang per hari"
         ),
@@ -135,7 +135,7 @@ class HomeViewModel @Inject constructor(
             name = "RK",
             fullName = "Riwayat Keluarga",
             impactPercentage = 0.0,
-            explanation = "Riwayat keluarga penyakit tertentu dapat meningkatkan risiko seseorang terhadap kondisi kesehatan tersebut.",
+            explanation = "",
             idealValue = "Tidak ada riwayat penyakit serius",
             currentValue = "-"
         ),
@@ -143,7 +143,7 @@ class HomeViewModel @Inject constructor(
             name = "K",
             fullName = "Kolesterol",
             impactPercentage = 0.0,
-            explanation = "Tingkat kolesterol yang tinggi dalam darah dapat meningkatkan risiko penyakit jantung dan stroke.",
+            explanation = "",
             idealValue = "< 200 mg/dL",
             currentValue = "0 mg/dL"
         )

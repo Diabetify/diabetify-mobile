@@ -30,6 +30,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,9 +51,10 @@ import androidx.navigation.NavController
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.home.components.BarChartEntry
-import com.itb.diabetify.presentation.home.components.BarChartV2
+import com.itb.diabetify.presentation.home.components.BarChart
 import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
+import com.itb.diabetify.presentation.home.components.PieChart
 import com.itb.diabetify.presentation.home.components.RiskCategory
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
@@ -198,7 +203,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 HomeCard(
-                    title = "Persentase Resiko",
+                    title = "Persentase Risiko",
                     hasWarning = true,
                     riskPercentage = viewModel.latestPredictionScoreState.value
                 ) {
@@ -253,22 +258,72 @@ fun HomeScreen(
                                 color = colorResource(id = R.color.primary)
                             )
                         } else {
-//                            PieChart(
-//                                riskFactors = viewModel.riskFactors.value,
-//                                centerText = "Faktor\nRisiko",
-//                                modifier = Modifier.fillMaxWidth()
-//                            )
+                            var selectedTabIndex by remember { mutableIntStateOf(0) }
+                            val tabTitles = listOf("Grafik Batang", "Grafik Lingkaran")
 
-                            BarChartV2(
-                                entries = viewModel.riskFactors.value.mapIndexed { index, riskFactor ->
-                                    BarChartEntry(
-                                        label = riskFactor.name,
-                                        abbreviation = riskFactor.abbreviation,
-                                        value = riskFactor.percentage,
-                                        isNegative = riskFactor.percentage < 0
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                tabTitles.forEachIndexed { index, title ->
+                                    Card(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clickable {
+                                                selectedTabIndex = index
+                                            },
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = if (selectedTabIndex == index) {
+                                                colorResource(id = R.color.primary)
+                                            } else {
+                                                Color(0xFFF3F4F6)
+                                            }
+                                        ),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(
+                                            text = title,
+                                            fontFamily = poppinsFontFamily,
+                                            fontWeight = if (selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Medium,
+                                            fontSize = 12.sp,
+                                            color = if (selectedTabIndex == index) {
+                                                Color.White
+                                            } else {
+                                                Color(0xFF6B7280)
+                                            },
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp, horizontal = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Chart
+                            when (selectedTabIndex) {
+                                0 -> {
+                                    BarChart(
+                                        entries = viewModel.riskFactors.value.mapIndexed { _, riskFactor ->
+                                            BarChartEntry(
+                                                label = riskFactor.name,
+                                                abbreviation = riskFactor.abbreviation,
+                                                value = riskFactor.percentage,
+                                                isNegative = riskFactor.percentage < 0
+                                            )
+                                        }
                                     )
                                 }
-                            )
+                                1 -> {
+                                    PieChart(
+                                        riskFactors = viewModel.riskFactors.value,
+                                        centerText = "Faktor\nRisiko",
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
                         }
 
                         PrimaryButton(

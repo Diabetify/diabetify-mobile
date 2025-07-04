@@ -114,7 +114,6 @@ fun PieChart(
                 }
             },
             update = { chart ->
-                // Update center text
                 if (centerText != null) {
                     chart.setDrawCenterText(true)
                     chart.centerText = centerText
@@ -125,7 +124,6 @@ fun PieChart(
                     chart.setDrawCenterText(false)
                 }
 
-                // Create entries and dataset
                 val entries = sortedRiskFactors.map { riskFactor ->
                     PieEntry(abs(riskFactor.percentage.toFloat()), riskFactor.name)
                 }
@@ -161,7 +159,7 @@ fun PieChart(
                 if (hasDataChanged) {
                     chart.data = PieData(dataSet)
                     chart.data.setDrawValues(true)
-                    chart.invalidate() // Refresh the chart
+                    chart.invalidate()
                     chart.animateY(animationDuration)
                 }
             },
@@ -210,14 +208,12 @@ fun LegendItem(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Color box
         Box(
             modifier = Modifier
                 .size(16.dp)
                 .background(color)
         )
 
-        // Label
         Text(
             text = label,
             modifier = Modifier
@@ -229,7 +225,6 @@ fun LegendItem(
             color = colorResource(id = R.color.primary)
         )
 
-        // Value with sign
         Text(
             text = when {
                 abs(value) < 0.000001 -> "${String.format("%.1f", value)}%"

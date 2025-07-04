@@ -14,6 +14,7 @@ import com.itb.diabetify.presentation.history.components.RiskFactorContribution
 import com.itb.diabetify.presentation.history.components.DailyInput
 import com.itb.diabetify.data.remote.prediction.response.PredictionData
 import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.PredictionUpdateNotifier
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -257,22 +258,5 @@ class HistoryViewModel @Inject constructor(
     private fun refreshPredictionData() {
         loadPredictionForDate(_date.value)
         loadPredictionScores()
-    }
-}
-
-// Extension function
-object PredictionUpdateNotifier {
-    private val listeners = mutableSetOf<() -> Unit>()
-    
-    fun addListener(listener: () -> Unit) {
-        listeners.add(listener)
-    }
-    
-    fun removeListener(listener: () -> Unit) {
-        listeners.remove(listener)
-    }
-    
-    fun notifyPredictionUpdated() {
-        listeners.forEach { it() }
     }
 }

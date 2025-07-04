@@ -9,6 +9,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import com.itb.diabetify.util.PredictionUpdateNotifier
 import kotlin.math.abs
 
 data class BarChartEntry(
@@ -50,6 +52,15 @@ fun BarChart(
     val maxValue = remember(entries) {
         val max = entries.maxOf { abs(it.value) }
         (((max + 10f) / 10f).toInt() * 10f)
+    }
+
+    DisposableEffect(Unit) {
+        val listener = {
+        }
+        PredictionUpdateNotifier.addListener(listener)
+        onDispose {
+            PredictionUpdateNotifier.removeListener(listener)
+        }
     }
 
     Column(modifier = modifier.wrapContentHeight()) {
@@ -83,6 +94,12 @@ fun BarChart(
                 }
             },
             update = { chart ->
+                chart.axisLeft.apply {
+                    axisMinimum = 0f
+                    axisMaximum = maxValue
+                    setLabelCount((maxValue / 10f).toInt() + 1, true)
+                }
+
                 val dataSets = mutableListOf<IBarDataSet>()
 
                 val labelEntries = mutableListOf<BarEntry>()
@@ -134,9 +151,17 @@ fun BarChart(
                     barWidth = 0.5f
                 }
 
-                chart.data = barData
-                chart.invalidate()
-                chart.animateY(animationDuration)
+                val hasDataChanged = chart.data?.let { currentData ->
+                    val currentValues = (currentData.getDataSetByIndex(0) as? BarDataSet)?.values?.map { it.y }
+                    val newValues = barEntries.map { it.y }
+                    currentValues != newValues
+                } ?: true
+
+                if (hasDataChanged) {
+                    chart.data = barData
+                    chart.invalidate()
+                    chart.animateY(animationDuration)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,7 +184,7 @@ fun BarChart(
                     .wrapContentHeight()
             ) {
                 sortedDescendingEntries.forEach { entry ->
-                    LegendItemsV2(
+                    LegendItems(
                         color = if (entry.isNegative) {
                             androidx.compose.ui.graphics.Color(0xFF2E7D32)
                         } else {
@@ -176,7 +201,7 @@ fun BarChart(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun LegendItemsV2(
+fun LegendItems(
     color: androidx.compose.ui.graphics.Color,
     label: String,
     value: Double
@@ -220,4 +245,4 @@ fun LegendItemsV2(
             }
         )
     }
-} 
+}

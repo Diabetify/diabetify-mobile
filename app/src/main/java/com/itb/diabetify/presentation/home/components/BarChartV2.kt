@@ -97,7 +97,7 @@ fun BarChartV2(
 
                 sortedAscendingEntries.forEachIndexed { index, entry ->
                     // All bars start from 0 and extend to the right using absolute value
-                    barEntries.add(BarEntry(index.toFloat(), abs(entry.value)))
+                    barEntries.add(BarEntry(index.toFloat(), abs(entry.value.toFloat())))
                     barColors.add(
                         if (entry.isNegative) {
                             Color.rgb(46, 125, 50) // Green for negative values
@@ -187,7 +187,7 @@ fun BarChartV2(
 fun LegendItemsV2(
     color: androidx.compose.ui.graphics.Color,
     label: String,
-    value: Float
+    value: Double
 ) {
     Row(
         modifier = Modifier

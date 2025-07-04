@@ -47,15 +47,15 @@ class WhatIfViewModel @Inject constructor(
     val predictionScore: State<Int> = _predictionScore
 
     private val _riskFactors = mutableStateOf(listOf(
-        RiskFactor("Indeks Massa Tubuh", "IMT", 0f),
-        RiskFactor("Hipertensi", "H", 0f),
-        RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0f),
-        RiskFactor("Aktivitas Fisik", "AF", 0f),
-        RiskFactor("Usia", "U", 0f),
-        RiskFactor("Status Merokok", "SM", 0f),
-        RiskFactor("Indeks Brinkman", "IB", 0f),
-        RiskFactor("Riwayat Keluarga", "RK", 0f),
-        RiskFactor("Kolesterol", "K", 0f),
+        RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
+        RiskFactor("Hipertensi", "H", 0.0),
+        RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0.0),
+        RiskFactor("Aktivitas Fisik", "AF", 0.0),
+        RiskFactor("Usia", "U", 0.0),
+        RiskFactor("Status Merokok", "SM", 0.0),
+        RiskFactor("Indeks Brinkman", "IB", 0.0),
+        RiskFactor("Riwayat Keluarga", "RK", 0.0),
+        RiskFactor("Kolesterol", "K", 0.0),
     ))
     val riskFactors: State<List<RiskFactor>> = _riskFactors
 
@@ -138,11 +138,11 @@ class WhatIfViewModel @Inject constructor(
                     _age.intValue = it.age?.toInt() ?: 0
 
                     _averageCigarettesFieldState.value = FieldState(
-                        text = it.avgSmokeCount ?: "0",
+                        text = it.avgSmokeCount.toString(),
                         error = null
                     )
                     _physicalActivityFieldState.value = FieldState(
-                        text = it.physicalActivityFrequency ?: "0",
+                        text = it.physicalActivityFrequency.toString(),
                         error = null
                     )
                 }
@@ -246,14 +246,14 @@ class WhatIfViewModel @Inject constructor(
                             featureKey?.let { key ->
                                 data.featureExplanations[key]?.let { explanation ->
                                     val adjustedContribution = if (explanation.impact == 0) {
-                                        -explanation.contribution.toFloat()
+                                        -explanation.contribution
                                     } else {
-                                        explanation.contribution.toFloat()
+                                        explanation.contribution
                                     }
                                     riskFactor.copy(
                                         name = riskFactor.name,
                                         abbreviation = riskFactor.abbreviation,
-                                        percentage = adjustedContribution * 100f
+                                        percentage = adjustedContribution
                                     )
                                 }
                             } ?: riskFactor

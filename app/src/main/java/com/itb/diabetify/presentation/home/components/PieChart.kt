@@ -44,7 +44,7 @@ import kotlin.math.abs
 fun PieChart(
     riskFactors: List<HomeViewModel.RiskFactor>,
     centerText: String? = null,
-    holeRadius: Float = 30f,
+    holeRadius: Int = 30,
     animationDuration: Int = 1000,
     modifier: Modifier
 ) {
@@ -69,19 +69,19 @@ fun PieChart(
     }
     
     val maxPositiveValue = remember(dataPercentages) {
-        dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
+        dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1.0
     }
     
     val maxNegativeValue = remember(dataPercentages) {
-        dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
+        dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1.0
     }
     
     val chartColors = remember(dataPercentages, maxPositiveValue, maxNegativeValue) {
         dataPercentages.map { percentage ->
             when {
                 percentage >= 0 -> {
-                    val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
-                    val red = (200 * (0.6f + 0.4f * intensity)).toInt()
+                    val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0.0
+                    val red = (200 * (0.6 + 0.4 * intensity)).toInt()
                     val green = (80 * (1 - intensity)).toInt()
                     Color(red, green, green).toArgb()
                 }
@@ -102,7 +102,7 @@ fun PieChart(
                     description.isEnabled = false
                     isDrawHoleEnabled = true
                     setHoleColor(Color.Transparent.toArgb())
-                    this.holeRadius = holeRadius
+                    this.holeRadius = holeRadius.toFloat()
                     transparentCircleRadius = holeRadius + 5f
                     legend.isEnabled = false
                     rotationAngle = 0f
@@ -127,7 +127,7 @@ fun PieChart(
 
                 // Create entries and dataset
                 val entries = sortedRiskFactors.map { riskFactor ->
-                    PieEntry(abs(riskFactor.percentage), riskFactor.name)
+                    PieEntry(abs(riskFactor.percentage.toFloat()), riskFactor.name)
                 }
 
                 val dataSet = PieDataSet(entries, "").apply {
@@ -202,7 +202,7 @@ fun PieChart(
 fun LegendItem(
     color: Color,
     label: String,
-    value: Float
+    value: Double
 ) {
     Row(
         modifier = Modifier
@@ -232,7 +232,7 @@ fun LegendItem(
         // Value with sign
         Text(
             text = when {
-                abs(value) < 0.000001 -> "${String.format("%.1f", value)}%" // Handle effectively zero values
+                abs(value) < 0.000001 -> "${String.format("%.1f", value)}%"
                 value > 0 -> "+${String.format("%.1f", value)}%"
                 else -> "${String.format("%.1f", value)}%"
             },
@@ -240,7 +240,7 @@ fun LegendItem(
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
             color = when {
-                abs(value) < 0.000001 -> Color(0xFF2E7D32) // Handle effectively zero values
+                abs(value) < 0.000001 -> Color(0xFF2E7D32)
                 value > 0 -> Color(0xFFC62828)
                 else -> Color(0xFF2E7D32)
             }

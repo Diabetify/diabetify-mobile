@@ -5,9 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import java.time.Duration
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
@@ -49,24 +47,24 @@ fun getActivityAverageColor(days: Int): Color {
 }
 
 fun calculateRiskFactorColor(
-    percentage: Float,
+    percentage: Double,
     riskFactors: List<HomeViewModel.RiskFactor>
 ): Color {
     val dataPercentages = riskFactors.map { it.percentage }
 
-    val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1f
-    val maxNegativeValue = dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1f
+    val maxPositiveValue = dataPercentages.filter { it >= 0 }.maxOrNull() ?: 1.0
+    val maxNegativeValue = dataPercentages.filter { it < 0 }.minOrNull()?.let { abs(it) } ?: 1.0
 
     return when {
         percentage >= 0 -> {
-            val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0f
-            val red = (200 * (0.6f + 0.4f * intensity)).toInt()
+            val intensity = if (maxPositiveValue > 0) percentage / maxPositiveValue else 0.0
+            val red = (200 * (0.6 + 0.4 * intensity)).toInt()
             val green = (80 * (1 - intensity)).toInt()
             Color(red, green, green)
         }
         else -> {
             val intensity = abs(percentage) / maxNegativeValue
-            val green = (180 * (0.6f + 0.4f * intensity)).toInt()
+            val green = (180 * (0.6 + 0.4 * intensity)).toInt()
             val red = (80 * (1 - intensity)).toInt()
             Color(red, green, red)
         }
@@ -218,4 +216,33 @@ fun formatDisplayTime(timestamp: String, format: String = "dd/MM/yyyy HH:mm"): S
     } catch (e: Exception) {
         return "Format waktu tidak valid"
     }
+}
+
+fun getRiskCategoryColor(predictionScore: String): Color {
+    val scorePercentage = predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
+    val lowRiskColor = Color(0xFF8BC34A)    // Green
+    val mediumRiskColor = Color(0xFFFFC107) // Yellow
+    val highRiskColor = Color(0xFFFA821F)   // Orange
+    val veryHighRiskColor = Color(0xFFF44336) // Red
+    
+    return when {
+        scorePercentage <= 35 -> lowRiskColor
+        scorePercentage <= 55 -> mediumRiskColor
+        scorePercentage <= 70 -> highRiskColor
+        else -> veryHighRiskColor
+    }
+}
+
+fun getRiskCategoryDescription(predictionScore: String): String {
+    val scorePercentage = predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
+    return when {
+        scorePercentage <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        scorePercentage <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        scorePercentage <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        else -> "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes"
+    }
+}
+
+fun getRiskPercentage(predictionScore: String): Int {
+    return predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
 }

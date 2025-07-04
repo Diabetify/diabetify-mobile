@@ -50,6 +50,7 @@ import com.itb.diabetify.presentation.home.components.BarChartEntry
 import com.itb.diabetify.presentation.home.components.BarChartV2
 import com.itb.diabetify.presentation.home.components.MeasurementCard
 import com.itb.diabetify.presentation.home.components.HomeCard
+import com.itb.diabetify.presentation.home.components.RiskCategory
 import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.StatItem
 import com.itb.diabetify.presentation.home.components.formatDisplayTime
@@ -58,9 +59,11 @@ import com.itb.diabetify.presentation.home.components.getActivityAverageColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
 import com.itb.diabetify.presentation.home.components.getBrinkmanIndexColor
+import com.itb.diabetify.presentation.home.components.getRiskCategoryColor
+import com.itb.diabetify.presentation.home.components.getRiskCategoryDescription
+import com.itb.diabetify.presentation.home.components.getRiskPercentage
 import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
 import com.itb.diabetify.presentation.home.components.getSmokingTextColor
-import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
 import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.text.SimpleDateFormat
@@ -116,7 +119,7 @@ fun HomeScreen(
                         color = colorResource(id = R.color.primary)
                     )
                     Text(
-                        text = viewModel.userNameState.value.split(" ").firstOrNull() ?: "Pengguna",
+                        text = viewModel.userName.value.split(" ").firstOrNull() ?: "Pengguna",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -164,13 +167,13 @@ fun HomeScreen(
                 ) {
                     StatItem(
                         label = "Pemeriksaan Terakhir",
-                        value = formatRelativeTime(viewModel.lastPredictionAtState.value),
+                        value = formatRelativeTime(viewModel.lastPredictionAt.value),
                         icon = Icons.Outlined.Info
                     )
                 }
             }
 
-            // Last update text
+            // Last update
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -182,7 +185,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Terakhir diperbarui: ${formatDisplayTime(viewModel.lastPredictionAtState.value)}",
+                    text = "Terakhir diperbarui: ${formatDisplayTime(viewModel.lastPredictionAt.value)}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
@@ -197,7 +200,7 @@ fun HomeScreen(
                 HomeCard(
                     title = "Persentase Resiko",
                     hasWarning = true,
-                    riskPercentage = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100) ?: 0f
+                    riskPercentage = viewModel.latestPredictionScoreState.value.toFloatOrNull() ?: 0f
                 ) {
                     Column(
                         modifier = Modifier
@@ -206,31 +209,15 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         RiskIndicator(
-                            percentage = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100)?.toInt() ?: 0,
+                            percentage = getRiskPercentage(viewModel.latestPredictionScoreState.value),
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         RiskCategory(
                             modifier = Modifier.padding(vertical = 5.dp),
-                            color = when {
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 35 -> viewModel.lowRiskColor
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 55 -> viewModel.mediumRiskColor
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 70 -> viewModel.highRiskColor
-                                else -> viewModel.veryHighRiskColor
-                            },
-                            description = when {
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                                (viewModel.latestPredictionScoreState.value.toFloatOrNull()
-                                    ?.times(100)?.toInt() ?: 0) <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                                else -> "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes"
-                            },
+                            color = getRiskCategoryColor(viewModel.latestPredictionScoreState.value),
+                            description = getRiskCategoryDescription(viewModel.latestPredictionScoreState.value),
                             isHighlighted = true
                         )
 
@@ -277,7 +264,7 @@ fun HomeScreen(
                                     BarChartEntry(
                                         label = riskFactor.name,
                                         abbreviation = riskFactor.abbreviation,
-                                        value = riskFactor.percentage.toFloat(),
+                                        value = riskFactor.percentage,
                                         isNegative = riskFactor.percentage < 0
                                     )
                                 }
@@ -342,26 +329,6 @@ fun HomeScreen(
                                         color = Color(0xFF059669)
                                     )
                                 }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Text(
-                                    text = "Jika Anda mengurangi konsumsi rokok dan meningkatkan aktivitas fisik, risiko diabetes dapat turun hingga",
-                                    fontSize = 12.sp,
-                                    fontFamily = poppinsFontFamily,
-                                    color = Color(0xFF065F46)
-                                )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Text(
-                                    text = "-17%",
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = poppinsFontFamily,
-                                    color = Color(0xFF059669),
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
                             }
                         }
 
@@ -389,7 +356,6 @@ fun HomeScreen(
                 }
             }
 
-            // Today's Data Section
             Column(
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             ) {

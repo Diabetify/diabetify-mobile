@@ -30,7 +30,7 @@ import kotlin.math.abs
 data class BarChartEntry(
     val label: String,
     val abbreviation: String,
-    val value: Float,
+    val value: Double,
     val isNegative: Boolean = false
 )
 
@@ -104,7 +104,7 @@ fun BarChart(
 
                 sortedAscendingEntries.forEachIndexed { index, entry ->
                     // Add actual bar
-                    barEntries.add(BarEntry(index.toFloat(), entry.value))
+                    barEntries.add(BarEntry(index.toFloat(), entry.value.toFloat()))
                     barColors.add(
                         if (entry.isNegative) {
                             Color.rgb(46, 125, 50) // Green for negative values
@@ -158,7 +158,7 @@ fun BarChart(
 
                 sortedAscendingEntries.forEachIndexed { index, entry ->
                     if (entry.value < 0) {
-                        negativeEntries.add(BarEntry(index.toFloat(), entry.value))
+                        negativeEntries.add(BarEntry(index.toFloat(), entry.value.toFloat()))
                         negativeColors.add(Color.TRANSPARENT)
                     }
                 }
@@ -233,7 +233,7 @@ fun BarChart(
 fun LegendItems(
     color: androidx.compose.ui.graphics.Color,
     label: String,
-    value: Float
+    value: Double
 ) {
     Row(
         modifier = Modifier

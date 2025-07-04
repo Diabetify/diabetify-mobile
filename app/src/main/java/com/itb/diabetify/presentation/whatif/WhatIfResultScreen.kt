@@ -34,7 +34,7 @@ import com.itb.diabetify.presentation.home.components.BarChartEntry
 import com.itb.diabetify.presentation.home.components.BarChartV2
 import com.itb.diabetify.presentation.home.components.HomeCard
 import com.itb.diabetify.presentation.home.components.RiskIndicator
-import com.itb.diabetify.presentation.home.risk_detail.components.RiskCategory
+import com.itb.diabetify.presentation.home.components.RiskCategory
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable

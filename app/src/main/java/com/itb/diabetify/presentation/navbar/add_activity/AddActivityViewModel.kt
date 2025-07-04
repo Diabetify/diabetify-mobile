@@ -366,7 +366,10 @@ class AddActivityViewModel @Inject constructor(
 
             userUseCases.getUserRepository().onEach { user ->
                 _userState.value = userState.value.copy(isLoading = false)
-                _userGender.value = user?.gender
+
+                user?.let {
+                    _userGender.value = it.gender
+                }
             }.launchIn(viewModelScope)
         }
     }

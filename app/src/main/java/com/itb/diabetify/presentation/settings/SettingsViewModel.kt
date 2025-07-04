@@ -150,6 +150,8 @@ class SettingsViewModel @Inject constructor(
             _userState.value = userState.value.copy(isLoading = true)
 
             userUseCases.getUserRepository().onEach { user ->
+                _userState.value = userState.value.copy(isLoading = false)
+
                 user?.let {
                     _nameFieldState.value = nameFieldState.value.copy(
                         text = it.name,
@@ -169,8 +171,6 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
-
-            _userState.value = userState.value.copy(isLoading = false)
         }
     }
 

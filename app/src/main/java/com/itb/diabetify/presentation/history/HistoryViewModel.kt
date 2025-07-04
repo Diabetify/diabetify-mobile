@@ -65,6 +65,10 @@ class HistoryViewModel @Inject constructor(
     init {
         loadPredictionScores()
         loadPredictionForDate(_date.value)
+        
+        PredictionUpdateNotifier.addListener {
+            refreshPredictionData()
+        }
     }
 
     // Setters for UI States
@@ -248,5 +252,27 @@ class HistoryViewModel @Inject constructor(
 
     fun onErrorShown() {
         _errorMessage.value = null
+    }
+    
+    private fun refreshPredictionData() {
+        loadPredictionForDate(_date.value)
+        loadPredictionScores()
+    }
+}
+
+// Extension function
+object PredictionUpdateNotifier {
+    private val listeners = mutableSetOf<() -> Unit>()
+    
+    fun addListener(listener: () -> Unit) {
+        listeners.add(listener)
+    }
+    
+    fun removeListener(listener: () -> Unit) {
+        listeners.remove(listener)
+    }
+    
+    fun notifyPredictionUpdated() {
+        listeners.forEach { it() }
     }
 }

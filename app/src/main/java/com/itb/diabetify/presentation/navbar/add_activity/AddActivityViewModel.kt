@@ -13,6 +13,7 @@ import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
+import com.itb.diabetify.presentation.history.PredictionUpdateNotifier
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -669,6 +670,7 @@ class AddActivityViewModel @Inject constructor(
             when (predictionResult.result) {
                 is Resource.Success -> {
                     _successMessage.value = "Data berhasil diperbarui"
+                    PredictionUpdateNotifier.notifyPredictionUpdated()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = predictionResult.result.message ?: "Terjadi kesalahan saat memperbarui prediksi"

@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Warning
@@ -34,7 +32,7 @@ import com.itb.diabetify.ui.theme.poppinsFontFamily
 fun HomeCard(
     title: String,
     hasWarning: Boolean = false,
-    riskPercentage: Float? = null,
+    riskPercentage: Double? = null,
     content: @Composable () -> Unit
 ) {
     Card(
@@ -47,7 +45,7 @@ fun HomeCard(
         )
     ) {
         Column {
-            // Title bar with gradient background
+            // Title Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,10 +72,10 @@ fun HomeCard(
                         color = Color.White
                     )
 
-                    if (hasWarning && riskPercentage != null && riskPercentage > 30f) {
+                    if (hasWarning && riskPercentage != null && riskPercentage > 35) {
                         val warningColor = when {
-                            riskPercentage <= 50f -> Color(0xFFFFC107)
-                            riskPercentage <= 65f -> Color(0xFFFA821F)
+                            riskPercentage <= 55 -> Color(0xFFFFC107)
+                            riskPercentage <= 70 -> Color(0xFFFA821F)
                             else -> Color(0xFFF44336)
                         }
 

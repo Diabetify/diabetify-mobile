@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.home.components
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -20,9 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun RiskIndicator(
-    percentage: Int,
+    percentage: Double,
     modifier: Modifier = Modifier,
     size: Dp = 150.dp,
     strokeWidth: Dp = 16.dp,
@@ -62,10 +64,10 @@ fun RiskIndicator(
             )
 
             val percentageColor = when {
-                currentPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
-                currentPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
-                currentPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
-                else -> Color(0xFFF44336) // Very high risk - Red
+                currentPercentage <= 35f -> Color(0xFF8BC34A) // Green
+                currentPercentage <= 55f -> Color(0xFFFFC107) // Yellow
+                currentPercentage <= 70f -> Color(0xFFFA821F) // Orange
+                else -> Color(0xFFF44336) // Red
             }
 
             drawArc(
@@ -85,8 +87,8 @@ fun RiskIndicator(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "${currentPercentage.toInt()}%",
-                fontSize = 30.sp,
+                text = "${String.format("%.1f", currentPercentage)}%",
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = poppinsFontFamily,
                 color = textColor,
@@ -101,10 +103,10 @@ fun RiskIndicator(
             }
 
             val riskColor = when {
-                currentPercentage <= 35f -> Color(0xFF8BC34A) // Low risk - Green
-                currentPercentage <= 55f -> Color(0xFFFFC107) // Medium risk - Yellow
-                currentPercentage <= 70f -> Color(0xFFFA821F) // High risk - Orange
-                else -> Color(0xFFF44336) // Very high risk - Red
+                currentPercentage <= 35f -> Color(0xFF8BC34A) // Green
+                currentPercentage <= 55f -> Color(0xFFFFC107) // Yellow
+                currentPercentage <= 70f -> Color(0xFFFA821F) // Orange
+                else -> Color(0xFFF44336) // Red
             }
 
             Text(

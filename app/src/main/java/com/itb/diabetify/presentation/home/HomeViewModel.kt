@@ -57,8 +57,8 @@ class HomeViewModel @Inject constructor(
     private val _lastPredictionAt = mutableStateOf("Belum ada prediksi")
     val lastPredictionAt: State<String> = _lastPredictionAt
 
-    private val _latestPredictionScoreState = mutableStateOf("0.0")
-    val latestPredictionScoreState: State<String> = _latestPredictionScoreState
+    private val _latestPredictionScoreState = mutableStateOf(0.0)
+    val latestPredictionScoreState: State<Double> = _latestPredictionScoreState
 
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
@@ -275,7 +275,7 @@ class HomeViewModel @Inject constructor(
 
                 prediction.let { latestPrediction ->
                     _lastPredictionAt.value = latestPrediction.createdAt
-                    _latestPredictionScoreState.value = latestPrediction.riskScore.toString()
+                    _latestPredictionScoreState.value = latestPrediction.riskScore
 
                     _riskFactors.value = listOf(
                         RiskFactor("Indeks Massa Tubuh", "IMT", latestPrediction.bmiContribution),
@@ -442,7 +442,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun resetToDefaultValues() {
-        _latestPredictionScoreState.value = "0.0"
+        _latestPredictionScoreState.value = 0.0
         _bmiValueState.value = "0.0"
         _weightValueState.value = "0"
         _heightValueState.value = "0"

@@ -3,6 +3,7 @@ package com.itb.diabetify.presentation.whatif
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -43,8 +44,8 @@ class WhatIfViewModel @Inject constructor(
     val whatIfPredictionState: State<DataState> = _whatIfPredictionState
 
     // States
-    private val _predictionScore = mutableIntStateOf(0)
-    val predictionScore: State<Int> = _predictionScore
+    private val _predictionScore = mutableDoubleStateOf(0.0)
+    val predictionScore: State<Double> = _predictionScore
 
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
@@ -227,7 +228,7 @@ class WhatIfViewModel @Inject constructor(
                     val responseData = whatIfPredictionResult.result.data?.data
 
                     responseData?.let { data ->
-                        _predictionScore.intValue = data.riskPercentage.toInt()
+                        _predictionScore.doubleValue = data.riskPercentage
 
                         val updatedRiskFactors = _riskFactors.value.map { riskFactor ->
                             val featureKey = when (riskFactor.abbreviation) {

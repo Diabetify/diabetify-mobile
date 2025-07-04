@@ -34,7 +34,7 @@ fun RiskDetailScreen(
     viewModel: HomeViewModel,
 ) {
     val scrollState = rememberScrollState()
-    val score = viewModel.latestPredictionScoreState.value.toFloatOrNull()?.times(100)?.toInt() ?: 0
+    val score = viewModel.latestPredictionScoreState.value
 
     Column(
         modifier = Modifier
@@ -75,7 +75,7 @@ fun RiskDetailScreen(
                 .padding(horizontal = 16.dp)
         ) {
             RiskScoreGauge(
-                score = score,
+                score = score.toInt(),
                 lowRiskColor = viewModel.lowRiskColor,
                 mediumRiskColor = viewModel.mediumRiskColor,
                 highRiskColor = viewModel.highRiskColor,
@@ -104,14 +104,14 @@ fun RiskDetailScreen(
                 color = viewModel.mediumRiskColor,
                 title = "35 - 55: Sedang",
                 description = "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score in 35..55
+                isHighlighted = score.toInt() in 35..55
             )
 
             RiskCategory(
                 color = viewModel.highRiskColor,
                 title = "55 - 70: Tinggi",
                 description = "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes",
-                isHighlighted = score in 55..70
+                isHighlighted = score.toInt() in 55..70
             )
 
             RiskCategory(

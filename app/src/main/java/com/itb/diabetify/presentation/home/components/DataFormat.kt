@@ -218,31 +218,25 @@ fun formatDisplayTime(timestamp: String, format: String = "dd/MM/yyyy HH:mm"): S
     }
 }
 
-fun getRiskCategoryColor(predictionScore: String): Color {
-    val scorePercentage = predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
+fun getRiskCategoryColor(predictionScore: Double): Color {
     val lowRiskColor = Color(0xFF8BC34A)    // Green
     val mediumRiskColor = Color(0xFFFFC107) // Yellow
     val highRiskColor = Color(0xFFFA821F)   // Orange
     val veryHighRiskColor = Color(0xFFF44336) // Red
     
     return when {
-        scorePercentage <= 35 -> lowRiskColor
-        scorePercentage <= 55 -> mediumRiskColor
-        scorePercentage <= 70 -> highRiskColor
+        predictionScore <= 35 -> lowRiskColor
+        predictionScore <= 55 -> mediumRiskColor
+        predictionScore <= 70 -> highRiskColor
         else -> veryHighRiskColor
     }
 }
 
-fun getRiskCategoryDescription(predictionScore: String): String {
-    val scorePercentage = predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
+fun getRiskCategoryDescription(predictionScore: Double): String {
     return when {
-        scorePercentage <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
-        scorePercentage <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
-        scorePercentage <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        predictionScore <= 35 -> "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        predictionScore <= 55 -> "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes"
+        predictionScore <= 70 -> "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes"
         else -> "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes"
     }
-}
-
-fun getRiskPercentage(predictionScore: String): Int {
-    return predictionScore.toFloatOrNull()?.times(100)?.toInt() ?: 0
 }

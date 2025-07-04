@@ -89,7 +89,7 @@ fun WhatIfResultScreen(
             HomeCard(
                 title = "Persentase Risiko",
                 hasWarning = true,
-                riskPercentage = predictionPercentage.toFloat()
+                riskPercentage = predictionPercentage
             ) {
                 Column(
                     modifier = Modifier

@@ -1,5 +1,8 @@
 package com.itb.diabetify.presentation.home.risk_detail.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -12,6 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import kotlinx.coroutines.async
+import kotlin.math.roundToInt
 
 @Composable
 fun RiskScoreGauge(
@@ -30,8 +37,41 @@ fun RiskScoreGauge(
     lowRiskColor: Color,
     mediumRiskColor: Color,
     highRiskColor: Color,
-    veryHighRiskColor: Color
+    veryHighRiskColor: Color,
+    animationDuration: Int = 2000,
 ) {
+    val targetScore = score.coerceIn(0, 100)
+    val normalizedTargetScore = targetScore / 100f
+
+    val animatedPosition = remember { Animatable(0f) }
+
+    val animatedScoreText = remember { Animatable(0f) }
+
+    LaunchedEffect(targetScore) {
+        val positionAnimation = async {
+            animatedPosition.animateTo(
+                targetValue = normalizedTargetScore,
+                animationSpec = tween(
+                    durationMillis = animationDuration,
+                    easing = EaseInOut
+                )
+            )
+        }
+
+        val scoreAnimation = async {
+            animatedScoreText.animateTo(
+                targetValue = targetScore.toFloat(),
+                animationSpec = tween(
+                    durationMillis = animationDuration,
+                    easing = EaseInOut
+                )
+            )
+        }
+
+        positionAnimation.await()
+        scoreAnimation.await()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,25 +87,23 @@ fun RiskScoreGauge(
                     brush = Brush.horizontalGradient(
                         colorStops = arrayOf(
                             0.0f to lowRiskColor,
-                            0.3f to mediumRiskColor,
-                            0.5f to highRiskColor,
-                            0.65f to veryHighRiskColor,
+                            0.35f to mediumRiskColor,
+                            0.55f to highRiskColor,
+                            0.70f to veryHighRiskColor,
                             1.0f to veryHighRiskColor
                         )
                     )
                 )
         )
 
-        val normalizedScore = score.coerceIn(0, 100) / 100f
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (normalizedScore > 0) {
+            if (animatedPosition.value > 0) {
                 Spacer(
                     modifier = Modifier
-                        .weight(normalizedScore)
+                        .weight(animatedPosition.value)
                         .height(1.dp)
                 )
             }
@@ -77,7 +115,7 @@ fun RiskScoreGauge(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = score.toString(),
+                    text = animatedScoreText.value.roundToInt().toString(),
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -85,10 +123,10 @@ fun RiskScoreGauge(
                 )
             }
 
-            if (normalizedScore < 1) {
+            if (animatedPosition.value < 1) {
                 Spacer(
                     modifier = Modifier
-                        .weight(1f - normalizedScore)
+                        .weight(1f - animatedPosition.value)
                         .height(1.dp)
                 )
             }

@@ -61,7 +61,6 @@ import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
 import com.itb.diabetify.presentation.home.components.getBrinkmanIndexColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryDescription
-import com.itb.diabetify.presentation.home.components.getRiskPercentage
 import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
 import com.itb.diabetify.presentation.home.components.getSmokingTextColor
 import com.itb.diabetify.presentation.navgraph.Route
@@ -136,6 +135,7 @@ fun HomeScreen(
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
+
                         val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
                         val formattedDate = dateFormat.format(Date())
                         Text(
@@ -200,7 +200,7 @@ fun HomeScreen(
                 HomeCard(
                     title = "Persentase Resiko",
                     hasWarning = true,
-                    riskPercentage = viewModel.latestPredictionScoreState.value.toFloatOrNull() ?: 0f
+                    riskPercentage = viewModel.latestPredictionScoreState.value
                 ) {
                     Column(
                         modifier = Modifier
@@ -209,7 +209,7 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         RiskIndicator(
-                            percentage = getRiskPercentage(viewModel.latestPredictionScoreState.value),
+                            percentage = viewModel.latestPredictionScoreState.value,
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))

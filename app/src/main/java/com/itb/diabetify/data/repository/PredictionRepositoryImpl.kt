@@ -107,7 +107,7 @@ class PredictionRepositoryImpl (
 
                 predictionManager.savePrediction(
                     Prediction(
-                        riskScore = prediction.riskScore,
+                        riskScore = prediction.riskScore * 100,
                         age = prediction.age,
                         ageContribution = ageContribution * 100,
                         ageExplanation = prediction.ageExplanation,

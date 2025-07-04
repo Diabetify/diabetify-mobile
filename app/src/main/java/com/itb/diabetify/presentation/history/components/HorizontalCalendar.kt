@@ -124,12 +124,12 @@ fun HorizontalCalendar(
             data = data,
             onPrevClickListener = { startDate ->
                 val newMonth = startDate.minusMonths(1)
-                val firstDayOfNewMonth = newMonth.withDayOfMonth(1)
-                data = dataSource.getMonthData(newMonth, firstDayOfNewMonth)
+                val lastDayOfNewMonth = newMonth.withDayOfMonth(newMonth.lengthOfMonth())
+                data = dataSource.getMonthData(newMonth, lastDayOfNewMonth)
                 currentMonth = newMonth.month
                 currentYear = newMonth.year
 
-                onDateClickListener(firstDayOfNewMonth)
+                onDateClickListener(lastDayOfNewMonth)
             },
             onNextClickListener = { startDate ->
                 val newMonth = startDate.plusMonths(1)
@@ -149,21 +149,23 @@ fun HorizontalCalendar(
             data = data,
             lazyListState = lazyListState,
         ) { date ->
-            if (date.date.month != currentMonth || date.date.year != currentYear) {
-                data = dataSource.getMonthData(date.date, date.date)
-                currentMonth = date.date.month
-                currentYear = date.date.year
-            } else {
-                data = data.copy(
-                    selectedDate = date,
-                    visibleDates = data.visibleDates.map {
-                        it.copy(
-                            isSelected = it.date.isEqual(date.date)
-                        )
-                    }
-                )
+            if (!date.isFutureDate) {
+                if (date.date.month != currentMonth || date.date.year != currentYear) {
+                    data = dataSource.getMonthData(date.date, date.date)
+                    currentMonth = date.date.month
+                    currentYear = date.date.year
+                } else {
+                    data = data.copy(
+                        selectedDate = date,
+                        visibleDates = data.visibleDates.map {
+                            it.copy(
+                                isSelected = it.date.isEqual(date.date)
+                            )
+                        }
+                    )
+                }
+                onDateClickListener(date.date)
             }
-            onDateClickListener(date.date)
         }
 
         // Date picker dialog
@@ -178,10 +180,12 @@ fun HorizontalCalendar(
                             formattedDate,
                             DateTimeFormatter.ofPattern("dd/MM/yyyy", INDONESIAN_LOCALE)
                         )
-                        data = dataSource.getMonthData(localDate, localDate)
-                        currentMonth = localDate.month
-                        currentYear = localDate.year
-                        onDateClickListener(localDate)
+                        if (!localDate.isAfter(dataSource.today)) {
+                            data = dataSource.getMonthData(localDate, localDate)
+                            currentMonth = localDate.month
+                            currentYear = localDate.year
+                            onDateClickListener(localDate)
+                        }
                     }
                 },
                 onDismiss = { showDatePicker.value = false }
@@ -199,6 +203,10 @@ fun Header(
     modifier: Modifier = Modifier,
     onDatePickerClickListener: () -> Unit
 ) {
+    val nextMonth = data.selectedDate.date.plusMonths(1)
+    val today = LocalDate.now()
+    val isNextMonthDisabled = nextMonth.withDayOfMonth(1).isAfter(today)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -243,12 +251,22 @@ fun Header(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Next month",
-            tint = colorResource(id = R.color.primary),
+            tint = if (isNextMonthDisabled) {
+                colorResource(id = R.color.primary).copy(alpha = 0.3f)
+            } else {
+                colorResource(id = R.color.primary)
+            },
             modifier = Modifier
                 .size(24.dp)
-                .clickable {
-                    onNextClickListener(data.selectedDate.date)
-                }
+                .then(
+                    if (isNextMonthDisabled) {
+                        Modifier
+                    } else {
+                        Modifier.clickable {
+                            onNextClickListener(data.selectedDate.date)
+                        }
+                    }
+                )
         )
     }
 }
@@ -295,10 +313,23 @@ fun ContentItem(
     ) {
         Column(modifier = Modifier
             .width(60.dp)
-            .noRippleEffect {
-                onClickListener(date)
-            }
-            .background(color = colorResource(R.color.white), shape = RoundedCornerShape(15.dp))
+            .then(
+                if (date.isFutureDate) {
+                    Modifier
+                } else {
+                    Modifier.noRippleEffect {
+                        onClickListener(date)
+                    }
+                }
+            )
+            .background(
+                color = if (date.isFutureDate) {
+                    colorResource(R.color.white).copy(alpha = 0.5f)
+                } else {
+                    colorResource(R.color.white)
+                },
+                shape = RoundedCornerShape(15.dp)
+            )
             .border(
                 if (date.isSelected) (1.5).dp else (0.5).dp,
                 if (date.isSelected) colorResource(R.color.primary) else colorResource(R.color.white),
@@ -313,7 +344,11 @@ fun ContentItem(
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Thin,
                 fontSize = 14.sp,
-                color = colorResource(id = R.color.primary)
+                color = if (date.isFutureDate) {
+                    colorResource(id = R.color.primary).copy(alpha = 0.4f)
+                } else {
+                    colorResource(id = R.color.primary)
+                }
             )
             Text(
                 text = date.date.dayOfMonth.toString(),
@@ -322,7 +357,11 @@ fun ContentItem(
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = colorResource(id = R.color.primary)
+                color = if (date.isFutureDate) {
+                    colorResource(id = R.color.primary).copy(alpha = 0.4f)
+                } else {
+                    colorResource(id = R.color.primary)
+                }
             )
         }
     }
@@ -395,6 +434,9 @@ data class CalendarUiModel(
     ) {
         @RequiresApi(Build.VERSION_CODES.O)
         val day: String = date.format(DateTimeFormatter.ofPattern("E", INDONESIAN_LOCALE))
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        val isFutureDate: Boolean = date.isAfter(LocalDate.now())
     }
 }
 

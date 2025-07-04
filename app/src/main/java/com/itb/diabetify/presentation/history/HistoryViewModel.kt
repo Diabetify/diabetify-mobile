@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.history
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -9,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.presentation.history.components.PredictionScoreEntry
+import com.itb.diabetify.presentation.history.components.RiskFactorContribution
+import com.itb.diabetify.presentation.history.components.DailyInput
 import com.itb.diabetify.data.remote.prediction.response.PredictionData
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
@@ -39,26 +42,34 @@ class HistoryViewModel @Inject constructor(
     val getPredictionScoreByDateState: State<DataState> = _getPredictionScoreByDateState
 
     // UI States
+    data class PredictionDisplayData(
+        val riskFactorContributions: List<RiskFactorContribution>,
+        val dailyInputs: List<DailyInput>
+    )
+
+    private val _displayData = MutableStateFlow<PredictionDisplayData?>(null)
+    val displayData: StateFlow<PredictionDisplayData?> = _displayData
+
     private val _predictionScores = MutableStateFlow<List<PredictionScoreEntry>>(emptyList())
     val predictionScores: StateFlow<List<PredictionScoreEntry>> = _predictionScores
 
     private val _currentPrediction = MutableStateFlow<PredictionData?>(null)
     val currentPrediction: StateFlow<PredictionData?> = _currentPrediction
 
-    private val _dateState = mutableStateOf(
+    private val _date = mutableStateOf(
         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     )
-    val dateState: State<String> = _dateState
+    val date: State<String> = _date
 
     // Initialization
     init {
         loadPredictionScores()
-        loadPredictionForDate(_dateState.value)
+        loadPredictionForDate(_date.value)
     }
 
     // Setters for UI States
     fun setDate(date: String) {
-        _dateState.value = date
+        _date.value = date
         loadPredictionScores()
         loadPredictionForDate(date)
     }
@@ -78,20 +89,17 @@ class HistoryViewModel @Inject constructor(
             when (getPredictionResult.result) {
                 is Resource.Success -> {
                     val prediction = getPredictionResult.result.data?.data?.firstOrNull()
-
                     _currentPrediction.value = prediction
-                    Log.d("HistoryViewModel", "Prediction loaded successfully for date: $date")
+                    _displayData.value = prediction?.let { mapPredictionToDisplayData(it) }
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = getPredictionResult.result.message
-                    Log.d("HistoryViewModel", "Error loading prediction: ${getPredictionResult.result.message}")
+                    _errorMessage.value = getPredictionResult.result.message ?: "Terjadi kesalahan saat memuat prediksi"
+                    getPredictionResult.result.message?.let { Log.e("HistoryViewModel", it) }
                 }
-                is Resource.Loading -> {
-                    Log.d("HistoryViewModel", "Loading prediction...")
-                }
+
                 else -> {
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HistoryViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat memuat prediksi"
+                    Log.e("HistoryViewModel", "Unexpected error")
                 }
             }
         }
@@ -102,7 +110,7 @@ class HistoryViewModel @Inject constructor(
             _getPredictionScoreByDateState.value = getPredictionScoreByDateState.value.copy(isLoading = true)
 
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val selectedDate = LocalDate.parse(_dateState.value ?: LocalDate.now().format(formatter))
+            val selectedDate = LocalDate.parse(_date.value ?: LocalDate.now().format(formatter))
 
             val startDate = selectedDate.minusDays(15).format(formatter)
             val endDate = selectedDate.plusDays(15).format(formatter)
@@ -132,29 +140,96 @@ class HistoryViewModel @Inject constructor(
                         emptyList()
                     }
                     _predictionScores.value = scores
-                    Log.d("HistoryViewModel", "Prediction scores loaded successfully for range: $startDate to $endDate")
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = getPredictionScoreByDateResult.result.message
-                    getPredictionScoreByDateResult.result.message?.let { Log.d("HistoryViewModel", it) }
+                    _errorMessage.value = getPredictionScoreByDateResult.result.message ?: "Terjadi kesalahan saat memuat skor prediksi"
+                    getPredictionScoreByDateResult.result.message?.let { Log.e("HistoryViewModel", it) }
                 }
-                is Resource.Loading -> {
-                    Log.d("HistoryViewModel", "Loading prediction scores...")
-                }
+
                 else -> {
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HistoryViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat memuat skor prediksi"
+                    Log.e("HistoryViewModel", "Unexpected error")
                 }
             }
         }
     }
 
+    // Helper Functions
+    @SuppressLint("DefaultLocale")
+    private fun mapPredictionToDisplayData(prediction: PredictionData): PredictionDisplayData {
+        return PredictionDisplayData(
+            riskFactorContributions = listOf(
+                RiskFactorContribution(
+                    "Indeks Massa Tubuh",
+                    String.format("%.1f", prediction.bmiContribution * 100),
+                    prediction.bmiImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Riwayat Hipertensi",
+                    String.format("%.1f", prediction.isHypertensionContribution * 100),
+                    prediction.isHypertensionImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Riwayat Bayi Makrosomia",
+                    String.format("%.1f", prediction.isMacrosomicBabyContribution * 100),
+                    prediction.isMacrosomicBabyImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Aktivitas Fisik",
+                    String.format("%.1f", prediction.physicalActivityFrequencyContribution * 100),
+                    prediction.physicalActivityFrequencyImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Usia",
+                    String.format("%.1f", prediction.ageContribution * 100),
+                    prediction.ageImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Status Merokok",
+                    String.format("%.1f", prediction.smokingStatusContribution * 100),
+                    prediction.smokingStatusImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Indeks Brinkman",
+                    String.format("%.1f", prediction.brinkmanScoreContribution * 100),
+                    prediction.brinkmanScoreImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Riwayat Keluarga",
+                    String.format("%.1f", prediction.isBloodlineContribution * 100),
+                    prediction.isBloodlineImpact == 1
+                ),
+                RiskFactorContribution(
+                    "Kolesterol",
+                    String.format("%.1f", prediction.isCholesterolContribution * 100),
+                    prediction.isCholesterolImpact == 1
+                )
+            ),
+            dailyInputs = listOf(
+                DailyInput("Usia", "${prediction.age} tahun"),
+                DailyInput("Indeks Massa Tubuh", "${prediction.bmi} kg/m²"),
+                DailyInput("Hipertensi", if (prediction.isHypertension) "Ya" else "Tidak"),
+                DailyInput("Kolesterol", if (prediction.isCholesterol) "Ya" else "Tidak"),
+                DailyInput("Riwayat Keluarga", if (prediction.isBloodline) "Ya" else "Tidak"),
+                DailyInput("Riwayat Bayi Makrosomia", if (prediction.isMacrosomicBaby == 1) "Ya" else "Tidak"),
+                DailyInput("Status Merokok",
+                    when (prediction.smokingStatus) {
+                        "0" -> "Tidak Pernah"
+                        "1" -> "Sudah Berhenti"
+                        "2" -> "Masih Merokok"
+                        else -> "Tidak Diketahui"
+                    }),
+                DailyInput("Indeks Brinkman", "${prediction.brinkmanScore}"),
+                DailyInput("Jumlah Rokok", "${prediction.avgSmokeCount} batang / hari"),
+                DailyInput("Frekuensi Aktivitas Fisik", "${prediction.physicalActivityFrequency}x / minggu")
+            )
+        )
+    }
+
     private fun convertUtcToLocalDate(timestamp: String): String {
         return try {
             val zonedDateTime = ZonedDateTime.parse(timestamp.replace(" ", "T"))
-
             val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault())
-
             localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         } catch (e: Exception) {
             Log.e("HistoryViewModel", "Error parsing timestamp: $timestamp", e)
@@ -171,7 +246,6 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    // Helper Functions
     fun onErrorShown() {
         _errorMessage.value = null
     }

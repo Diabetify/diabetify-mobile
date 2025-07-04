@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,8 +33,6 @@ import com.itb.diabetify.presentation.history.components.HorizontalCalendar
 import com.itb.diabetify.presentation.history.components.LineGraph
 import com.itb.diabetify.presentation.history.components.DailySummary
 import com.itb.diabetify.presentation.history.components.DailySummaryData
-import com.itb.diabetify.presentation.history.components.RiskFactorContribution
-import com.itb.diabetify.presentation.history.components.DailyInput
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -44,8 +43,9 @@ fun HistoryScreen(
     viewModel: HistoryViewModel
 ) {
     // States
-    val predictionScores = viewModel.predictionScores.collectAsState(initial = emptyList())
-    val currentPrediction = viewModel.currentPrediction.collectAsState(initial = null)
+    val predictionScores by viewModel.predictionScores.collectAsState(initial = emptyList())
+    val currentPrediction by viewModel.currentPrediction.collectAsState(initial = null)
+    val displayData by viewModel.displayData.collectAsState(initial = null)
     val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.getPredictionByDateState.value.isLoading || viewModel.getPredictionScoreByDateState.value.isLoading
 
@@ -98,6 +98,7 @@ fun HistoryScreen(
             )
 
             if (isLoading) {
+                // Loading
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,12 +122,13 @@ fun HistoryScreen(
                         )
                     }
                 }
-            } else if (currentPrediction.value == null) {
+            } else if (currentPrediction == null) {
                 LineGraph(
-                    predictionScores = predictionScores.value,
-                    selectedDate = viewModel.dateState.value
+                    predictionScores = predictionScores,
+                    selectedDate = viewModel.date.value
                 )
 
+                // No data available
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -163,108 +165,26 @@ fun HistoryScreen(
                 }
             } else {
                 LineGraph(
-                    predictionScores = predictionScores.value,
-                    selectedDate = viewModel.dateState.value
+                    predictionScores = predictionScores,
+                    selectedDate = viewModel.date.value
                 )
 
-                currentPrediction.value?.let { prediction ->
-                    DailySummary(
-                        summaryData = DailySummaryData(
-                            date = if (viewModel.dateState.value.isNotEmpty()) {
-                                LocalDate.parse(viewModel.dateState.value)
-                            } else {
-                                LocalDate.now()
-                            },
-                            riskPercentage = (prediction.riskScore * 100).toFloat(),
-                            riskFactorContributions = listOf(
-                                RiskFactorContribution(
-                                    "Indeks Massa Tubuh",
-                                    (String.format("%.1f", prediction.bmiContribution * 100)),
-                                    prediction.bmiImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Riwayat Hipertensi",
-                                    (String.format("%.1f", prediction.isHypertensionContribution * 100)),
-                                    prediction.isHypertensionImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Riwayat Bayi Makrosomia",
-                                    (String.format("%.1f", prediction.isMacrosomicBabyContribution * 100)),
-                                    prediction.isMacrosomicBabyImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Aktivitas Fisik",
-                                    (String.format("%.1f", prediction.physicalActivityFrequencyContribution * 100)),
-                                    prediction.physicalActivityFrequencyImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Usia",
-                                    (String.format("%.1f", prediction.ageContribution * 100)),
-                                    prediction.ageImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Status Merokok",
-                                    (String.format("%.1f", prediction.smokingStatusContribution * 100)),
-                                    prediction.smokingStatusImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Indeks Brinkman",
-                                    (String.format("%.1f", prediction.brinkmanScoreContribution * 100)),
-                                    prediction.brinkmanScoreImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Riwayat Keluarga",
-                                    (String.format("%.1f", prediction.isBloodlineContribution * 100)),
-                                    prediction.isBloodlineImpact == 1
-                                ),
-                                RiskFactorContribution(
-                                    "Kolesterol",
-                                    (String.format("%.1f", prediction.isCholesterolContribution * 100)),
-                                    prediction.isCholesterolImpact == 1
-                                )
-                            ),
-                            dailyInputs = listOf(
-                                DailyInput("Usia", "${prediction.age} tahun"),
-                                DailyInput("Indeks Massa Tubuh", "${prediction.bmi} kg/m²"),
-                                DailyInput("Hipertensi",
-                                    if (prediction.isHypertension) "Ya" else "Tidak"
-                                ),
-                                DailyInput(
-                                    "Kolesterol",
-                                    if (prediction.isCholesterol) "Ya" else "Tidak"
-                                ),
-                                DailyInput(
-                                    "Riwayat Keluarga",
-                                    if (prediction.isBloodline) "Ya" else "Tidak"
-                                ),
-                                DailyInput(
-                                    "Riwayat Bayi Makrosomia",
-                                    if (prediction.isMacrosomicBaby == 1) "Ya" else "Tidak"
-                                ),
-                                DailyInput(
-                                    "Status Merokok",
-                                    when (prediction.smokingStatus) {
-                                        "0" -> "Tidak Pernah"
-                                        "1" -> "Sudah Berhenti"
-                                        "2" -> "Masih Merokok"
-                                        else -> "Tidak Diketahui"
-                                    }
-                                ),
-                                DailyInput(
-                                    "Indeks Brinkman",
-                                    "${prediction.brinkmanScore}"
-                                ),
-                                DailyInput(
-                                    "Jumlah Rokok",
-                                    "${prediction.avgSmokeCount} batang / hari"
-                                ),
-                                DailyInput(
-                                    "Frekuensi Aktivitas Fisik",
-                                    "${prediction.physicalActivityFrequency}x / minggu"
-                                ),
+                // Daily Summary
+                currentPrediction?.let { prediction ->
+                    displayData?.let { data ->
+                        DailySummary(
+                            summaryData = DailySummaryData(
+                                date = if (viewModel.date.value.isNotEmpty()) {
+                                    LocalDate.parse(viewModel.date.value)
+                                } else {
+                                    LocalDate.now()
+                                },
+                                riskPercentage = (prediction.riskScore * 100).toFloat(),
+                                riskFactorContributions = data.riskFactorContributions,
+                                dailyInputs = data.dailyInputs
                             )
                         )
-                    )
+                    }
                 }
             }
         }

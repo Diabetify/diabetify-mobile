@@ -28,15 +28,6 @@ fun getBmiCategoryColor(bmi: Double): Color {
     }
 }
 
-fun getBrinkmanIndexColor(index: Int): Color {
-    return when {
-        index >= 400 -> Color(0xFFDC2626)
-        index >= 200 -> Color(0xFFEA580C)
-        index >= 100 -> Color(0xFFF59E0B)
-        else -> Color(0xFF10B981)
-    }
-}
-
 fun getActivityAverageColor(days: Int): Color {
     return when {
         days >= 5 -> Color(0xFF10B981)
@@ -219,10 +210,10 @@ fun formatDisplayTime(timestamp: String, format: String = "dd/MM/yyyy HH:mm"): S
 }
 
 fun getRiskCategoryColor(predictionScore: Double): Color {
-    val lowRiskColor = Color(0xFF8BC34A)    // Green
-    val mediumRiskColor = Color(0xFFFFC107) // Yellow
-    val highRiskColor = Color(0xFFFA821F)   // Orange
-    val veryHighRiskColor = Color(0xFFF44336) // Red
+    val lowRiskColor = Color(0xFF8BC34A)
+    val mediumRiskColor = Color(0xFFFFC107)
+    val highRiskColor = Color(0xFFFA821F)
+    val veryHighRiskColor = Color(0xFFF44336)
     
     return when {
         predictionScore <= 35 -> lowRiskColor

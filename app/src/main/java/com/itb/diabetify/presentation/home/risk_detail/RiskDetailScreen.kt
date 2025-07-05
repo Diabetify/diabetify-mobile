@@ -76,10 +76,6 @@ fun RiskDetailScreen(
         ) {
             RiskScoreGauge(
                 score = score.toInt(),
-                lowRiskColor = viewModel.lowRiskColor,
-                mediumRiskColor = viewModel.mediumRiskColor,
-                highRiskColor = viewModel.highRiskColor,
-                veryHighRiskColor = viewModel.veryHighRiskColor
             )
 
             Text(
@@ -94,28 +90,28 @@ fun RiskDetailScreen(
 
             // Risk categories
             RiskCategory(
-                color = viewModel.lowRiskColor,
+                color = Color(0xFF8BC34A),
                 title = "0 - 35: Rendah",
                 description = "Diperkirakan 15 dari 100 orang dengan skor ini akan mengidap Diabetes",
                 isHighlighted = score <= 35
             )
 
             RiskCategory(
-                color = viewModel.mediumRiskColor,
+                color = Color(0xFFFFC107),
                 title = "35 - 55: Sedang",
                 description = "Diperkirakan 31 dari 100 orang dengan skor ini akan mengidap Diabetes",
                 isHighlighted = score.toInt() in 35..55
             )
 
             RiskCategory(
-                color = viewModel.highRiskColor,
+                color = Color(0xFFFA821F),
                 title = "55 - 70: Tinggi",
                 description = "Diperkirakan 55 dari 100 orang dengan skor ini akan mengidap Diabetes",
                 isHighlighted = score.toInt() in 55..70
             )
 
             RiskCategory(
-                color = viewModel.veryHighRiskColor,
+                color = Color(0xFFF44336),
                 title = "70 - 100: Sangat Tinggi",
                 description = "Diperkirakan 69 dari 100 orang dengan skor ini akan mengidap Diabetes",
                 isHighlighted = score > 70

@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -63,7 +64,6 @@ import com.itb.diabetify.presentation.home.components.formatRelativeTime
 import com.itb.diabetify.presentation.home.components.getActivityAverageColor
 import com.itb.diabetify.presentation.home.components.getBmiCategory
 import com.itb.diabetify.presentation.home.components.getBmiCategoryColor
-import com.itb.diabetify.presentation.home.components.getBrinkmanIndexColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryDescription
 import com.itb.diabetify.presentation.home.components.getSmokingBackgroundColor
@@ -74,6 +74,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -445,10 +446,9 @@ fun HomeScreen(
                     containerColor = colorResource(id = R.color.white)
                 )
             ) {
-                val bmi = viewModel.bmi.value
-                val bmiValue = bmi
-                val bmiCategory = getBmiCategory(bmiValue)
-                val bmiColor = getBmiCategoryColor(bmiValue)
+                val bmi by viewModel.bmi
+                val bmiCategory = getBmiCategory(bmi)
+                val bmiColor = getBmiCategoryColor(bmi)
 
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -477,7 +477,7 @@ fun HomeScreen(
                         }
 
                         Text(
-                            text = String.format("%.1f", bmiValue),
+                            text = String.format("%.1f", bmi),
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp,
@@ -502,10 +502,10 @@ fun HomeScreen(
                                 .background(
                                     brush = Brush.horizontalGradient(
                                         colors = listOf(
-                                            Color(0xFFF59E0B), // Underweight
-                                            Color(0xFF10B981), // Normal
-                                            Color(0xFFF59E0B), // Overweight
-                                            Color(0xFFEF4444)  // Obese
+                                            Color(0xFFF59E0B),
+                                            Color(0xFF10B981),
+                                            Color(0xFFF59E0B),
+                                            Color(0xFFEF4444)
                                         )
                                     )
                                 )
@@ -514,9 +514,9 @@ fun HomeScreen(
                         // BMI indicator
                         Box(
                             modifier = Modifier
-                                .size(12.dp)
+                                .size(8.dp)
                                 .offset(
-                                    x = ((bmiValue - 10) / 30f * (1f - 12f/360f)) * 360.dp,
+                                    x = ((bmi - 10) / 30f * (1f - 12f/360f)) * 360.dp,
                                 )
                                 .clip(CircleShape)
                                 .background(Color.White)
@@ -565,10 +565,13 @@ fun HomeScreen(
                     .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val weight by viewModel.weight
+                val height by viewModel.height
+
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Berat",
-                    value = viewModel.weight.value,
+                    value = weight,
                     unit = "kg",
                     changeIndicator = "+0.5",
                     trend = "up"
@@ -577,7 +580,7 @@ fun HomeScreen(
                 MeasurementCard(
                     modifier = Modifier.weight(1f),
                     label = "Tinggi",
-                    value = viewModel.height.value,
+                    value = height,
                     unit = "cm",
                     changeIndicator = "0",
                     trend = "stable"
@@ -616,7 +619,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isHypertension = viewModel.isHypertension.value
+                        val isHypertension by viewModel.isHypertension
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -665,7 +668,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isCholesterol = viewModel.isCholesterol.value
+                        val isCholesterol by viewModel.isCholesterol
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -736,7 +739,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isBloodline = viewModel.isBloodline.value
+                        val isBloodline by viewModel.isBloodline
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -785,7 +788,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val isMacrosomicBaby = viewModel.macrosomicBaby.value
+                        val isMacrosomicBaby by viewModel.macrosomicBaby
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -807,13 +810,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (isMacrosomicBaby != 2) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (isMacrosomicBaby != 1) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (isMacrosomicBaby == 2) "Ya" else "Tidak",
-                                color = if (isMacrosomicBaby != 2) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (isMacrosomicBaby == 1) "Ya" else "Tidak",
+                                color = if (isMacrosomicBaby != 1) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -868,7 +871,7 @@ fun HomeScreen(
                             )
                         }
 
-                        val smokingValue = viewModel.smoke.value
+                        val smokingValue by viewModel.smoke
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = getSmokingBackgroundColor(smokingValue)
@@ -894,8 +897,8 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val smokingStatus = viewModel.smokingStatus.value
-                        val brinkmanIndex = viewModel.brinkmanIndex.value
+                        val smokingStatus by viewModel.smokingStatus
+                        val smokeAverage by viewModel.smokeAverage
 
                         Column(
                             modifier = Modifier.weight(1f)
@@ -930,18 +933,18 @@ fun HomeScreen(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "Indeks Brinkman",
+                                text = "Rata-rata Rokok per Hari",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280)
                             )
                             Text(
-                                text = brinkmanIndex.toString(),
+                                text = smokeAverage.toString(),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
-                                color = getBrinkmanIndexColor(brinkmanIndex)
+                                color = getSmokingTextColor(smokeAverage)
                             )
                         }
                     }
@@ -988,7 +991,6 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     val physicalActivityAverage = viewModel.physicalActivityAverage.value
-                    val averageValue = physicalActivityAverage
 
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -1007,11 +1009,11 @@ fun HomeScreen(
                             )
 
                             Text(
-                                text = "$averageValue/7 hari",
+                                text = "$physicalActivityAverage/7 hari",
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
-                                color = getActivityAverageColor(averageValue),
+                                color = getActivityAverageColor(physicalActivityAverage),
                             )
                         }
 
@@ -1026,10 +1028,10 @@ fun HomeScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth(averageValue / 7f)
+                                    .fillMaxWidth(physicalActivityAverage / 7f)
                                     .height(8.dp)
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(getActivityAverageColor(averageValue))
+                                    .background(getActivityAverageColor(physicalActivityAverage))
                             )
                         }
 
@@ -1056,15 +1058,15 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = when {
-                                averageValue >= 5 -> "Sangat Aktif"
-                                averageValue >= 3 -> "Cukup Aktif"
-                                averageValue >= 1 -> "Kurang Aktif"
+                                physicalActivityAverage >= 5 -> "Sangat Aktif"
+                                physicalActivityAverage >= 3 -> "Cukup Aktif"
+                                physicalActivityAverage >= 1 -> "Kurang Aktif"
                                 else -> "Tidak Aktif"
                             },
                             fontSize = 12.sp,
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Medium,
-                            color = getActivityAverageColor(averageValue),
+                            color = getActivityAverageColor(physicalActivityAverage),
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }

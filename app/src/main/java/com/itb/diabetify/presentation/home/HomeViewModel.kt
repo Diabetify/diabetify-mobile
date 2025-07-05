@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.repository.PredictionRepository
@@ -62,6 +61,12 @@ class HomeViewModel @Inject constructor(
     private val _latestPredictionScore = mutableDoubleStateOf(0.0)
     val latestPredictionScore: State<Double> = _latestPredictionScore
 
+    data class RiskFactor(
+        val name: String,
+        val abbreviation: String,
+        val percentage: Double
+    )
+
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
         RiskFactor("Hipertensi", "H", 0.0),
@@ -74,6 +79,16 @@ class HomeViewModel @Inject constructor(
         RiskFactor("Kolesterol", "K", 0.0),
     ))
     val riskFactors: State<List<RiskFactor>> = _riskFactors
+
+    data class RiskFactorDetails(
+        val name: String,
+        val fullName: String,
+        val impactPercentage: Double,
+        val explanation: String,
+        val idealValue: String,
+        val currentValue: String,
+        val isModifiable: Boolean = true
+    )
 
     private val _riskFactorDetails = mutableStateOf(listOf(
         RiskFactorDetails(
@@ -175,9 +190,6 @@ class HomeViewModel @Inject constructor(
 
     private val _isCholesterol = mutableStateOf(false)
     val isCholesterol: State<Boolean> = _isCholesterol
-
-    private val _brinkmanIndex = mutableIntStateOf(0)
-    val brinkmanIndex: State<Int> = _brinkmanIndex
 
     private val _smokeAverage = mutableIntStateOf(0)
     val smokeAverage: State<Int> = _smokeAverage
@@ -373,7 +385,6 @@ class HomeViewModel @Inject constructor(
                         )
                     )
 
-                    _brinkmanIndex.intValue = latestPrediction.brinkmanScore
                     _smokeAverage.intValue = latestPrediction.avgSmokeCount
                     _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency
                 }
@@ -391,7 +402,7 @@ class HomeViewModel @Inject constructor(
 
             when (getProfileResult.result) {
                 is Resource.Success -> {
-                    collectProfile()
+                    collectProfileData()
                 }
                 is Resource.Error -> {
                     if (getProfileResult.result.message?.contains("404") == true) {
@@ -413,7 +424,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectProfile() {
+    private fun collectProfileData() {
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
 
@@ -444,39 +455,50 @@ class HomeViewModel @Inject constructor(
 
             when (getActivityTodayResult.result) {
                 is Resource.Success -> {
-                    Log.d("HomeViewModel", "Activity data loaded successfully")
                     collectActivityToday()
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = getActivityTodayResult.result.message ?: "Unknown error occurred"
-                    getActivityTodayResult.result.message?.let { Log.d("HomeViewModel", it) }
-                }
-                is Resource.Loading -> {
-                    Log.d("HomeViewModel", "Loading")
+                    _errorMessage.value = getActivityTodayResult.result.message ?: "Terjadi kesalahan saat mengambil data aktivitas hari ini"
+                    getActivityTodayResult.result.message?.let { Log.e("HomeViewModel", it) }
                 }
 
                 else -> {
                     // Handle unexpected error
-                    _errorMessage.value = "Unknown error occurred"
-                    Log.d("HomeViewModel", "Unexpected error")
+                    _errorMessage.value = "Terjadi kesalahan saat mengambil data aktivitas hari ini"
+                    Log.e("HomeViewModel", "Unexpected error")
                 }
             }
         }
     }
 
+    private fun collectActivityToday() {
+        viewModelScope.launch {
+            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
+
+            activityUseCases.getActivityRepository().onEach { activity ->
+                _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
+
+                activity?.let { todayActivity ->
+                    _smokeToday.intValue = todayActivity.smokingValue
+                    _physicalActivityToday.intValue = todayActivity.workoutValue
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    // Helper Functions
     private fun resetToDefaultValues() {
-        _latestPredictionScore.value = 0.0
-        _bmi.value = 0.0
-        _weight.value = 0
-        _height.value = 0
+        _latestPredictionScore.doubleValue = 0.0
+        _bmi.doubleValue = 0.0
+        _weight.intValue = 0
+        _height.intValue = 0
         _isHypertension.value = false
-        _macrosomicBaby.value = 0
+        _macrosomicBaby.intValue = 0
         _isBloodline.value = false
         _isCholesterol.value = false
-        _brinkmanIndex.value = 0
-        _smokingStatus.value = 0
-        _smokeToday.value = 0
-        _physicalActivityToday.value = 0
+        _smokingStatus.intValue = 0
+        _smokeToday.intValue = 0
+        _physicalActivityToday.intValue = 0
 
         _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0.0) }
         
@@ -496,43 +518,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectActivityToday() {
-        viewModelScope.launch {
-            _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
-
-            activityUseCases.getActivityRepository().collect { activity ->
-                _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
-
-                activity?.let { todayActivity ->
-                    _smokeToday.value = todayActivity.smokingValue
-                    _physicalActivityToday.value = todayActivity.workoutValue
-                }
-            }
-        }
-    }
-
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }
 
-    val lowRiskColor = Color(0xFF8BC34A)    // Green
-    val mediumRiskColor = Color(0xFFFFC107) // Yellow
-    val highRiskColor = Color(0xFFFA821F)   // Orange
-    val veryHighRiskColor = Color(0xFFF44336) // Red
+    fun onErrorShown() {
+        _errorMessage.value = null
+    }
 
-    data class RiskFactor(
-        val name: String,
-        val abbreviation: String,
-        val percentage: Double
-    )
-
-    data class RiskFactorDetails(
-        val name: String,
-        val fullName: String,
-        val impactPercentage: Double,
-        val explanation: String,
-        val idealValue: String,
-        val currentValue: String,
-        val isModifiable: Boolean = true
-    )
+    fun onSuccessShown() {
+        _successMessage.value = null
+    }
 }

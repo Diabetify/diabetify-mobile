@@ -34,17 +34,17 @@ import kotlin.math.roundToInt
 @Composable
 fun RiskScoreGauge(
     score: Int,
-    lowRiskColor: Color,
-    mediumRiskColor: Color,
-    highRiskColor: Color,
-    veryHighRiskColor: Color,
     animationDuration: Int = 2000,
 ) {
+    val lowRiskColor = Color(0xFF8BC34A)
+    val mediumRiskColor = Color(0xFFFFC107)
+    val highRiskColor = Color(0xFFFA821F)
+    val veryHighRiskColor = Color(0xFFF44336)
+
     val targetScore = score.coerceIn(0, 100)
     val normalizedTargetScore = targetScore / 100f
 
     val animatedPosition = remember { Animatable(0f) }
-
     val animatedScoreText = remember { Animatable(0f) }
 
     LaunchedEffect(targetScore) {

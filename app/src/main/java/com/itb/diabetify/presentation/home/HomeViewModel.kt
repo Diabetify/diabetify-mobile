@@ -183,8 +183,8 @@ class HomeViewModel @Inject constructor(
     private val _bmi = mutableDoubleStateOf(0.0)
     val bmi: State<Double> = _bmi
 
-    private val _smokingStatus = mutableIntStateOf(0)
-    val smokingStatus: State<Int> = _smokingStatus
+    private val _smokingStatus = mutableStateOf("0")
+    val smokingStatus: State<String> = _smokingStatus
 
     private val _macrosomicBaby = mutableIntStateOf(0)
     val macrosomicBaby: State<Int> = _macrosomicBaby
@@ -401,6 +401,7 @@ class HomeViewModel @Inject constructor(
                         )
                     )
 
+                    _smokingStatus.value = latestPrediction.smokingStatus
                     _smokeAverage.intValue = latestPrediction.avgSmokeCount
                     _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency
                 }
@@ -451,7 +452,6 @@ class HomeViewModel @Inject constructor(
                     _weight.intValue = userProfile.weight
                     _height.intValue = userProfile.height
                     _bmi.doubleValue = userProfile.bmi
-                    _smokingStatus.intValue = userProfile.smoking
                     _isHypertension.value = userProfile.hypertension
                     _macrosomicBaby.intValue = userProfile.macrosomicBaby
                     _isBloodline.value = userProfile.bloodline
@@ -548,7 +548,7 @@ class HomeViewModel @Inject constructor(
         _macrosomicBaby.intValue = 0
         _isBloodline.value = false
         _isCholesterol.value = false
-        _smokingStatus.intValue = 0
+        _smokingStatus.value = "0"
         _smokeToday.intValue = 0
         _physicalActivityToday.intValue = 0
 

@@ -178,6 +178,10 @@ class WhatIfViewModel @Inject constructor(
                 prediction?.let {
                     _age.intValue = it.age
 
+                    _smokingStatusFieldState.value = FieldState(
+                        text = it.smokingStatus,
+                        error = null
+                    )
                     _averageCigarettesFieldState.value = FieldState(
                         text = it.avgSmokeCount.toString(),
                         error = null
@@ -203,10 +207,6 @@ class WhatIfViewModel @Inject constructor(
                     _yearsSmoking.intValue = it.yearOfSmoking
                     _isBloodline.value = it.bloodline
 
-                    _smokingStatusFieldState.value = FieldState(
-                        text = it.smoking.toString(),
-                        error = null
-                    )
                     _weightFieldState.value = FieldState(
                         text = it.weight.toString(),
                         error = null

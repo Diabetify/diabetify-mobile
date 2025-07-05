@@ -912,18 +912,18 @@ fun HomeScreen(
                             )
                             Text(
                                 text = when (smokingStatus) {
-                                    0 -> "Tidak Pernah"
-                                    1 -> "Berhenti Merokok"
-                                    2 -> "Aktif Merokok"
+                                    "0" -> "Tidak Pernah"
+                                    "1" -> "Berhenti Merokok"
+                                    "2" -> "Aktif Merokok"
                                     else -> "Tidak Diketahui"
                                 },
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
                                 color = when (smokingStatus) {
-                                    0 -> Color(0xFF10B981)
-                                    1 -> Color(0xFFF59E0B)
-                                    2 -> Color(0xFFEF4444)
+                                    "0" -> Color(0xFF10B981)
+                                    "1" -> Color(0xFFF59E0B)
+                                    "2" -> Color(0xFFEF4444)
                                     else -> Color(0xFF6B7280)
                                 }
                             )

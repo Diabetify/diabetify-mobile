@@ -1,8 +1,8 @@
 package com.itb.diabetify.domain.model
 
 data class Activity(
-    val smokingId: String? = null,
-    val workoutId: String? = null,
-    val smokingValue: String? = null,
-    val workoutValue: String? = null,
+    val smokingId: Int? = null,
+    val workoutId: Int? = null,
+    val smokingValue: Int,
+    val workoutValue: Int
 )

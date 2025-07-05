@@ -28,7 +28,7 @@ fun getBmiCategoryColor(bmi: Double): Color {
     }
 }
 
-fun getBrinkmanIndexColor(index: Double): Color {
+fun getBrinkmanIndexColor(index: Int): Color {
     return when {
         index >= 400 -> Color(0xFFDC2626)
         index >= 200 -> Color(0xFFEA580C)

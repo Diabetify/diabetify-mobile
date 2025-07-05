@@ -34,7 +34,7 @@ fun RiskDetailScreen(
     viewModel: HomeViewModel,
 ) {
     val scrollState = rememberScrollState()
-    val score = viewModel.latestPredictionScoreState.value
+    val score = viewModel.latestPredictionScore.value
 
     Column(
         modifier = Modifier

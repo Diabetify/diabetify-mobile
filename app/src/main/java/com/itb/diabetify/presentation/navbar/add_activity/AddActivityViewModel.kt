@@ -69,11 +69,11 @@ class AddActivityViewModel @Inject constructor(
     private val _userGender = mutableStateOf<String?>(null)
     val userGender: State<String?> = _userGender
 
-    private val _smokingId = mutableStateOf<String?>(null)
-    val smokingId: State<String?> = _smokingId
+    private val _smokingId = mutableStateOf<Int?>(null)
+    val smokingId: State<Int?> = _smokingId
 
-    private val _workoutId = mutableStateOf<String?>(null)
-    val workoutId: State<String?> = _workoutId
+    private val _workoutId = mutableStateOf<Int?>(null)
+    val workoutId: State<Int?> = _workoutId
 
     private val _currentQuestionType = mutableStateOf("weight")
     val currentQuestionType: State<String> = _currentQuestionType
@@ -385,11 +385,11 @@ class AddActivityViewModel @Inject constructor(
                     _smokingId.value = it.smokingId
                     _workoutId.value = it.workoutId
                     _smokeFieldState.value = FieldState(
-                        text = it.smokingValue ?: "0",
+                        text = it.smokingValue.toString(),
                         error = null
                     )
                     _workoutFieldState.value = FieldState(
-                        text = if ((it.workoutValue ?: "0") == "0") "false" else "true",
+                        text = if (it.workoutValue == 0) "false" else "true",
                         error = null
                     )
                 }
@@ -512,7 +512,7 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
-    private fun updateSmokingActivity(activityId: String, value: Int) {
+    private fun updateSmokingActivity(activityId: Int, value: Int) {
         viewModelScope.launch {
             _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
 
@@ -545,7 +545,7 @@ class AddActivityViewModel @Inject constructor(
         }
     }
 
-    private fun updateWorkoutActivity(activityId: String, value: Int) {
+    private fun updateWorkoutActivity(activityId: Int, value: Int) {
         viewModelScope.launch {
             _updateActivityState.value = updateActivityState.value.copy(isLoading = true)
 

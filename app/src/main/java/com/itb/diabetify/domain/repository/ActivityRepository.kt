@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ActivityRepository {
     suspend fun getToken(): String?
     suspend fun addActivity(addActivityRequest: AddActivityRequest): Resource<Unit>
-    suspend fun updateActivity(activityId: String, updateActivityRequest: UpdateActivityRequest): Resource<Unit>
+    suspend fun updateActivity(activityId: Int, updateActivityRequest: UpdateActivityRequest): Resource<Unit>
     suspend fun fetchActivityToday(): Resource<Unit>
     fun getActivityToday(): Flow<Activity?>
 }

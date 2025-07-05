@@ -37,7 +37,7 @@ class ActivityRepositoryImpl(
     }
 
     override suspend fun updateActivity(
-        activityId: String,
+        activityId: Int,
         updateActivityRequest: UpdateActivityRequest
     ): Resource<Unit> {
         return try {
@@ -58,36 +58,15 @@ class ActivityRepositoryImpl(
             val startDate = currentDate.toString()
             val response = activityApiService.getActivityByDate(startDate, startDate)
             response.data?.let { activities ->
-                val smokingValue = if (activities.smoke.isEmpty()) {
-                    "0"
-                } else {
-                    activities.smoke[0].value.toString()
-                }
-
-                val workoutValue = if (activities.workout.isEmpty()) {
-                    "0"
-                } else {
-                    activities.workout[0].value.toString()
-                }
-
-                val smokingId = if (activities.smoke.isEmpty()) {
-                    null
-                } else {
-                    activities.smoke[0].id.toString()
-                }
-
-                val workoutId = if (activities.workout.isEmpty()) {
-                    null
-                } else {
-                    activities.workout[0].id.toString()
-                }
+                val smokingActivity = activities.smoke.firstOrNull()
+                val workoutActivity = activities.workout.firstOrNull()
 
                 activityManager.saveActivity(
                     Activity(
-                        smokingId = smokingId,
-                        workoutId = workoutId,
-                        smokingValue = smokingValue,
-                        workoutValue = workoutValue,
+                        smokingId = smokingActivity?.id,
+                        workoutId = workoutActivity?.id,
+                        smokingValue = smokingActivity?.value ?: 0,
+                        workoutValue = workoutActivity?.value ?: 0
                     )
                 )
             }

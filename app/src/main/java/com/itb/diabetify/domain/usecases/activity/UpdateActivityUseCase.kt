@@ -12,12 +12,11 @@ class UpdateActivityUseCase(
 ) {
     @SuppressLint("NewApi")
     suspend operator fun invoke(
-        activityId: String,
+        activityId: Int,
         activityDate: String,
         activityType: String,
         value: Int,
     ): UpdateActivityResult {
-        val activityIdError: String? = if (activityId.isEmpty()) "ID aktivitas tidak boleh kosong" else null
         val activityDateError: String? = when {
             try {
                 ZonedDateTime.parse(activityDate)
@@ -32,12 +31,6 @@ class UpdateActivityUseCase(
             activityType == "smoke" && (value < 0 || value > 60) -> "Jumlah rokok tidak valid"
             activityType == "workout" && (value < 0 || value > 1) -> "Nilai aktivitas tidak valid"
             else -> null
-        }
-
-        if (activityIdError != null) {
-            return UpdateActivityResult(
-                activityIdError = activityIdError
-            )
         }
 
         if (activityDateError != null) {

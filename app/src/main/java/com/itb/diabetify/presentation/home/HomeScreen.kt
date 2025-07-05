@@ -79,6 +79,12 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
+    // States
+    val userName by viewModel.userName
+    val lastPredictionAt by viewModel.lastPredictionAt
+    val latestPredictionScore by viewModel.latestPredictionScore
+    val riskFactors by viewModel.riskFactors
+
     // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
@@ -123,7 +129,7 @@ fun HomeScreen(
                         color = colorResource(id = R.color.primary)
                     )
                     Text(
-                        text = viewModel.userName.value.split(" ").firstOrNull() ?: "Pengguna",
+                        text = userName.split(" ").first(),
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -172,7 +178,7 @@ fun HomeScreen(
                 ) {
                     StatItem(
                         label = "Pemeriksaan Terakhir",
-                        value = formatRelativeTime(viewModel.lastPredictionAt.value),
+                        value = formatRelativeTime(lastPredictionAt),
                         icon = Icons.Outlined.Info
                     )
                 }
@@ -190,7 +196,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Terakhir diperbarui: ${formatDisplayTime(viewModel.lastPredictionAt.value)}",
+                    text = "Terakhir diperbarui: ${formatDisplayTime(lastPredictionAt)}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
@@ -205,7 +211,7 @@ fun HomeScreen(
                 HomeCard(
                     title = "Persentase Risiko",
                     hasWarning = true,
-                    riskPercentage = viewModel.latestPredictionScoreState.value
+                    riskPercentage = latestPredictionScore
                 ) {
                     Column(
                         modifier = Modifier
@@ -214,15 +220,15 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         RiskIndicator(
-                            percentage = viewModel.latestPredictionScoreState.value,
+                            percentage = latestPredictionScore,
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         RiskCategory(
                             modifier = Modifier.padding(vertical = 5.dp),
-                            color = getRiskCategoryColor(viewModel.latestPredictionScoreState.value),
-                            description = getRiskCategoryDescription(viewModel.latestPredictionScoreState.value),
+                            color = getRiskCategoryColor(latestPredictionScore),
+                            description = getRiskCategoryDescription(latestPredictionScore),
                             isHighlighted = true
                         )
 
@@ -306,7 +312,7 @@ fun HomeScreen(
                             when (selectedTabIndex) {
                                 0 -> {
                                     BarChart(
-                                        entries = viewModel.riskFactors.value.mapIndexed { _, riskFactor ->
+                                        entries = riskFactors.mapIndexed { _, riskFactor ->
                                             BarChartEntry(
                                                 label = riskFactor.name,
                                                 abbreviation = riskFactor.abbreviation,
@@ -318,7 +324,7 @@ fun HomeScreen(
                                 }
                                 1 -> {
                                     PieChart(
-                                        riskFactors = viewModel.riskFactors.value,
+                                        riskFactors = riskFactors,
                                         centerText = "Faktor\nRisiko",
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -865,14 +871,14 @@ fun HomeScreen(
                         val smokingValue = viewModel.smoke.value
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = getSmokingBackgroundColor(smokingValue.toIntOrNull() ?: 0)
+                                containerColor = getSmokingBackgroundColor(smokingValue)
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.padding(start = 8.dp)
                         ) {
                             Text(
                                 text = "$smokingValue batang",
-                                color = getSmokingTextColor(smokingValue.toIntOrNull() ?: 0),
+                                color = getSmokingTextColor(smokingValue),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -903,18 +909,18 @@ fun HomeScreen(
                             )
                             Text(
                                 text = when (smokingStatus) {
-                                    "0" -> "Tidak Pernah"
-                                    "1" -> "Berhenti Merokok"
-                                    "2" -> "Aktif Merokok"
+                                    0 -> "Tidak Pernah"
+                                    1 -> "Berhenti Merokok"
+                                    2 -> "Aktif Merokok"
                                     else -> "Tidak Diketahui"
                                 },
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
                                 color = when (smokingStatus) {
-                                    "0" -> Color(0xFF10B981)
-                                    "1" -> Color(0xFFF59E0B)
-                                    "2" -> Color(0xFFEF4444)
+                                    0 -> Color(0xFF10B981)
+                                    1 -> Color(0xFFF59E0B)
+                                    2 -> Color(0xFFEF4444)
                                     else -> Color(0xFF6B7280)
                                 }
                             )
@@ -931,11 +937,11 @@ fun HomeScreen(
                                 color = Color(0xFF6B7280)
                             )
                             Text(
-                                text = String.format("%.1f", brinkmanIndex.toDoubleOrNull() ?: 0.0),
+                                text = brinkmanIndex.toString(),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
-                                color = getBrinkmanIndexColor(brinkmanIndex.toDoubleOrNull() ?: 0.0)
+                                color = getBrinkmanIndexColor(brinkmanIndex)
                             )
                         }
                     }
@@ -948,7 +954,7 @@ fun HomeScreen(
                     )
 
                     // Physical Activity Section
-                    val workoutValue = viewModel.physicalActivity.value
+                    val workoutValue = viewModel.physicalActivityToday.value
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -964,13 +970,13 @@ fun HomeScreen(
 
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (workoutValue.toBoolean()) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
+                                containerColor = if (workoutValue == 1) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)
                             ),
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Text(
-                                text = if (workoutValue.toBoolean()) "Ya" else "Tidak",
-                                color = if (workoutValue.toBoolean()) Color(0xFF16A34A) else Color(0xFFDC2626),
+                                text = if (workoutValue == 1) "Ya" else "Tidak",
+                                color = if (workoutValue == 1) Color(0xFF16A34A) else Color(0xFFDC2626),
                                 fontFamily = poppinsFontFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp,
@@ -982,7 +988,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     val physicalActivityAverage = viewModel.physicalActivityAverage.value
-                    val averageValue = physicalActivityAverage.toIntOrNull() ?: 0
+                    val averageValue = physicalActivityAverage
 
                     Column(
                         modifier = Modifier.fillMaxWidth()

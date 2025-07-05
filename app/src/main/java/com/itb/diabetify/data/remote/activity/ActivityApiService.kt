@@ -19,7 +19,7 @@ interface ActivityApiService {
 
     @PUT("activity/{activityId}")
     suspend fun updateActivity(
-        @Path("activityId") activityId: String,
+        @Path("activityId") activityId: Int,
         @Body updateActivityRequest: UpdateActivityRequest
     ): ActivityResponse
 

@@ -53,14 +53,14 @@ class HomeViewModel @Inject constructor(
     val profileState: State<DataState> = _profileState
 
     // UI States
-    private val _userName = mutableStateOf("User")
+    private val _userName = mutableStateOf("Pengguna")
     val userName: State<String> = _userName
 
     private val _lastPredictionAt = mutableStateOf("Belum ada prediksi")
     val lastPredictionAt: State<String> = _lastPredictionAt
 
-    private val _latestPredictionScoreState = mutableDoubleStateOf(0.0)
-    val latestPredictionScoreState: State<Double> = _latestPredictionScoreState
+    private val _latestPredictionScore = mutableDoubleStateOf(0.0)
+    val latestPredictionScore: State<Double> = _latestPredictionScore
 
     private val _riskFactors = mutableStateOf(listOf(
         RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
@@ -152,8 +152,8 @@ class HomeViewModel @Inject constructor(
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
 
-    private val _bmi = mutableDoubleStateOf(0.0)
-    val bmi: State<Double> = _bmi
+    private val _isHypertension = mutableStateOf(false)
+    val isHypertension: State<Boolean> = _isHypertension
 
     private val _weight = mutableIntStateOf(0)
     val weight: State<Int> = _weight
@@ -161,17 +161,14 @@ class HomeViewModel @Inject constructor(
     private val _height = mutableIntStateOf(0)
     val height: State<Int> = _height
 
-    private val _isHypertension = mutableStateOf(false)
-    val isHypertension: State<Boolean> = _isHypertension
+    private val _bmi = mutableDoubleStateOf(0.0)
+    val bmi: State<Double> = _bmi
+
+    private val _smokingStatus = mutableIntStateOf(0)
+    val smokingStatus: State<Int> = _smokingStatus
 
     private val _macrosomicBaby = mutableIntStateOf(0)
     val macrosomicBaby: State<Int> = _macrosomicBaby
-
-    private val _smoke = mutableStateOf("0")
-    val smoke: State<String> = _smoke
-
-    private val _physicalActivity = mutableStateOf("0")
-    val physicalActivity: State<String> = _physicalActivity
 
     private val _isBloodline = mutableStateOf(false)
     val isBloodline: State<Boolean> = _isBloodline
@@ -179,14 +176,20 @@ class HomeViewModel @Inject constructor(
     private val _isCholesterol = mutableStateOf(false)
     val isCholesterol: State<Boolean> = _isCholesterol
 
-    private val _brinkmanIndex = mutableStateOf("0.0")
-    val brinkmanIndex: State<String> = _brinkmanIndex
+    private val _brinkmanIndex = mutableIntStateOf(0)
+    val brinkmanIndex: State<Int> = _brinkmanIndex
 
-    private val _smokingStatus = mutableStateOf("0")
-    val smokingStatus: State<String> = _smokingStatus
+    private val _smokeAverage = mutableIntStateOf(0)
+    val smokeAverage: State<Int> = _smokeAverage
 
-    private val _physicalActivityAverage = mutableStateOf("0")
-    val physicalActivityAverage: State<String> = _physicalActivityAverage
+    private val _physicalActivityAverage = mutableIntStateOf(0)
+    val physicalActivityAverage: State<Int> = _physicalActivityAverage
+
+    private val _smokeToday = mutableIntStateOf(0)
+    val smoke: State<Int> = _smokeToday
+
+    private val _physicalActivityToday = mutableIntStateOf(0)
+    val physicalActivityToday: State<Int> = _physicalActivityToday
 
     // Initialization
     init {
@@ -277,7 +280,7 @@ class HomeViewModel @Inject constructor(
 
                 prediction.let { latestPrediction ->
                     _lastPredictionAt.value = latestPrediction.createdAt
-                    _latestPredictionScoreState.doubleValue = latestPrediction.riskScore
+                    _latestPredictionScore.doubleValue = latestPrediction.riskScore
 
                     _riskFactors.value = listOf(
                         RiskFactor("Indeks Massa Tubuh", "IMT", latestPrediction.bmiContribution),
@@ -370,9 +373,9 @@ class HomeViewModel @Inject constructor(
                         )
                     )
 
-                    _brinkmanIndex.value = latestPrediction.brinkmanScore.toString()
-                    _smokingStatus.value = latestPrediction.smokingStatus
-                    _physicalActivityAverage.value = latestPrediction.physicalActivityFrequency.toString()
+                    _brinkmanIndex.intValue = latestPrediction.brinkmanScore
+                    _smokeAverage.intValue = latestPrediction.avgSmokeCount
+                    _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency
                 }
             }.launchIn(viewModelScope)
         }
@@ -410,7 +413,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
     private fun collectProfile() {
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
@@ -419,11 +421,12 @@ class HomeViewModel @Inject constructor(
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let { userProfile ->
-                    _bmi.value = userProfile.bmi
-                    _weight.value = userProfile.weight
-                    _height.value = userProfile.height
+                    _weight.intValue = userProfile.weight
+                    _height.intValue = userProfile.height
+                    _bmi.doubleValue = userProfile.bmi
+                    _smokingStatus.intValue = userProfile.smoking
                     _isHypertension.value = userProfile.hypertension
-                    _macrosomicBaby.value = userProfile.macrosomicBaby
+                    _macrosomicBaby.intValue = userProfile.macrosomicBaby
                     _isBloodline.value = userProfile.bloodline
                     _isCholesterol.value = userProfile.cholesterol
                 }
@@ -462,17 +465,19 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun resetToDefaultValues() {
-        _latestPredictionScoreState.value = 0.0
+        _latestPredictionScore.value = 0.0
         _bmi.value = 0.0
         _weight.value = 0
         _height.value = 0
         _isHypertension.value = false
         _macrosomicBaby.value = 0
-        _smoke.value = "0"
-        _physicalActivity.value = "0"
         _isBloodline.value = false
         _isCholesterol.value = false
-        
+        _brinkmanIndex.value = 0
+        _smokingStatus.value = 0
+        _smokeToday.value = 0
+        _physicalActivityToday.value = 0
+
         _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0.0) }
         
         _riskFactorDetails.value = _riskFactorDetails.value.map {
@@ -499,8 +504,8 @@ class HomeViewModel @Inject constructor(
                 _activityTodayState.value = activityTodayState.value.copy(isLoading = false)
 
                 activity?.let { todayActivity ->
-                    _smoke.value = todayActivity.smokingValue ?: "0"
-                    _physicalActivity.value = todayActivity.workoutValue ?: "0"
+                    _smokeToday.value = todayActivity.smokingValue
+                    _physicalActivityToday.value = todayActivity.workoutValue
                 }
             }
         }

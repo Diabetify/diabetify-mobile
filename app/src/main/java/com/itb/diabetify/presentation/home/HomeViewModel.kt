@@ -13,6 +13,7 @@ import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.PredictionUpdateNotifier
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -47,6 +48,9 @@ class HomeViewModel @Inject constructor(
 
     private var _latestPredictionState = mutableStateOf(DataState())
     val latestPredictionState: State<DataState> = _latestPredictionState
+
+    private var _explainPredictionState = mutableStateOf(DataState())
+    val explainPredictionState: State<DataState> = _explainPredictionState
 
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
@@ -203,12 +207,24 @@ class HomeViewModel @Inject constructor(
     private val _physicalActivityToday = mutableIntStateOf(0)
     val physicalActivityToday: State<Int> = _physicalActivityToday
 
+    private var isOnRiskFactorDetailScreen = false
+    private var hasUnprocessedPredictionUpdate = false
+    private var hasLoadedExplanationsOnce = false
+
     // Initialization
     init {
         loadUserData()
         loadLatestPredictionData()
         loadActivityTodayData()
         loadProfileData()
+        
+        PredictionUpdateNotifier.addListener {
+            hasUnprocessedPredictionUpdate = true
+            if (isOnRiskFactorDetailScreen) {
+                loadExplanationData()
+                hasUnprocessedPredictionUpdate = false
+            }
+        }
     }
 
     // Use Case Calls
@@ -455,7 +471,7 @@ class HomeViewModel @Inject constructor(
 
             when (getActivityTodayResult.result) {
                 is Resource.Success -> {
-                    collectActivityToday()
+                    collectActivityTodayData()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getActivityTodayResult.result.message ?: "Terjadi kesalahan saat mengambil data aktivitas hari ini"
@@ -471,7 +487,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectActivityToday() {
+    private fun collectActivityTodayData() {
         viewModelScope.launch {
             _activityTodayState.value = activityTodayState.value.copy(isLoading = true)
 
@@ -483,6 +499,42 @@ class HomeViewModel @Inject constructor(
                     _physicalActivityToday.intValue = todayActivity.workoutValue
                 }
             }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun loadExplanationData() {
+        viewModelScope.launch {
+            _explainPredictionState.value = explainPredictionState.value.copy(isLoading = true)
+
+            val explainPredictionResult = predictionUseCases.explainPrediction()
+
+            _explainPredictionState.value = explainPredictionState.value.copy(isLoading = false)
+
+            when (explainPredictionResult.result) {
+                is Resource.Success -> {
+                    // Do nothing
+                }
+                is Resource.Error -> {
+                    _errorMessage.value = explainPredictionResult.result.message ?: "Terjadi kesalahan saat memuat penjelasan"
+                    explainPredictionResult.result.message?.let { Log.e("HomeViewModel", it) }
+                }
+
+                else -> {
+                    // Handle unexpected error
+                    _errorMessage.value = "Terjadi kesalahan saat memuat penjelasan"
+                    Log.e("HomeViewModel", "Unexpected error loading explanation data")
+                }
+            }
+        }
+    }
+
+    fun loadRiskFactorExplanations() {
+        isOnRiskFactorDetailScreen = true
+        
+        if (!hasLoadedExplanationsOnce || hasUnprocessedPredictionUpdate) {
+            loadExplanationData()
+            hasUnprocessedPredictionUpdate = false
+            hasLoadedExplanationsOnce = true
         }
     }
 
@@ -501,7 +553,7 @@ class HomeViewModel @Inject constructor(
         _physicalActivityToday.intValue = 0
 
         _riskFactors.value = _riskFactors.value.map { it.copy(percentage = 0.0) }
-        
+
         _riskFactorDetails.value = _riskFactorDetails.value.map {
             it.copy(impactPercentage = 0.0, currentValue = when(it.name) {
                 "IMT" -> "0 kg/m²"
@@ -518,6 +570,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onRiskFactorDetailScreenExit() {
+        isOnRiskFactorDetailScreen = false
+    }
+
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }
@@ -528,5 +584,16 @@ class HomeViewModel @Inject constructor(
 
     fun onSuccessShown() {
         _successMessage.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        PredictionUpdateNotifier.removeListener {
+            hasUnprocessedPredictionUpdate = true
+            if (isOnRiskFactorDetailScreen) {
+                loadExplanationData()
+                hasUnprocessedPredictionUpdate = false
+            }
+        }
     }
 }

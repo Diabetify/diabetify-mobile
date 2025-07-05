@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -51,10 +53,20 @@ fun RiskFactorDetailScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
+    val isLoading = viewModel.latestPredictionState.value.isLoading || viewModel.explainPredictionState.value.isLoading
     val scrollState = rememberScrollState()
-
     val sortedRiskFactorDetails = viewModel.riskFactorDetails.value
         .sortedByDescending { abs(it.impactPercentage) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadRiskFactorExplanations()
+    }
+    
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.onRiskFactorDetailScreenExit()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -94,15 +106,31 @@ fun RiskFactorDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
         ) {
-            if (viewModel.latestPredictionState.value.isLoading) {
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(50.dp),
-                        color = colorResource(id = R.color.primary)
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(50.dp),
+                            color = colorResource(id = R.color.primary)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = if (viewModel.explainPredictionState.value.isLoading) {
+                                "Memuat penjelasan..."
+                            } else {
+                                "Memuat data..."
+                            },
+                            fontFamily = poppinsFontFamily,
+                            fontSize = 14.sp,
+                            color = colorResource(id = R.color.primary),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             } else {
                 SummarySection(viewModel.riskFactors.value)

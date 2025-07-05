@@ -1073,56 +1073,6 @@ fun HomeScreen(
                 }
             }
 
-            // Tips Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = RoundedCornerShape(16.dp),
-                        spotColor = Color.Gray.copy(alpha = 0.2f)
-                    ),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFEFF6FF)
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Tips",
-                            tint = Color(0xFF3B82F6),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Tips Hari Ini",
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = Color(0xFF3B82F6)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Untuk menurunkan risiko hipertensi, kurangi asupan garam hingga kurang dari 5 gram per hari dan perbanyak konsumsi buah dan sayuran.",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
-                        color = Color(0xFF1E3A8A),
-                        lineHeight = 20.sp
-                    )
-                }
-            }
             Spacer(modifier = Modifier.height(30.dp))
         }
     }

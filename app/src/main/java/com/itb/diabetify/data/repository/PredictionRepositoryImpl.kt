@@ -26,6 +26,7 @@ class PredictionRepositoryImpl (
     override suspend fun predict(): Resource<Unit> {
         return try {
             val response = predictionApiService.predict()
+            fetchLatestPrediction()
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error("${e.message}")

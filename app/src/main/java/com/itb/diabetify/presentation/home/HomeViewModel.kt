@@ -530,7 +530,7 @@ class HomeViewModel @Inject constructor(
 
     fun loadRiskFactorExplanations() {
         isOnRiskFactorDetailScreen = true
-        
+
         if (!hasLoadedExplanationsOnce || hasUnprocessedPredictionUpdate) {
             loadExplanationData()
             hasUnprocessedPredictionUpdate = false

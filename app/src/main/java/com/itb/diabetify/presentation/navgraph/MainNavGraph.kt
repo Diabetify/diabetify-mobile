@@ -144,7 +144,9 @@ fun MainNavGraph(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Route.HomeScreen.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.MainNavigation.route)
+                )
                 HomeScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
@@ -170,7 +172,9 @@ fun MainNavGraph(
             }
 
             composable(route = Route.RiskDetailScreen.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.MainNavigation.route)
+                )
                 RiskDetailScreen(
                     navController = mainNavController,
                      viewModel = homeViewModel,
@@ -178,7 +182,9 @@ fun MainNavGraph(
             }
 
             composable(route = Route.RiskFactorDetailScreen.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = hiltViewModel(
+                    navController.getBackStackEntry(Route.MainNavigation.route)
+                )
                 RiskFactorDetailScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,

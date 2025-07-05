@@ -122,6 +122,7 @@ fun SurveyPage(
                             fontSize = 12.sp,
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Normal,
+                            lineHeight = 18.sp,
                             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }
@@ -171,6 +172,7 @@ fun SurveyPage(
                             fontSize = 12.sp,
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.Normal,
+                            lineHeight = 18.sp,
                             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }

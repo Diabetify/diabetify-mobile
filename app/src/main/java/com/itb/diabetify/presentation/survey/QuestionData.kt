@@ -65,6 +65,13 @@ val questions = listOf(
         numericUnit = "tahun"
     ),
     SurveyQuestion(
+        id = "smoking_end_age",
+        category = "Kebiasaan Merokok",
+        questionText = "Pada usia berapa Anda berhenti merokok?",
+        questionType = SurveyQuestionType.Numeric,
+        numericUnit = "tahun"
+    ),
+    SurveyQuestion(
         id = "smoking_amount",
         category = "Kebiasaan Merokok",
         questionText = "Berapa batang rokok yang Anda konsumsi per hari (rata-rata)?",

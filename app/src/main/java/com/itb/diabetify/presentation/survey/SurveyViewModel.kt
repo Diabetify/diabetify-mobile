@@ -2,6 +2,7 @@ package com.itb.diabetify.presentation.survey
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,11 @@ import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
@@ -31,6 +35,9 @@ class SurveyViewModel @Inject constructor(
     val errorMessage: State<String?> = _errorMessage
 
     // Operational States
+    private var _userState = mutableStateOf(DataState())
+    val userState: State<DataState> = _userState
+
     private var _profileState = mutableStateOf(DataState())
     val profileState: State<DataState> = _profileState
 
@@ -39,6 +46,13 @@ class SurveyViewModel @Inject constructor(
 
     private var _predictionState = mutableStateOf(DataState())
     val predictionState: State<DataState> = _predictionState
+
+    // UI States
+    private val _gender = mutableStateOf("")
+    val gender: State<String> = _gender
+
+    private val _age = mutableIntStateOf(0)
+    val age: State<Int> = _age
 
     // Survey States
     data class SurveyState(
@@ -53,11 +67,16 @@ class SurveyViewModel @Inject constructor(
 
     private val surveyQuestions = questions
 
+    // Initialization
+    init {
+        collectUserData()
+    }
+
     // Setters for Survey State
     fun setAnswer(questionId: String, answer: String) {
         val newFieldStates = _surveyState.value.fieldStates.toMutableMap()
         val currentFieldState = newFieldStates[questionId] ?: FieldState()
-        
+
         val validationError = validateField(questionId, answer)
         newFieldStates[questionId] = currentFieldState.copy(
             text = answer,
@@ -96,6 +115,25 @@ class SurveyViewModel @Inject constructor(
                             if (numericValue < 10 || numericValue > 80) {
                                 return "Usia mulai merokok harus antara 10-80 tahun"
                             }
+
+                            // Validate against user's current age
+                            if (_age.intValue in 1..<numericValue) {
+                                return "Usia mulai merokok tidak boleh lebih dari usia Anda saat ini (${_age.intValue} tahun)"
+                            }
+                        }
+                        "smoking_end_age" -> {
+                            if (numericValue < 10 || numericValue > 80) {
+                                return "Usia berhenti merokok harus antara 10-80 tahun"
+                            }
+
+                            if (_age.intValue in 1..<numericValue) {
+                                return "Usia berhenti merokok tidak boleh lebih dari usia Anda saat ini (${_age.intValue} tahun)"
+                            }
+
+                            val smokingStartAge = _surveyState.value.fieldStates["smoking_age"]?.text?.toIntOrNull()
+                            if (smokingStartAge != null && numericValue <= smokingStartAge) {
+                                return "Usia berhenti merokok harus lebih besar dari usia mulai merokok"
+                            }
                         }
                         "smoking_amount" -> {
                             if (numericValue < 0 || numericValue > 60) {
@@ -127,7 +165,7 @@ class SurveyViewModel @Inject constructor(
                 }
             }
         }
-        
+
         return null
     }
 
@@ -176,10 +214,8 @@ class SurveyViewModel @Inject constructor(
             val filteredQuestions = surveyQuestions.filter { question ->
                 when (question.id) {
                     "smoking_age", "smoking_amount" -> _surveyState.value.fieldStates["smoking_status"]?.text == "1" || _surveyState.value.fieldStates["smoking_status"]?.text == "2"
-                    "pregnancy" -> {
-                        val user = runBlocking { userUseCases.getUserRepository().first() }
-                        user?.gender?.lowercase() != "laki-laki" && user?.gender?.lowercase() != "male"
-                    }
+                    "smoking_end_age" -> _surveyState.value.fieldStates["smoking_status"]?.text == "1"
+                    "pregnancy" -> _gender.value.lowercase() != "laki-laki" && _gender.value.lowercase() != "male"
                     "systolic", "diastolic" -> _surveyState.value.fieldStates["bp_unknown"]?.text == "yes"
                     "hypertension" -> _surveyState.value.fieldStates["bp_unknown"]?.text == "no"
                     else -> true
@@ -224,7 +260,7 @@ class SurveyViewModel @Inject constructor(
         if (currentQuestion.id == "diastolic" && _surveyState.value.fieldStates["bp_unknown"]?.text == "yes") {
             val systolic = _surveyState.value.fieldStates["systolic"]?.text?.toIntOrNull()
             val diastolic = _surveyState.value.fieldStates["diastolic"]?.text?.toIntOrNull()
-            
+
             if (systolic != null && diastolic != null) {
                 val hasHypertension = systolic >= 140 || diastolic >= 90
                 setAnswer("hypertension", hasHypertension.toString())
@@ -296,6 +332,23 @@ class SurveyViewModel @Inject constructor(
     }
 
     // Use Case Calls
+    private fun collectUserData() {
+        viewModelScope.launch {
+            _userState.value = userState.value.copy(isLoading = true)
+
+            userUseCases.getUserRepository().onEach { user ->
+                _userState.value = userState.value.copy(isLoading = false)
+
+                user?.let {
+                    _gender.value = it.gender
+                    it.dob.let { dob ->
+                        _age.intValue = calculateAgeFromDob(dob)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
     fun submitSurvey() {
         viewModelScope.launch {
             _profileState.value = profileState.value.copy(isLoading = true)
@@ -306,6 +359,7 @@ class SurveyViewModel @Inject constructor(
             val macrosomicBaby = _surveyState.value.fieldStates["pregnancy"]?.text?.toIntOrNull() ?: 2
             val smoking = _surveyState.value.fieldStates["smoking_status"]?.text?.toIntOrNull() ?: 0
             val yearOfSmoking = _surveyState.value.fieldStates["smoking_age"]?.text?.toIntOrNull() ?: 0
+            val smokingEndAge = _surveyState.value.fieldStates["smoking_end_age"]?.text?.toIntOrNull() ?: 0
             val cholesterol = _surveyState.value.fieldStates["cholesterol"]?.text?.toBoolean() ?: false
             val bloodline = _surveyState.value.fieldStates["bloodline"]?.text?.toBoolean() ?: false
             val physicalActivityFrequency = _surveyState.value.fieldStates["activity"]?.text?.toIntOrNull() ?: 0
@@ -425,6 +479,32 @@ class SurveyViewModel @Inject constructor(
     }
 
     // Helper Functions
+    private fun calculateAgeFromDob(dob: String): Int {
+        return try {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val birthDate = dateFormat.parse(dob)
+            val currentDate = Calendar.getInstance()
+            val birthCalendar = Calendar.getInstance()
+
+            if (birthDate != null) {
+                birthCalendar.time = birthDate
+
+                var age = currentDate.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR)
+
+                if (currentDate.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+                    age--
+                }
+
+                age
+            } else {
+                0
+            }
+        } catch (e: Exception) {
+            Log.e("SurveyViewModel", "Error calculating age from DOB: $dob", e)
+            0
+        }
+    }
+
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }

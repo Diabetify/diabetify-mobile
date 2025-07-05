@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.itb.diabetify.R
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlinx.coroutines.delay
 
@@ -197,4 +199,72 @@ fun SuccessNotification(
             }
         }
     }
-} 
+}
+
+@Composable
+fun LoadingNotification(
+    showLoading: Boolean,
+    loadingMessage: String?,
+    modifier: Modifier = Modifier
+) {
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showLoading, loadingMessage) {
+        if (showLoading && loadingMessage != null) {
+            isVisible = true
+        } else {
+            isVisible = false
+        }
+    }
+
+    AnimatedVisibility(
+        visible = isVisible && showLoading && loadingMessage != null,
+        enter = slideInVertically(
+            initialOffsetY = { -it },
+            animationSpec = tween(300)
+        ) + fadeIn(animationSpec = tween(300)),
+        exit = slideOutVertically(
+            targetOffsetY = { -it },
+            animationSpec = tween(300)
+        ) + fadeOut(animationSpec = tween(300))
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(12.dp)
+                ),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFF3F4F6)
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = colorResource(id = R.color.primary),
+                    strokeWidth = 3.dp
+                )
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Text(
+                    text = loadingMessage ?: "",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = Color(0xFF374151),
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}

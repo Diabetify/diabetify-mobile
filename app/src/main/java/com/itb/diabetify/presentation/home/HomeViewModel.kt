@@ -39,6 +39,9 @@ class HomeViewModel @Inject constructor(
     private val _successMessage = mutableStateOf<String?>(null)
     val successMessage: State<String?> = _successMessage
 
+    private val _loadingMessage = mutableStateOf<String?>(null)
+    val loadingMessage: State<String?> = _loadingMessage
+
     // Operational States
     private var _userState = mutableStateOf(DataState())
     val userState: State<DataState> = _userState
@@ -210,9 +213,16 @@ class HomeViewModel @Inject constructor(
     private var isOnRiskFactorDetailScreen = false
     private var hasUnprocessedPredictionUpdate = false
     private var hasLoadedExplanationsOnce = false
+    
+    // Loading state tracking
+    private var isUserDataLoaded = false
+    private var isPredictionDataLoaded = false
+    private var isActivityDataLoaded = false
+    private var isProfileDataLoaded = false
 
     // Initialization
     init {
+        _loadingMessage.value = "Memuat data..."
         loadUserData()
         loadLatestPredictionData()
         loadActivityTodayData()
@@ -239,16 +249,24 @@ class HomeViewModel @Inject constructor(
             when (getUserResult.result) {
                 is Resource.Success -> {
                     collectUserData()
+                    isUserDataLoaded = true
+                    checkAllDataLoaded()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getUserResult.result.message ?: "Terjadi kesalahan saat mengambil data pengguna"
                     getUserResult.result.message?.let { Log.e("HomeViewModel", it) }
+                    _loadingMessage.value = null
+                    isUserDataLoaded = true
+                    checkAllDataLoaded()
                 }
 
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Terjadi kesalahan saat mengambil data pengguna"
                     Log.e("HomeViewModel", "Unexpected error")
+                    _loadingMessage.value = null
+                    isUserDataLoaded = true
+                    checkAllDataLoaded()
                 }
             }
         }
@@ -279,16 +297,24 @@ class HomeViewModel @Inject constructor(
             when (getLatestPredictionResult.result) {
                 is Resource.Success -> {
                     collectLatestPredictionData()
+                    isPredictionDataLoaded = true
+                    checkAllDataLoaded()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getLatestPredictionResult.result.message ?: "Terjadi kesalahan saat mengambil data prediksi terbaru"
                     getLatestPredictionResult.result.message?.let { Log.e("HomeViewModel", it) }
+                    _loadingMessage.value = null
+                    isPredictionDataLoaded = true
+                    checkAllDataLoaded()
                 }
 
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Terjadi kesalahan saat mengambil data prediksi terbaru"
                     Log.e("HomeViewModel", "Unexpected error loading latest prediction data")
+                    _loadingMessage.value = null
+                    isPredictionDataLoaded = true
+                    checkAllDataLoaded()
                 }
             }
         }
@@ -420,22 +446,31 @@ class HomeViewModel @Inject constructor(
             when (getProfileResult.result) {
                 is Resource.Success -> {
                     collectProfileData()
+                    isProfileDataLoaded = true
+                    checkAllDataLoaded()
                 }
                 is Resource.Error -> {
                     if (getProfileResult.result.message?.contains("404") == true) {
                         Log.d("HomeViewModel", "Profile not found, navigating to survey screen")
                         resetToDefaultValues()
                         _navigationEvent.value = "SURVEY_SCREEN"
+                        _loadingMessage.value = null
                     } else {
                         _errorMessage.value = getProfileResult.result.message ?: "Terjadi kesalahan saat mengambil data profil"
                         getProfileResult.result.message?.let { Log.e("HomeViewModel", it) }
+                        _loadingMessage.value = null
                     }
+                    isProfileDataLoaded = true
+                    checkAllDataLoaded()
                 }
 
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Terjadi kesalahan saat mengambil data profil"
                     Log.e("HomeViewModel", "Unexpected error loading profile data")
+                    _loadingMessage.value = null
+                    isProfileDataLoaded = true
+                    checkAllDataLoaded()
                 }
             }
         }
@@ -472,16 +507,24 @@ class HomeViewModel @Inject constructor(
             when (getActivityTodayResult.result) {
                 is Resource.Success -> {
                     collectActivityTodayData()
+                    isActivityDataLoaded = true
+                    checkAllDataLoaded()
                 }
                 is Resource.Error -> {
                     _errorMessage.value = getActivityTodayResult.result.message ?: "Terjadi kesalahan saat mengambil data aktivitas hari ini"
                     getActivityTodayResult.result.message?.let { Log.e("HomeViewModel", it) }
+                    _loadingMessage.value = null
+                    isActivityDataLoaded = true
+                    checkAllDataLoaded()
                 }
 
                 else -> {
                     // Handle unexpected error
                     _errorMessage.value = "Terjadi kesalahan saat mengambil data aktivitas hari ini"
                     Log.e("HomeViewModel", "Unexpected error")
+                    _loadingMessage.value = null
+                    isActivityDataLoaded = true
+                    checkAllDataLoaded()
                 }
             }
         }
@@ -567,6 +610,18 @@ class HomeViewModel @Inject constructor(
                 "K" -> "0 mg/dL"
                 else -> "0"
             })
+        }
+        
+        isUserDataLoaded = false
+        isPredictionDataLoaded = false
+        isActivityDataLoaded = false
+        isProfileDataLoaded = false
+    }
+
+    private fun checkAllDataLoaded() {
+        if (isUserDataLoaded && isPredictionDataLoaded && isActivityDataLoaded && isProfileDataLoaded) {
+            _loadingMessage.value = null
+            _successMessage.value = "Data berhasil dimuat"
         }
     }
 

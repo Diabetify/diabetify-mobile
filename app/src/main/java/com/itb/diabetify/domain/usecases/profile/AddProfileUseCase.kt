@@ -13,7 +13,8 @@ class AddProfileUseCase(
         hypertension: Boolean,
         macrosomicBaby: Int,
         smoking: Int,
-        yearOfSmoking: Int,
+        ageOfSmoking: Int,
+        ageOfStopSmoking: Int,
         cholesterol: Boolean,
         bloodline: Boolean,
         physicalActivityFrequency: Int,
@@ -23,7 +24,8 @@ class AddProfileUseCase(
         val heightError: String? = if (height < 100 || height > 250) "Tinggi badan tidak valid" else null
         val macrosomicBabyError: String? = if (macrosomicBaby < 0 || macrosomicBaby > 2) "Status bayi makrosomia tidak valid" else null
         val smokingError: String? = if (smoking < 0 || smoking > 2) "Status merokok tidak valid" else null
-        val yearOfSmokingError: String? = if (yearOfSmoking != 0 && (yearOfSmoking < 10 || yearOfSmoking > 80)) "Tahun merokok tidak valid" else null
+        val ageOfSmokingError: String? = if (ageOfSmoking != 0 && (ageOfSmoking < 10 || ageOfSmoking > 80)) "Usia mulai merokok tidak valid" else null
+        val ageOfStopSmokingError: String? = if (ageOfStopSmoking != 0 && (ageOfStopSmoking < 10 || ageOfStopSmoking > 80)) "Usia berhenti merokok tidak valid" else null
         val physicalActivityFrequencyError: String? = if (physicalActivityFrequency < 0 || physicalActivityFrequency > 7) "Frekuensi aktivitas fisik tidak valid" else null
         val smokeCountError: String? = if (smokeCount < 0 || smokeCount > 60) "Jumlah rokok tidak valid" else null
 
@@ -51,9 +53,15 @@ class AddProfileUseCase(
             )
         }
 
-        if (yearOfSmokingError != null) {
+        if (ageOfSmokingError != null) {
             return AddProfileResult(
-                yearOfSmokingError = yearOfSmokingError
+                ageOfSmokingError = ageOfSmokingError
+            )
+        }
+
+        if (ageOfStopSmokingError != null) {
+            return AddProfileResult(
+                ageOfStopSmokingError = ageOfStopSmokingError
             )
         }
 
@@ -75,7 +83,8 @@ class AddProfileUseCase(
             hypertension = hypertension,
             macrosomicBaby = macrosomicBaby,
             smoking = smoking,
-            yearOfSmoking = yearOfSmoking,
+            ageOfSmoking = ageOfSmoking,
+            ageOfStopSmoking = ageOfStopSmoking,
             cholesterol = cholesterol,
             bloodline = bloodline,
             physicalActivityFrequency = physicalActivityFrequency,

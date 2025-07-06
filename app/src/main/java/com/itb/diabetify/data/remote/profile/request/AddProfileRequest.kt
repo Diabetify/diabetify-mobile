@@ -13,8 +13,10 @@ data class AddProfileRequest (
     val macrosomicBaby: Int,
     @SerializedName("smoking")
     val smoking: Int,
-    @SerializedName("year_of_smoking")
-    val yearOfSmoking: Int,
+    @SerializedName("age_of_smoking")
+    val ageOfSmoking: Int,
+    @SerializedName("age_of_stop_smoking")
+    val ageOfStopSmoking: Int,
     @SerializedName("cholesterol")
     val cholesterol: Boolean,
     @SerializedName("bloodline")

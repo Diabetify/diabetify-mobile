@@ -54,7 +54,6 @@ fun WhatIfScreen(
 ) {
     val age by viewModel.age
     val macrosomicBaby by viewModel.macrosomicBaby
-    val yearsSmoking by viewModel.yearsSmoking
     val isBloodline by viewModel.isBloodline
     val smokingStatus by viewModel.smokingStatusFieldState
     val averageCigarettes by viewModel.averageCigarettesFieldState
@@ -204,28 +203,6 @@ fun WhatIfScreen(
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // Years smoking
-                if (yearsSmoking != 0) {
-                    Text(
-                        text = "Sejak usia berapa mulai merokok?",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
-                        color = colorResource(id = R.color.primary),
-                    )
-                    InputField(
-                        value = yearsSmoking.toString(),
-                        onValueChange = { },
-                        placeholderText = "Sejak usia berapa mulai merokok?",
-                        iconResId = R.drawable.ic_calendar,
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
 
                 // Bloodline
                 Text(

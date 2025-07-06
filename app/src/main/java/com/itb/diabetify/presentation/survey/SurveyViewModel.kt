@@ -116,7 +116,6 @@ class SurveyViewModel @Inject constructor(
                                 return "Usia mulai merokok harus antara 10-80 tahun"
                             }
 
-                            // Validate against user's current age
                             if (_age.intValue in 1..<numericValue) {
                                 return "Usia mulai merokok tidak boleh lebih dari usia Anda saat ini (${_age.intValue} tahun)"
                             }
@@ -358,8 +357,8 @@ class SurveyViewModel @Inject constructor(
             val hypertension = _surveyState.value.fieldStates["hypertension"]?.text?.toBoolean() ?: false
             val macrosomicBaby = _surveyState.value.fieldStates["pregnancy"]?.text?.toIntOrNull() ?: 2
             val smoking = _surveyState.value.fieldStates["smoking_status"]?.text?.toIntOrNull() ?: 0
-            val yearOfSmoking = _surveyState.value.fieldStates["smoking_age"]?.text?.toIntOrNull() ?: 0
-            val smokingEndAge = _surveyState.value.fieldStates["smoking_end_age"]?.text?.toIntOrNull() ?: 0
+            val ageOfSmoking = _surveyState.value.fieldStates["smoking_age"]?.text?.toIntOrNull() ?: 0
+            val ageOfStopSmoking = _surveyState.value.fieldStates["smoking_end_age"]?.text?.toIntOrNull() ?: 0
             val cholesterol = _surveyState.value.fieldStates["cholesterol"]?.text?.toBoolean() ?: false
             val bloodline = _surveyState.value.fieldStates["bloodline"]?.text?.toBoolean() ?: false
             val physicalActivityFrequency = _surveyState.value.fieldStates["activity"]?.text?.toIntOrNull() ?: 0
@@ -371,7 +370,8 @@ class SurveyViewModel @Inject constructor(
                 hypertension = hypertension,
                 macrosomicBaby = macrosomicBaby,
                 smoking = smoking,
-                yearOfSmoking = yearOfSmoking,
+                ageOfSmoking = ageOfSmoking,
+                ageOfStopSmoking = ageOfStopSmoking,
                 cholesterol = cholesterol,
                 bloodline = bloodline,
                 physicalActivityFrequency = physicalActivityFrequency,
@@ -407,9 +407,14 @@ class SurveyViewModel @Inject constructor(
                 updatedFieldStates["smoking_status"] = currentFieldState.copy(error = addProfileResult.smokingError)
             }
 
-            if (addProfileResult.yearOfSmokingError != null) {
+            if (addProfileResult.ageOfSmokingError != null) {
                 val currentFieldState = updatedFieldStates["smoking_age"] ?: FieldState()
-                updatedFieldStates["smoking_age"] = currentFieldState.copy(error = addProfileResult.yearOfSmokingError)
+                updatedFieldStates["smoking_age"] = currentFieldState.copy(error = addProfileResult.ageOfSmokingError)
+            }
+
+            if (addProfileResult.ageOfStopSmokingError != null) {
+                val currentFieldState = updatedFieldStates["smoking_end_age"] ?: FieldState()
+                updatedFieldStates["smoking_end_age"] = currentFieldState.copy(error = addProfileResult.ageOfStopSmokingError)
             }
 
             if (addProfileResult.cholesterolError != null) {

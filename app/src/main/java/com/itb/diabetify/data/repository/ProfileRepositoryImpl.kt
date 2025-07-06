@@ -63,7 +63,8 @@ class ProfileRepositoryImpl(
                         height = profile.height,
                         bmi = profile.bmi,
                         smoking = profile.smoking,
-                        yearOfSmoking = profile.yearOfSmoking,
+                        ageOfSmoking = profile.ageOfSmoking,
+                        ageOfStopSmoking = profile.ageOfStopSmoking,
                         macrosomicBaby = profile.macrosomicBaby
                     )
                 )

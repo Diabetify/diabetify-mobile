@@ -68,9 +68,6 @@ class WhatIfViewModel @Inject constructor(
     private val _macrosomicBaby = mutableIntStateOf(0)
     val macrosomicBaby: State<Int> = _macrosomicBaby
 
-    private val _yearsSmoking = mutableIntStateOf(0)
-    val yearsSmoking: State<Int> = _yearsSmoking
-
     private val _isBloodline = mutableStateOf(false)
     val isBloodline: State<Boolean> = _isBloodline
 
@@ -204,7 +201,6 @@ class WhatIfViewModel @Inject constructor(
 
                 profile?.let {
                     _macrosomicBaby.intValue = it.macrosomicBaby
-                    _yearsSmoking.intValue = it.yearOfSmoking
                     _isBloodline.value = it.bloodline
 
                     _weightFieldState.value = FieldState(

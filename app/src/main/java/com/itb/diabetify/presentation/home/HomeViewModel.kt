@@ -1,5 +1,6 @@
 package com.itb.diabetify.presentation.home
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -91,10 +92,11 @@ class HomeViewModel @Inject constructor(
         val name: String,
         val fullName: String,
         val impactPercentage: Double,
+        val description: String,
         val explanation: String,
         val idealValue: String,
         val currentValue: String,
-        val isModifiable: Boolean = true
+        val categories: String? = null
     )
 
     private val _riskFactorDetails = mutableStateOf(listOf(
@@ -102,74 +104,97 @@ class HomeViewModel @Inject constructor(
             name = "IMT",
             fullName = "Indeks Massa Tubuh",
             impactPercentage = 0.0,
+            description = "Rasio berat badan terhadap tinggi badan untuk menilai status gizi. Dihitung dengan rumus: `berat badan (kg) / (tinggi badan (m)²)`",
             explanation = "",
-            idealValue = "18.5 - 24.9 kg/m²",
-            currentValue = "0 kg/m²"
+            idealValue = "18.5 - 22.9 kg/m²",
+            currentValue = "0.0 kg/m² (Kurus)",
+            categories = "• Kurus: < 18.5 kg/m²\n" +
+                    "• Normal: 18.5 - 22.9 kg/m²\n" +
+                    "• Beresiko Obesitas: 23 - 24.9 kg/m²\n" +
+                    "• Obesitas I: 25 - 29.9 kg/m²\n" +
+                    "• Obesitas II: ≥ 30 kg/m²"
         ),
         RiskFactorDetails(
             name = "H",
             fullName = "Hipertensi",
             impactPercentage = 0.0,
+            description = "Status yang menandakan apakah pengguna memiliki tekanan darah tinggi.",
             explanation = "",
-            idealValue = "< 120/80 mmHg",
-            currentValue = "0/0 mmHg"
+            idealValue = "Tidak",
+            currentValue = "Tidak"
         ),
         RiskFactorDetails(
             name = "RBM",
             fullName = "Riwayat Bayi Makrosomia",
             impactPercentage = 0.0,
+            description = "Informasi apakah pengguna pernah melahirkan bayi dengan berat badan lahir di atas 4 kg. (Tidak relevan untuk pengguna pria atau yang belum pernah hamil).",
             explanation = "",
-            idealValue = "Berat lahir normal, kelahiran cukup bulan",
-            currentValue = "-"
+            idealValue = "Tidak",
+            currentValue = "Tidak",
+            categories = "• Tidak\n" +
+                    "• Ya\n" +
+                    "• Tidak relevan (pria atau belum pernah hamil)"
         ),
         RiskFactorDetails(
             name = "AF",
             fullName = "Aktivitas Fisik",
             impactPercentage = 0.0,
+            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang.",
             explanation = "",
-            idealValue = "Min. 150 menit aktivitas sedang per minggu",
-            currentValue = "0 menit"
+            idealValue = "7 hari per minggu",
+            currentValue = "0 hari per minggu"
         ),
         RiskFactorDetails(
             name = "U",
             fullName = "Usia",
             impactPercentage = 0.0,
+            description = "Usia pengguna saat ini.",
             explanation = "",
             idealValue = "-",
             currentValue = "0 tahun",
-            isModifiable = false
         ),
         RiskFactorDetails(
             name = "SM",
             fullName = "Status Merokok",
             impactPercentage = 0.0,
+            description = "Kondisi kebiasaan merokok pengguna, dapat berupa tidak pernah merokok, sudah berhenti merokok, atau masih aktif merokok.",
             explanation = "",
-            idealValue = "0 (tidak merokok)",
-            currentValue = "0 batang per hari"
+            idealValue = "Tidak merokok",
+            currentValue = "Tidak merokok",
+            categories = "• Tidak merokok\n" +
+                    "• Sudah berhenti merokok\n" +
+                    "• Masih aktif merokok"
         ),
         RiskFactorDetails(
             name = "IB",
             fullName = "Indeks Brinkman",
             impactPercentage = 0.0,
+            description = "Kategori risiko berdasarkan kebiasaan merokok. Dihitung dengan rumus: `rata-rata rokok per hari x lama merokok (tahun)`. Kategori meliputi perokok ringan, sedang, dan berat.",
             explanation = "",
             idealValue = "0 (tidak merokok)",
-            currentValue = "0 batang per hari"
+            currentValue = "0",
+            categories = "• Tidak merokok: 0\n" +
+                    "• Perokok ringan: < 200\n" +
+                    "• Perokok sedang: 200 - 599\n" +
+                    "• Perokok berat: ≥ 600"
         ),
         RiskFactorDetails(
             name = "RK",
             fullName = "Riwayat Keluarga",
             impactPercentage = 0.0,
+            description = "Informasi apakah orang tua kandung pengguna meninggal akibat komplikasi diabetes.",
             explanation = "",
-            idealValue = "Tidak ada riwayat penyakit serius",
-            currentValue = "-"
+            idealValue = "Tidak",
+            currentValue = "Tidak"
         ),
         RiskFactorDetails(
             name = "K",
             fullName = "Kolesterol",
             impactPercentage = 0.0,
+            description = "Status yang menandakan apakah pengguna memiliki kadar kolesterol tinggi.",
             explanation = "",
-            idealValue = "< 200 mg/dL",
-            currentValue = "0 mg/dL"
+            idealValue = "Tidak",
+            currentValue = "Tidak"
         )
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
@@ -320,6 +345,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private fun collectLatestPredictionData() {
         viewModelScope.launch {
             _latestPredictionState.value = latestPredictionState.value.copy(isLoading = true)
@@ -353,76 +379,117 @@ class HomeViewModel @Inject constructor(
                             name = "IMT",
                             fullName = "Indeks Massa Tubuh",
                             impactPercentage = latestPrediction.bmiContribution,
+                            description = "Rasio berat badan terhadap tinggi badan untuk menilai status gizi. Dihitung dengan rumus: `berat badan (kg) / (tinggi badan (m)²)`",
                             explanation = latestPrediction.bmiExplanation,
-                            idealValue = "18.5 - 24.9 kg/m²",
-                            currentValue = "${latestPrediction.bmi} kg/m²"
+                            idealValue = "18.5 - 22.9 kg/m²",
+                            currentValue = when {
+                                latestPrediction.bmi < 18.5 -> String.format("%.1f kg/m² (Kurus)", latestPrediction.bmi)
+                                latestPrediction.bmi < 23 -> String .format("%.1f kg/m² (Normal)", latestPrediction.bmi)
+                                latestPrediction.bmi < 25 -> String.format("%.1f kg/m² (Beresiko Obesitas)", latestPrediction.bmi)
+                                latestPrediction.bmi < 30 -> String.format("%.1f kg/m² (Obesitas I)", latestPrediction.bmi)
+                                else -> String.format("%.1f kg/m² (Obesitas II)", latestPrediction.bmi)
+                            },
+                            categories = "• Kurus: < 18.5 kg/m²\n" +
+                                    "• Normal: 18.5 - 22.9 kg/m²\n" +
+                                    "• Beresiko Obesitas: 23 - 24.9 kg/m²\n" +
+                                    "• Obesitas I: 25 - 29.9 kg/m²\n" +
+                                    "• Obesitas II: ≥ 30 kg/m²"
                         ),
                         RiskFactorDetails(
                             name = "H",
                             fullName = "Hipertensi",
                             impactPercentage = latestPrediction.isHypertensionContribution,
+                            description = "Status yang menandakan apakah pengguna memiliki tekanan darah tinggi.",
                             explanation = latestPrediction.isHypertensionExplanation,
-                            idealValue = "< 120/80 mmHg",
+                            idealValue = "Tidak",
                             currentValue = if (latestPrediction.isHypertension) "Ya" else "Tidak"
                         ),
                         RiskFactorDetails(
                             name = "RBM",
                             fullName = "Riwayat Bayi Makrosomia",
                             impactPercentage = latestPrediction.isMacrosomicBabyContribution,
+                            description = "Informasi apakah pengguna pernah melahirkan bayi dengan berat badan lahir di atas 4 kg. (Tidak relevan untuk pengguna pria atau yang belum pernah hamil).",
                             explanation = latestPrediction.isMacrosomicBabyExplanation,
-                            idealValue = "Berat lahir normal, kelahiran cukup bulan",
+                            idealValue = "Tidak",
                             currentValue = when (latestPrediction.isMacrosomicBaby) {
+                                0 -> "Tidak"
                                 1 -> "Ya"
-                                else -> "Tidak"
-                            }
+                                2 -> "Tidak relevan (pria atau belum pernah hamil)"
+                                else -> "Tidak diketahui"
+                            },
+                            categories = "• Tidak\n" +
+                                    "• Ya\n" +
+                                    "• Tidak relevan (pria atau belum pernah hamil)"
                         ),
                         RiskFactorDetails(
                             name = "AF",
                             fullName = "Aktivitas Fisik",
                             impactPercentage = latestPrediction.physicalActivityFrequencyContribution,
+                            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang.",
                             explanation = latestPrediction.physicalActivityFrequencyExplanation,
-                            idealValue = "Min. 150 menit aktivitas sedang per minggu",
-                            currentValue = "${latestPrediction.physicalActivityFrequency} menit per minggu"
+                            idealValue = "7 hari per minggu",
+                            currentValue = "${latestPrediction.physicalActivityFrequency} hari per minggu"
                         ),
                         RiskFactorDetails(
                             name = "U",
                             fullName = "Usia",
                             impactPercentage = latestPrediction.ageContribution,
+                            description = "Usia pengguna saat ini.",
                             explanation = latestPrediction.ageExplanation,
                             idealValue = "-",
                             currentValue = "${latestPrediction.age} tahun",
-                            isModifiable = false
                         ),
                         RiskFactorDetails(
                             name = "SM",
                             fullName = "Status Merokok",
                             impactPercentage = latestPrediction.smokingStatusContribution,
+                            description = "Kondisi kebiasaan merokok pengguna, dapat berupa tidak pernah merokok, sudah berhenti merokok, atau masih aktif merokok.",
                             explanation = latestPrediction.smokingStatusExplanation,
-                            idealValue = "0 (tidak merokok)",
-                            currentValue = "${latestPrediction.smokingStatus} batang per hari"
+                            idealValue = "Tidak merokok",
+                            currentValue = when (latestPrediction.smokingStatus) {
+                                "0" -> "Tidak merokok"
+                                "1" -> "Sudah berhenti merokok"
+                                "2" -> "Masih aktif merokok"
+                                else -> "Tidak diketahui"
+                            },
+                            categories = "• Tidak merokok\n" +
+                                    "• Sudah berhenti merokok\n" +
+                                    "• Masih aktif merokok"
                         ),
                         RiskFactorDetails(
                             name = "IB",
                             fullName = "Indeks Brinkman",
                             impactPercentage = latestPrediction.brinkmanScoreContribution,
+                            description = "Kategori risiko berdasarkan kebiasaan merokok. Dihitung dengan rumus: `rata-rata rokok per hari x lama merokok (tahun)`. Kategori meliputi perokok ringan, sedang, dan berat.",
                             explanation = latestPrediction.brinkmanScoreExplanation,
-                            idealValue = "0 (tidak merokok)",
-                            currentValue = "${latestPrediction.brinkmanScore}"
+                            idealValue = "0 (Tidak merokok)",
+                            currentValue = when {
+                                latestPrediction.brinkmanScore == 0 -> "0 (Tidak merokok)"
+                                latestPrediction.brinkmanScore < 200 -> "${latestPrediction.brinkmanScore} (Perokok ringan)"
+                                latestPrediction.brinkmanScore < 600 -> "${latestPrediction.brinkmanScore} (Perokok sedang)"
+                                else -> "${latestPrediction.brinkmanScore} (Perokok berat)"
+                            },
+                            categories = "• Tidak merokok: 0\n" +
+                                    "• Perokok ringan: < 200\n" +
+                                    "• Perokok sedang: 200 - 599\n" +
+                                    "• Perokok berat: ≥ 600"
                         ),
                         RiskFactorDetails(
                             name = "RK",
                             fullName = "Riwayat Keluarga",
                             impactPercentage = latestPrediction.isBloodlineContribution,
+                            description = "Informasi apakah orang tua kandung pengguna meninggal akibat komplikasi diabetes.",
                             explanation = latestPrediction.isBloodlineExplanation,
-                            idealValue = "Tidak ada riwayat penyakit serius",
+                            idealValue = "Tidak",
                             currentValue = if (latestPrediction.isBloodline) "Ya" else "Tidak"
                         ),
                         RiskFactorDetails(
                             name = "K",
                             fullName = "Kolesterol",
                             impactPercentage = latestPrediction.isCholesterolContribution,
+                            description = "Status yang menandakan apakah pengguna memiliki kadar kolesterol tinggi.",
                             explanation = latestPrediction.isCholesterolExplanation,
-                            idealValue = "< 200 mg/dL",
+                            idealValue = "Tidak",
                             currentValue = if (latestPrediction.isCholesterol) "Ya" else "Tidak"
                         )
                     )

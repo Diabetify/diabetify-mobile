@@ -8,7 +8,7 @@ data class FAQCardData(
 val faqCards = listOf(
     FAQCardData(
         question = "Seberapa akurat prediksi risiko diabetes dari aplikasi ini?",
-        answer = "Aplikasi Diabetify menggunakan model AI yang telah dilatih dengan data medis yang luas dan divalidasi oleh para ahli. Tingkat akurasi mencapai sekitar 85-90%, namun hasil ini bukanlah diagnosis medis. Prediksi ini adalah estimasi risiko berdasarkan faktor-faktor yang Anda masukkan. Untuk diagnosis pasti, Anda tetap perlu konsultasi dengan dokter dan melakukan pemeriksaan medis yang tepat."
+        answer = "Prediksi dalam aplikasi ini dibuat menggunakan model AI berbasis XGBoost yang telah dilatih dengan data survei IFLS5 dan divalidasi oleh tenaga ahli. Model ini memiliki tingkat akurasi yang cukup baik, dengan skor evaluasi ROC AUC sebesar 0,71–0,72. Artinya, model cukup andal dalam membedakan siapa yang memiliki risiko diabetes dan siapa yang tidak, terutama dalam konteks populasi umum di Indonesia."
     ),
     FAQCardData(
         question = "Apakah hasil prediksi bisa menggantikan konsultasi dokter?",
@@ -28,6 +28,6 @@ val faqCards = listOf(
     ),
     FAQCardData(
         question = "Apakah aplikasi ini cocok untuk semua usia?",
-        answer = "Diabetify dirancang untuk dewasa berusia 20 tahun ke atas. Model prediksi dioptimalkan untuk kelompok usia ini karena risiko diabetes tipe 2 umumnya meningkat setelah usia 20 tahun. Untuk anak-anak atau remaja di bawah 20 tahun yang memiliki faktor risiko diabetes, disarankan untuk langsung berkonsultasi dengan dokter anak atau ahli endokrin."
-    )
+        answer = "Aplikasi ini dirancang khusus untuk individu berusia 20 tahun ke atas, karena model AI-nya difokuskan pada prediksi diabetes tipe 2, yang umumnya berkembang pada usia dewasa. Model ini dilatih menggunakan data dari survei IFLS5 untuk kelompok usia tersebut. Oleh karena itu, bagi pengguna di bawah usia 20 tahun yang lebih berisiko mengalami diabetes tipe 1 hasil prediksi mungkin kurang relevan atau akurat, karena berada di luar cakupan data dan tujuan model."
+    ),
 )

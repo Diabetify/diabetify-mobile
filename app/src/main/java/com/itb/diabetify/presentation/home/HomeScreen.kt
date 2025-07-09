@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -499,71 +501,140 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // BMI progress indicator
-                        Box(
+                        BoxWithConstraints(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFFE5E7EB))
+                                .height(40.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                                    .background(
-                                        brush = Brush.horizontalGradient(
-                                            colors = listOf(
-                                                Color(0xFFF59E0B),
-                                                Color(0xFF10B981),
-                                                Color(0xFFF59E0B),
-                                                Color(0xFFEF4444)
-                                            )
-                                        )
-                                    )
-                            )
+                            val totalWidth = maxWidth
+                            val labelWidth = 60.dp
 
-                            // BMI indicator
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .offset(
-                                        x = ((bmi - 10) / 30f * (1f - 12f/360f)) * 360.dp,
-                                    )
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(5.dp))
-
-                        // BMI scale labels
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Kurus",
-                                fontSize = 10.sp,
-                                fontFamily = poppinsFontFamily,
-                                color = Color(0xFFF59E0B),
-                            )
                             Text(
                                 text = "Normal",
                                 fontSize = 10.sp,
                                 fontFamily = poppinsFontFamily,
-                                color = Color(0xFF10B981)
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF10B981),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .width(labelWidth)
+                                    .wrapContentHeight()
+                                    .offset(
+                                        x = (0.32f * totalWidth) - (labelWidth / 2),
+                                        y = 0.dp
+                                    )
                             )
+
                             Text(
-                                text = "Gemuk",
+                                text = "Obesitas I",
                                 fontSize = 10.sp,
                                 fontFamily = poppinsFontFamily,
-                                color = Color(0xFFF59E0B)
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFF17C0B),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .width(labelWidth)
+                                    .wrapContentHeight()
+                                    .offset(
+                                        x = (0.55f * totalWidth) - (labelWidth / 2),
+                                        y = 0.dp
+                                    )
                             )
+
+                            // Progress bar
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .offset(y = 20.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(Color(0xFFE5E7EB))
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(8.dp)
+                                        .background(
+                                            brush = Brush.horizontalGradient(
+                                                0f to Color(0xFFF59E0B),
+                                                0.185f to Color(0xFFF59E0B),
+                                                0.185f to Color(0xFF10B981),
+                                                0.46f to Color(0xFF10B981),
+                                                0.46f to Color(0xFFF7B13D),
+                                                0.5f to Color(0xFFF7B13D),
+                                                0.5f to Color(0xFFF17C0B),
+                                                0.6f to Color(0xFFF17C0B),
+                                                0.6f to Color(0xFFEF4444),
+                                                1f to Color(0xFFEF4444)
+                                            )
+                                        )
+                                )
+
+                                val indicatorPosition = when {
+                                    bmi < 18.5f -> (bmi / 50f) * 0.185f
+                                    bmi < 23f -> 0.185f + ((bmi - 18.5f) / (23f - 18.5f)) * (0.46f - 0.185f)
+                                    bmi < 25f -> 0.46f + ((bmi - 23f) / (25f - 23f)) * (0.5f - 0.46f)
+                                    bmi < 30f -> 0.5f + ((bmi - 25f) / (30f - 25f)) * (0.6f - 0.5f)
+                                    else -> 0.6f + ((bmi - 30f) / 20f) * (1f - 0.6f)
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .offset(
+                                            x = (indicatorPosition * totalWidth).coerceAtMost(totalWidth - 8.dp)
+                                        )
+                                        .clip(CircleShape)
+                                        .background(Color.White)
+                                )
+                            }
+
                             Text(
-                                text = "Obesitas",
+                                text = "Kurus",
                                 fontSize = 10.sp,
                                 fontFamily = poppinsFontFamily,
-                                color = Color(0xFFEF4444)
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFF59E0B),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .width(labelWidth)
+                                    .wrapContentHeight()
+                                    .offset(
+                                        x = (0.092f * totalWidth) - (labelWidth / 2),
+                                        y = 24.dp
+                                    )
+                            )
+
+                            Text(
+                                text = "Beresiko",
+                                fontSize = 10.sp,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFF7B13D),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .width(labelWidth)
+                                    .wrapContentHeight()
+                                    .offset(
+                                        x = (0.48f * totalWidth) - (labelWidth / 2),
+                                        y = 24.dp
+                                    )
+                            )
+
+                            Text(
+                                text = "Obesitas II",
+                                fontSize = 10.sp,
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFEF4444),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .width(labelWidth)
+                                    .wrapContentHeight()
+                                    .offset(
+                                        x = (0.8f * totalWidth) - (labelWidth / 2),
+                                        y = 24.dp
+                                    )
                             )
                         }
                     }

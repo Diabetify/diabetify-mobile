@@ -75,41 +75,25 @@ Diabetes dapat menyebabkan masalah serius seperti penyakit jantung, kerusakan gi
         content = listOf(
             GuideSection(
                 title = "Faktor Risiko yang Dapat Dimodifikasi",
-                content = """1. Merokok (Status Merokok & Indeks Brinkman)
-• Merokok meningkatkan risiko resistensi insulin dan komplikasi diabetes.
-• Brinkman Index (jumlah batang rokok per hari dikali tahun merokok) digunakan untuk mengukur paparan rokok seumur hidup. Semakin tinggi nilainya, semakin besar risikonya.
+                content = """• Status Merokok: Kondisi kebiasaan merokok pengguna, dapat berupa tidak pernah merokok, sudah berhenti merokok, atau masih aktif merokok.
 
-2. Indeks Massa Tubuh (BMI)
-• Kelebihan berat badan atau obesitas meningkatkan risiko diabetes tipe 2 secara signifikan.
+• Indeks Brinkman: Kategori risiko berdasarkan kebiasaan merokok. Dihitung dengan rumus: `rata-rata rokok per hari x lama merokok (tahun)`. Kategori meliputi perokok ringan, sedang, dan berat.
 
-3. Frekuensi Aktivitas Fisik
-• Kurangnya frekuensi aktivitas fisik meningkatkan risiko diabetes.
-• Aktivitas rutin seperti berjalan cepat, bersepeda, atau berenang membantu menurunkan risiko.
+• Indeks Massa Tubuh: Rasio berat badan terhadap tinggi badan untuk menilai status gizi. Dihitung dengan rumus: `berat badan (kg) / (tinggi badan (m)²)`.
 
-4. Hipertensi
-• Tekanan darah tinggi sering ditemukan bersamaan dengan diabetes dan meningkatkan risiko komplikasi.
+• Hipertensi: Status yang menandakan apakah pengguna memiliki tekanan darah tinggi.
 
-5. Kolesterol Tinggi
-• Kadar kolesterol tinggi berhubungan dengan risiko diabetes dan penyakit kardiovaskular.""",
-                source = GuideSource(
-                    title = "CDC - Diabetes Risk Factors",
-                    url = "https://www.cdc.gov/diabetes/risk-factors/?CDC_AAref_Val=https://www.cdc.gov/diabetes/basics/risk-factors.html"
-                )
+• Kolesterol: Status yang menandakan apakah pengguna memiliki kadar kolesterol tinggi.
+
+• Aktivitas Fisik: Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang.""",
             ),
             GuideSection(
                 title = "Faktor Risiko yang Tidak Dapat Dimodifikasi",
-                content = """1. Usia
-• Risiko diabetes meningkat seiring bertambahnya usia.
+                content = """• Usia: Usia pengguna saat ini.
 
-2. Riwayat Keluarga
-• Memiliki orang tua yang mempunyai riwayat diabetes meningkatkan risiko karena faktor genetik.
+• Riwayat Keluarga: Informasi apakah orang tua kandung pengguna meninggal akibat komplikasi diabetes.
 
-3. Riwayat Bayi Makrosomia
-• Wanita yang pernah melahirkan bayi dengan berat lahir ≥4 kg lebih berisiko terkena diabetes tipe 2.""",
-                source = GuideSource(
-                    title = "CDC - Diabetes Risk Factors",
-                    url = "https://www.cdc.gov/diabetes/risk-factors/?CDC_AAref_Val=https://www.cdc.gov/diabetes/basics/risk-factors.html"
-                )
+• Riwayat Bayi Makrosomia: Informasi apakah pengguna pernah melahirkan bayi dengan berat badan lahir di atas 4 kg. (Tidak relevan untuk pengguna pria atau yang belum pernah hamil).""",
             )
         )
     ),
@@ -156,30 +140,13 @@ Dalam konteks Diabetify, XAI membantu menjelaskan bagaimana berbagai faktor berk
         content = listOf(
             GuideSection(
                 title = "Bagaimana AI dan XAI Bekerja di Diabetify",
-                content = """1. Pengumpulan Data
-• Informasi kesehatan dasar
-• Gaya hidup dan kebiasaan
-• Riwayat medis
-
-2. Analisis
-• Mengidentifikasi pola dan hubungan
-• Menghitung kontribusi setiap faktor
-• Membandingkan dengan data populasi
-
-3. Penjelasan
-• Visualisasi kontribusi faktor risiko
-• Narasi tentang pengaruh masing-masing faktor risiko"""
+                content = """Aplikasi ini menggunakan teknologi AI (Artificial Intelligence) untuk membantu memprediksi risiko dini seseorang terkena diabetes berdasarkan data kesehatan dan gaya hidup. Model AI yang digunakan adalah XGBoost, sebuah algoritma pembelajaran mesin yang banyak digunakan secara global untuk prediksi berbasis data numerik dan kategorikal. Model ini dilatih menggunakan data dari survei IFLS5 (Indonesia Family Life Survey ke-5), khusus untuk individu berusia 20 tahun ke atas yang memiliki data pemeriksaan HbA1c, yaitu indikator penting dalam diagnosis diabetes. AI mempelajari pola dari berbagai informasi seperti usia, indeks massa tubuh (BMI), kebiasaan merokok, tekanan darah tinggi, kadar kolesterol, riwayat keluarga, aktivitas fisik, dan riwayat melahirkan bayi besar (macrosomic baby), lalu menghasilkan prediksi kemungkinan seseorang mengidap diabetes."""
             ),
             GuideSection(
                 title = "Validitas Hasil Prediksi",
-                content = """Diabetify menggunakan model AI canggih yang telah dilatih dengan data kesehatan dari ribuan individu. Model ini menganalisis berbagai faktor risiko untuk memberikan prediksi risiko diabetes yang akurat dan personal.
-                    
-Proses prediksi melibatkan:
-1. Pengumpulan data pengguna
-2. Analisis faktor risiko
-3. Perhitungan skor risiko
-4. Penjelasan kontribusi setiap faktor
-                """
+                content = """Untuk mengukur akurasi prediksi, model ini dievaluasi menggunakan metrik ROC AUC dan memperoleh skor antara 0,71 hingga 0,72, yang menunjukkan bahwa model cukup baik dalam membedakan siapa yang berisiko dan siapa yang tidak. Namun tidak berhenti di situ, aplikasi ini juga menggunakan pendekatan XAI (Explainable AI) untuk memastikan prediksi AI bisa dijelaskan secara transparan. Teknologi XAI yang digunakan adalah SHAP (SHapley Additive exPlanations), yang memungkinkan pengguna melihat kontribusi masing-masing faktor terhadap hasil prediksi mereka. Misalnya, SHAP bisa menunjukkan bahwa riwayat keluarga atau BMI Anda merupakan faktor dominan dalam hasil perhitungan risiko.
+
+Pendekatan ini tidak hanya memberikan angka probabilitas, tetapi juga penjelasan di baliknya, sehingga pengguna bisa memahami mengapa mereka dikategorikan berisiko atau tidak. Penjelasan ini telah ditinjau oleh tenaga ahli di bidang kesehatan, sehingga tetap selaras dengan pemahaman medis."""
             ),
             GuideSection(
                 title = "Menggunakan Hasil Prediksi",

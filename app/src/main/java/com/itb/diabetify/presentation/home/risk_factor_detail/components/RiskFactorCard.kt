@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.itb.diabetify.R
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
-import com.itb.diabetify.presentation.home.components.calculateProgress
 import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
@@ -104,6 +101,16 @@ fun RiskFactorCard(
             }
 
             Text(
+                text = "Deskripsi: " + riskFactor.description,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+                color = colorResource(id = R.color.primary).copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Text(
                 text = riskFactor.explanation,
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
@@ -112,11 +119,6 @@ fun RiskFactorCard(
                 color = colorResource(id = R.color.primary),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-
-            if (riskFactor.isModifiable) {
-                ComparisonBar(riskFactor)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
 
             // Current and Ideal Values
             Row(
@@ -157,70 +159,32 @@ fun RiskFactorCard(
                         fontSize = 14.sp,
                         fontFamily = poppinsFontFamily,
                         lineHeight = 22.sp,
-                        color = if (isHighRisk && riskFactor.isModifiable) Color.Red else colorResource(id = R.color.primary)
+                        color = if (isHighRisk) Color.Red else colorResource(id = R.color.primary)
                     )
                 }
             }
+
+            if (riskFactor.categories != null) {
+                Text(
+                    text = "Kategori: ",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    lineHeight = 22.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+                Text(
+                    text = "${riskFactor.categories}",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    lineHeight = 22.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
         }
-    }
-}
-
-
-
-@Composable
-fun ComparisonBar(riskFactor: RiskFactorDetails) {
-    val isNumber = riskFactor.currentValue.any { it.isDigit() }
-
-    if (!isNumber) return
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Perbandingan dengan Nilai Ideal",
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            lineHeight = 22.sp,
-            color = colorResource(id = R.color.primary),
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-
-        val progress = calculateProgress(riskFactor)
-
-        val color = when {
-            progress > 80f -> Color.Green
-            progress > 50f -> Color(0xFFFFA500)
-            else -> Color.Red
-        }
-
-        // Progress bar
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(Color.LightGray)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(progress / 100)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(color)
-            )
-        }
-
-        // Progress label
-        Text(
-            text = when {
-                progress > 80f -> "Baik"
-                progress > 50f -> "Perlu Perbaikan"
-                else -> "Jauh dari Ideal"
-            },
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 12.sp,
-            color = color,
-            modifier = Modifier.padding(top = 4.dp)
-        )
     }
 }

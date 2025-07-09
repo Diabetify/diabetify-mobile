@@ -153,13 +153,12 @@ fun RiskFactorCard(
                         color = colorResource(id = R.color.primary)
                     )
 
-                    val isHighRisk = abs(riskFactor.impactPercentage) > 15f
                     Text(
                         text = riskFactor.currentValue,
                         fontSize = 14.sp,
                         fontFamily = poppinsFontFamily,
                         lineHeight = 22.sp,
-                        color = if (isHighRisk) Color.Red else colorResource(id = R.color.primary)
+                        color = colorResource(id = R.color.primary)
                     )
                 }
             }

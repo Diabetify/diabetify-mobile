@@ -99,40 +99,14 @@ fun RiskFactorDetailScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp)
-            ) {
-                if (isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(50.dp),
-                                color = colorResource(id = R.color.primary)
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = if (viewModel.explainPredictionState.value.isLoading) {
-                                    "Memuat penjelasan..."
-                                } else {
-                                    "Memuat data..."
-                                },
-                                fontFamily = poppinsFontFamily,
-                                fontSize = 14.sp,
-                                color = colorResource(id = R.color.primary),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                } else {
+            if (!isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 16.dp)
+                ) {
                     SummarySection(viewModel.riskFactors.value)
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -143,6 +117,34 @@ fun RiskFactorDetailScreen(
                             riskFactors = viewModel.riskFactors.value
                         )
                     }
+                }
+            }
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(50.dp),
+                        color = colorResource(id = R.color.primary)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = if (viewModel.explainPredictionState.value.isLoading) {
+                            "Memuat penjelasan..."
+                        } else {
+                            "Memuat data..."
+                        },
+                        fontFamily = poppinsFontFamily,
+                        fontSize = 14.sp,
+                        color = colorResource(id = R.color.primary),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

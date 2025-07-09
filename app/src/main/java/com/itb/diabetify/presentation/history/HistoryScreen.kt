@@ -102,7 +102,7 @@ fun HistoryScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 40.dp),
+                        .padding(vertical = 100.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(

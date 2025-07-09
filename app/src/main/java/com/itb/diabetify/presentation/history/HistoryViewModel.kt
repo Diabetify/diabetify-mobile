@@ -212,7 +212,7 @@ class HistoryViewModel @Inject constructor(
             ),
             dailyInputs = listOf(
                 DailyInput("Usia", "${prediction.age} tahun"),
-                DailyInput("Indeks Massa Tubuh", "${prediction.bmi} kg/m²"),
+                DailyInput("Indeks Massa Tubuh", "${String.format("%.1f", prediction.bmi)} kg/m²"),
                 DailyInput("Hipertensi", if (prediction.isHypertension) "Ya" else "Tidak"),
                 DailyInput("Kolesterol", if (prediction.isCholesterol) "Ya" else "Tidak"),
                 DailyInput("Riwayat Keluarga", if (prediction.isBloodline) "Ya" else "Tidak"),

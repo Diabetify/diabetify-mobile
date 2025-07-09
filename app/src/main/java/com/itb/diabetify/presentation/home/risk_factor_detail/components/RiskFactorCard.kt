@@ -99,27 +99,34 @@ fun RiskFactorCard(
                 }
             }
 
-            if (riskFactor.description != null) {
+            // Explanation
+            val explanationParts = riskFactor.explanation.split(".")
+            val userImpact = explanationParts.getOrNull(0)?.trim().orEmpty()
+            val globalImpact = explanationParts.drop(1).joinToString(".").trim().removePrefix(".")
+
+            if (userImpact.isNotEmpty()) {
                 Text(
-                    text = riskFactor.description,
+                    text = userImpact + if (userImpact.isNotEmpty()) "." else "",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    lineHeight = 22.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+            if (globalImpact.isNotEmpty()) {
+                Text(
+                    text = globalImpact,
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    color = colorResource(id = R.color.primary).copy(alpha = 0.8f),
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    fontSize = 13.sp,
+                    lineHeight = 20.sp,
+                    color = colorResource(id = R.color.primary).copy(alpha = 0.7f),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
-
-            Text(
-                text = riskFactor.explanation,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                lineHeight = 22.sp,
-                color = colorResource(id = R.color.primary),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
 
             // Current and Ideal Values
             Row(

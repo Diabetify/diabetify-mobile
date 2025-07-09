@@ -114,7 +114,7 @@ fun RiskIndicator(
                 fontSize = 14.sp,
                 color = riskColor,
                 lineHeight = 18.sp,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 fontFamily = poppinsFontFamily,
                 textAlign = TextAlign.Center,
             )

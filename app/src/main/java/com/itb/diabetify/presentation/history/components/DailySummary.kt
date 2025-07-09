@@ -146,12 +146,7 @@ private fun RiskPercentageCard(
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
-                    color = when {
-                        riskPercentage <= 35f -> Color(0xFF8BC34A)
-                        riskPercentage <= 55f -> Color(0xFFFFC107)
-                        riskPercentage <= 70f -> Color(0xFFFA821F)
-                        else -> Color(0xFFF44336)
-                    }
+                    color = Color.Black
                 )
                 Text(
                     text = when {
@@ -161,8 +156,8 @@ private fun RiskPercentageCard(
                         else -> "Risiko Sangat Tinggi"
                     },
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
                     color = when {
                         riskPercentage <= 35f -> Color(0xFF8BC34A)
                         riskPercentage <= 55f -> Color(0xFFFFC107)
@@ -256,7 +251,7 @@ private fun RiskFactorItem(
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            color = if (contribution.isPositive) Color(0xFFF44336) else Color(0xFF4CAF50)
+            color = if (contribution.isPositive) Color(0xFFC62828) else Color(0xFF2E7D32)
         )
     }
 }

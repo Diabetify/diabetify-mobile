@@ -2,6 +2,7 @@ package com.itb.diabetify.presentation.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -579,12 +580,17 @@ fun HomeScreen(
 
                                 Box(
                                     modifier = Modifier
-                                        .size(8.dp)
+                                        .size(15.dp)
                                         .offset(
                                             x = (indicatorPosition * totalWidth).coerceAtMost(totalWidth - 8.dp)
                                         )
                                         .clip(CircleShape)
                                         .background(Color.White)
+                                        .border(
+                                            width = 2.dp,
+                                            color = Color(0xFF6B7280),
+                                            shape = CircleShape
+                                        )
                                 )
                             }
 

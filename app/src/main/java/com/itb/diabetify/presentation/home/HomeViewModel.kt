@@ -92,7 +92,6 @@ class HomeViewModel @Inject constructor(
         val name: String,
         val fullName: String,
         val impactPercentage: Double,
-        val description: String? = null,
         val explanation: String,
         val idealValue: String,
         val currentValue: String,
@@ -104,7 +103,6 @@ class HomeViewModel @Inject constructor(
             name = "IMT",
             fullName = "Indeks Massa Tubuh",
             impactPercentage = 0.0,
-            description = "Dihitung dengan rumus: `berat badan (kg) / (tinggi badan (m)²)`",
             explanation = "",
             idealValue = "18.5 - 22.9 kg/m²",
             currentValue = "0.0 kg/m² (Kurus)",
@@ -126,19 +124,14 @@ class HomeViewModel @Inject constructor(
             name = "RBM",
             fullName = "Riwayat Bayi Makrosomia",
             impactPercentage = 0.0,
-            description = "Informasi apakah pengguna pernah melahirkan bayi dengan berat badan lahir di atas 4 kg.",
             explanation = "",
             idealValue = "Tidak",
             currentValue = "Tidak",
-            categories = "• Tidak\n" +
-                    "• Ya\n" +
-                    "• Tidak relevan (pria atau belum pernah hamil)"
         ),
         RiskFactorDetails(
             name = "AF",
             fullName = "Aktivitas Fisik",
             impactPercentage = 0.0,
-            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang.",
             explanation = "",
             idealValue = "7 hari per minggu",
             currentValue = "0 hari per minggu"
@@ -158,15 +151,11 @@ class HomeViewModel @Inject constructor(
             explanation = "",
             idealValue = "Tidak merokok",
             currentValue = "Tidak merokok",
-            categories = "• Tidak merokok\n" +
-                    "• Sudah berhenti merokok\n" +
-                    "• Masih aktif merokok"
         ),
         RiskFactorDetails(
             name = "IB",
             fullName = "Indeks Brinkman",
             impactPercentage = 0.0,
-            description = "Dihitung dengan rumus: `rata-rata rokok per hari x lama merokok (tahun)`.",
             explanation = "",
             idealValue = "0 (tidak merokok)",
             currentValue = "0",
@@ -179,7 +168,6 @@ class HomeViewModel @Inject constructor(
             name = "RK",
             fullName = "Riwayat Keluarga",
             impactPercentage = 0.0,
-            description = "Informasi apakah orang tua kandung pengguna meninggal akibat komplikasi diabetes.",
             explanation = "",
             idealValue = "Tidak",
             currentValue = "Tidak"
@@ -365,7 +353,6 @@ class HomeViewModel @Inject constructor(
                             name = "IMT",
                             fullName = "Indeks Massa Tubuh",
                             impactPercentage = latestPrediction.bmiContribution,
-                            description = "Dihitung dengan rumus: `berat badan (kg) / (tinggi badan (m)²)`",
                             explanation = latestPrediction.bmiExplanation,
                             idealValue = "18.5 - 22.9 kg/m²",
                             currentValue = when {
@@ -393,7 +380,6 @@ class HomeViewModel @Inject constructor(
                             name = "RBM",
                             fullName = "Riwayat Bayi Makrosomia",
                             impactPercentage = latestPrediction.isMacrosomicBabyContribution,
-                            description = "Informasi apakah pengguna pernah melahirkan bayi dengan berat badan lahir di atas 4 kg.",
                             explanation = latestPrediction.isMacrosomicBabyExplanation,
                             idealValue = "Tidak",
                             currentValue = when (latestPrediction.isMacrosomicBaby) {
@@ -402,15 +388,11 @@ class HomeViewModel @Inject constructor(
                                 2 -> "Tidak relevan (pria atau belum pernah hamil)"
                                 else -> "Tidak diketahui"
                             },
-                            categories = "• Tidak\n" +
-                                    "• Ya\n" +
-                                    "• Tidak relevan (pria atau belum pernah hamil)"
                         ),
                         RiskFactorDetails(
                             name = "AF",
                             fullName = "Aktivitas Fisik",
                             impactPercentage = latestPrediction.physicalActivityFrequencyContribution,
-                            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang.",
                             explanation = latestPrediction.physicalActivityFrequencyExplanation,
                             idealValue = "7 hari per minggu",
                             currentValue = "${latestPrediction.physicalActivityFrequency} hari per minggu"
@@ -435,15 +417,11 @@ class HomeViewModel @Inject constructor(
                                 "2" -> "Masih aktif merokok"
                                 else -> "Tidak diketahui"
                             },
-                            categories = "• Tidak merokok\n" +
-                                    "• Sudah berhenti merokok\n" +
-                                    "• Masih aktif merokok"
                         ),
                         RiskFactorDetails(
                             name = "IB",
                             fullName = "Indeks Brinkman",
                             impactPercentage = latestPrediction.brinkmanScoreContribution,
-                            description = "Dihitung dengan rumus: `rata-rata rokok per hari x lama merokok (tahun)`.",
                             explanation = latestPrediction.brinkmanScoreExplanation,
                             idealValue = "0 (Tidak merokok)",
                             currentValue = when {
@@ -461,7 +439,6 @@ class HomeViewModel @Inject constructor(
                             name = "RK",
                             fullName = "Riwayat Keluarga",
                             impactPercentage = latestPrediction.isBloodlineContribution,
-                            description = "Informasi apakah orang tua kandung pengguna meninggal akibat komplikasi diabetes.",
                             explanation = latestPrediction.isBloodlineExplanation,
                             idealValue = "Tidak",
                             currentValue = if (latestPrediction.isBloodline) "Ya" else "Tidak"

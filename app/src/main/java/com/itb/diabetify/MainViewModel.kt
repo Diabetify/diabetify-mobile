@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
     var splashCondition by mutableStateOf(true)
         private set
 
-    var startDestination by mutableStateOf(Route.AppStartNavigation.route)
+    var startDestination by mutableStateOf<String?>(null) // Start as null
         private set
 
     var isConnected by mutableStateOf(true)
@@ -33,34 +33,40 @@ class MainViewModel @Inject constructor(
     private var previousDestination by mutableStateOf(Route.AppStartNavigation.route)
 
     init {
-        connectivityUseCases.observeConnectivity().onEach { connected ->
-            if (!connected && startDestination != Route.NoInternetScreen.route) {
-                previousDestination = startDestination
-                startDestination = Route.NoInternetScreen.route
-            } else if (connected && startDestination == Route.NoInternetScreen.route) {
-                startDestination = previousDestination
-            }
-            isConnected = connected
-        }.launchIn(viewModelScope)
-
         appEntryUseCase.readAppEntry().onEach { shouldStartFromRegisterScreen ->
             val isLoggedIn = tokenManager.isLoggedIn()
             val hasConnection = connectivityUseCases.checkConnectivity()
 
-            startDestination = when {
+            val destination = when {
                 !hasConnection -> Route.NoInternetScreen.route
                 isLoggedIn -> Route.MainNavigation.route
                 shouldStartFromRegisterScreen -> Route.AuthNavigation.route
                 else -> Route.AppStartNavigation.route
             }
 
-            if (startDestination != Route.NoInternetScreen.route) {
-                previousDestination = startDestination
+            startDestination = destination
+
+            if (destination != Route.NoInternetScreen.route) {
+                previousDestination = destination
             }
 
             isConnected = hasConnection
             delay(300)
             splashCondition = false
+
+            observeConnectivity()
+        }.launchIn(viewModelScope)
+    }
+
+    private fun observeConnectivity() {
+        connectivityUseCases.observeConnectivity().onEach { connected ->
+            if (!connected && startDestination != Route.NoInternetScreen.route) {
+                startDestination?.let { previousDestination = it }
+                startDestination = Route.NoInternetScreen.route
+            } else if (connected && startDestination == Route.NoInternetScreen.route) {
+                startDestination = previousDestination
+            }
+            isConnected = connected
         }.launchIn(viewModelScope)
     }
 

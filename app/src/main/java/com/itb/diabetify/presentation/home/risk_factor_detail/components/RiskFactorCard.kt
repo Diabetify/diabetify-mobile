@@ -27,7 +27,6 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
 import com.itb.diabetify.ui.theme.poppinsFontFamily
-import kotlin.math.abs
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -100,15 +99,17 @@ fun RiskFactorCard(
                 }
             }
 
-            Text(
-                text = "Deskripsi: " + riskFactor.description,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                color = colorResource(id = R.color.primary).copy(alpha = 0.8f),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            if (riskFactor.description != null) {
+                Text(
+                    text = riskFactor.description,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = colorResource(id = R.color.primary).copy(alpha = 0.8f),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
 
             Text(
                 text = riskFactor.explanation,

@@ -112,48 +112,48 @@ class PredictionRepositoryImpl (
                         age = prediction.age,
                         ageContribution = ageContribution * 100,
                         ageExplanation = prediction.ageExplanation.ifEmpty {
-                            "TODO"
+                            "Usia Anda adalah faktor utama dalam menilai risiko diabetes Anda. Seiring bertambahnya usia, kemampuan tubuh untuk mengelola gula darah dapat berubah, yang sering kali meningkatkan kerentanan Anda."
                         },
                         bmi = prediction.bmi,
                         bmiContribution = bmiContribution * 100,
                         bmiExplanation = prediction.bmiExplanation.ifEmpty {
-                            "TODO"
+                            "Indeks Massa Tubuh (IMT) Anda adalah ukuran lemak tubuh berdasarkan tinggi dan berat badan. IMT yang lebih tinggi sangat terkait dengan peningkatan risiko terkena diabetes tipe 2."
                         },
                         brinkmanScore = prediction.brinkmanScore,
                         brinkmanScoreContribution = brinkmanContribution * 100,
                         brinkmanScoreExplanation = prediction.brinkmanScoreExplanation.ifEmpty {
-                            "TODO"
+                            "Indeks Brinkman mengukur total paparan Anda terhadap rokok seumur hidup. Skor yang lebih tinggi, yang menandakan kebiasaan merokok yang lebih intens atau lama, berkontribusi pada risiko diabetes yang lebih besar."
                         },
                         isHypertension = prediction.isHypertension,
                         isHypertensionContribution = isHypertensionContribution * 100,
                         isHypertensionExplanation = prediction.isHypertensionExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini menunjukkan apakah Anda telah didiagnosis menderita tekanan darah tinggi (hipertensi). Memiliki hipertensi sangat erat kaitannya dengan resistensi insulin, yang meningkatkan peluang Anda terkena diabetes."
                         },
                         isCholesterol = prediction.isCholesterol,
                         isCholesterolContribution = isCholesterolContribution * 100,
                         isCholesterolExplanation = prediction.isCholesterolExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini mencatat apakah Anda memiliki kadar kolesterol tinggi. Kolesterol tinggi sering kali menyertai faktor risiko lain dan dapat berkontribusi pada kondisi yang mengarah ke diabetes tipe 2."
                         },
                         isBloodline = prediction.isBloodline,
                         isBloodlineContribution = isBloodlineContribution * 100,
                         isBloodlineExplanation = prediction.isBloodlineExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini mencerminkan apakah Anda memiliki riwayat diabetes dalam keluarga langsung (orang tua). Adanya faktor keturunan merupakan salah satu hal yang diketahui dapat meningkatkan risiko Anda."
                         },
                         isMacrosomicBaby = prediction.isMacrosomicBaby,
                         isMacrosomicBabyContribution = isMacrosomicBabyContribution * 100,
                         isMacrosomicBabyExplanation = prediction.isMacrosomicBabyExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini menunjukkan apakah Anda pernah melahirkan bayi dengan berat di atas 4 kg. Riwayat semacam ini bisa menjadi tanda adanya diabetes gestasional saat kehamilan, yang membuat Anda lebih rentan terkena diabetes tipe 2 di kemudian hari."
                         },
                         smokingStatus = prediction.smokingStatus,
                         smokingStatusContribution = smokingStatusContribution * 100,
                         avgSmokeCount = prediction.avgSmokeCount,
                         smokingStatusExplanation = prediction.smokingStatusExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini menjelaskan status merokok Anda saat ini, baik perokok aktif, mantan perokok, atau tidak pernah merokok. Merokok dapat meningkatkan peradangan dan resistensi insulin, sehingga menaikkan risiko diabetes Anda secara keseluruhan."
                         },
                         physicalActivityFrequency = prediction.physicalActivityFrequency,
                         physicalActivityFrequencyContribution = physicalActivityContribution * 100,
                         physicalActivityFrequencyExplanation = prediction.physicalActivityFrequencyExplanation.ifEmpty {
-                            "TODO"
+                            "Faktor ini mengukur seberapa sering Anda melakukan aktivitas fisik dalam seminggu. Olahraga teratur membantu mengontrol berat badan dan meningkatkan cara tubuh menggunakan insulin, sehingga menurunkan risiko diabetes Anda."
                         },
                         createdAt = prediction.createdAt
                     )

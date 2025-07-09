@@ -195,7 +195,6 @@ fun WhatIfResultScreen(
                         1 -> {
                             PieChart(
                                 riskFactors = riskFactors,
-                                centerText = "Faktor\nRisiko",
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

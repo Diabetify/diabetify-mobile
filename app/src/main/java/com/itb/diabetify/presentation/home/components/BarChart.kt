@@ -2,6 +2,8 @@ package com.itb.diabetify.presentation.home.components
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,11 +15,16 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -42,6 +49,18 @@ fun BarChart(
     modifier: Modifier = Modifier,
     animationDuration: Int = 1000
 ) {
+    val context = LocalContext.current
+
+    val poppinsBoldTypeface = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        try {
+            ResourcesCompat.getFont(context, R.font.poppins_bold)
+        } catch (e: Exception) {
+            Typeface.DEFAULT_BOLD
+        }
+    } else {
+        Typeface.DEFAULT_BOLD
+    }
+
     val sortedDescendingEntries = remember(entries) {
         entries.sortedByDescending { abs(it.value) }
     }
@@ -134,6 +153,7 @@ fun BarChart(
                     colors = labelColors
                     valueTextColor = Color.BLACK
                     valueTextSize = 12f
+                    valueTypeface = poppinsBoldTypeface
                     setDrawValues(true)
                     valueFormatter = object : ValueFormatter() {
                         override fun getBarLabel(barEntry: BarEntry?): String {
@@ -168,7 +188,68 @@ fun BarChart(
                 .height(270.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = androidx.compose.ui.graphics.Color(0xFFF9FAFB)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .wrapContentHeight()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(androidx.compose.ui.graphics.Color(0xFF2E7D32)),
+                    )
+
+                    Text(
+                        text = "= Mengurangi Risiko (-)",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        lineHeight = 22.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(androidx.compose.ui.graphics.Color(0xFFC62828)),
+                    )
+
+                    Text(
+                        text = "= Meningkatkan Risiko (+)",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        lineHeight = 22.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -191,6 +272,7 @@ fun BarChart(
                             androidx.compose.ui.graphics.Color(0xFFC62828)
                         },
                         label = entry.label,
+                        abbreviation = entry.abbreviation,
                         value = entry.value
                     )
                 }
@@ -204,6 +286,7 @@ fun BarChart(
 fun LegendItems(
     color: androidx.compose.ui.graphics.Color,
     label: String,
+    abbreviation: String,
     value: Double
 ) {
     Row(
@@ -219,12 +302,20 @@ fun LegendItems(
         )
 
         Text(
-            text = label,
+            buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("")
+                    append(abbreviation)
+                }
+                append(": ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
+                    append(label)
+                }
+            },
             modifier = Modifier
                 .padding(start = 8.dp)
                 .weight(1f),
             fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             color = colorResource(id = R.color.primary)
         )

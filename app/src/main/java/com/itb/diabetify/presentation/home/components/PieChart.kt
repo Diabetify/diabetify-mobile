@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -40,11 +44,11 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 import kotlin.math.abs
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun PieChart(
     riskFactors: List<HomeViewModel.RiskFactor>,
-    centerText: String? = null,
-    holeRadius: Int = 30,
+    holeRadius: Int = 10,
     animationDuration: Int = 1000,
     modifier: Modifier
 ) {
@@ -60,12 +64,41 @@ fun PieChart(
         Typeface.DEFAULT_BOLD
     }
 
-    val sortedRiskFactors = remember(riskFactors) {
-        riskFactors.sortedByDescending { abs(it.percentage) }
+    val processedRiskFactors = remember(riskFactors) {
+        val threshold = 5.0
+        val significantFactors = riskFactors.filter { abs(it.percentage) >= threshold }
+        val minorFactors = riskFactors.filter { abs(it.percentage) < threshold }
+        val positiveMinorFactors = minorFactors.filter { it.percentage > 0 }
+        val negativeMinorFactors = minorFactors.filter { it.percentage < 0 }
+        val result = mutableListOf<HomeViewModel.RiskFactor>()
+        result.addAll(significantFactors)
+        if (positiveMinorFactors.size > 1) {
+            val positiveOthersTotalPercentage = positiveMinorFactors.sumOf { it.percentage }
+            val positiveOthersItem = HomeViewModel.RiskFactor(
+                name = "Others (Positive)",
+                abbreviation = "L+",
+                percentage = positiveOthersTotalPercentage
+            )
+            result.add(positiveOthersItem)
+        } else if (positiveMinorFactors.size == 1) {
+            result.addAll(positiveMinorFactors)
+        }
+        if (negativeMinorFactors.size > 1) {
+            val negativeOthersTotalPercentage = negativeMinorFactors.sumOf { it.percentage }
+            val negativeOthersItem = HomeViewModel.RiskFactor(
+                name = "Others (Negative)",
+                abbreviation = "L-",
+                percentage = negativeOthersTotalPercentage
+            )
+            result.add(negativeOthersItem)
+        } else if (negativeMinorFactors.size == 1) {
+            result.addAll(negativeMinorFactors)
+        }
+        result.sortedByDescending { abs(it.percentage) }
     }
     
-    val dataPercentages = remember(sortedRiskFactors) {
-        sortedRiskFactors.map { it.percentage }
+    val dataPercentages = remember(processedRiskFactors) {
+        processedRiskFactors.map { it.percentage }
     }
     
     val maxPositiveValue = remember(dataPercentages) {
@@ -114,17 +147,9 @@ fun PieChart(
                 }
             },
             update = { chart ->
-                if (centerText != null) {
-                    chart.setDrawCenterText(true)
-                    chart.centerText = centerText
-                    chart.setCenterTextSize(16f)
-                    chart.setCenterTextColor(Color.Black.toArgb())
-                    chart.setCenterTextTypeface(poppinsBoldTypeface)
-                } else {
-                    chart.setDrawCenterText(false)
-                }
+                chart.setDrawCenterText(false)
 
-                val entries = sortedRiskFactors.map { riskFactor ->
+                val entries = processedRiskFactors.map { riskFactor ->
                     PieEntry(abs(riskFactor.percentage.toFloat()), riskFactor.name)
                 }
 
@@ -139,13 +164,13 @@ fun PieChart(
                         @SuppressLint("DefaultLocale")
                         override fun getFormattedValue(value: Float): String {
                             val index = entries.indexOfFirst { it.value == value }
-                            val originalValue = sortedRiskFactors[index].percentage
+                            val originalValue = processedRiskFactors[index].percentage
                             return String.format("%.1f", originalValue)
                         }
 
                         override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
                             val fullName = pieEntry?.label ?: ""
-                            return sortedRiskFactors.find { it.name == fullName }?.abbreviation ?: ""
+                            return processedRiskFactors.find { it.name == fullName }?.abbreviation ?: ""
                         }
                     }
                 }
@@ -168,7 +193,7 @@ fun PieChart(
                 .height(270.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -183,12 +208,199 @@ fun PieChart(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .wrapContentHeight()
             ) {
-                sortedRiskFactors.forEach { riskFactor ->
-                    LegendItem(
-                        color = Color(chartColors[sortedRiskFactors.indexOf(riskFactor)]),
-                        label = riskFactor.name,
-                        value = riskFactor.percentage
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(Color(0xFF2E7D32)),
                     )
+
+                    Text(
+                        text = "= Mengurangi Risiko (-)",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        lineHeight = 22.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(androidx.compose.ui.graphics.Color(0xFFC62828)),
+                    )
+
+                    Text(
+                        text = "= Meningkatkan Risiko (+)",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        lineHeight = 22.sp,
+                        color = colorResource(id = R.color.primary)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFF9FAFB)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .wrapContentHeight()
+            ) {
+                val threshold = 5.0
+                val minorPositive = riskFactors.filter { it.percentage > 0 && abs(it.percentage) < threshold }
+                val minorNegative = riskFactors.filter { it.percentage < 0 && abs(it.percentage) < threshold }
+                val significant = riskFactors.filter { abs(it.percentage) >= threshold }
+
+                significant.sortedByDescending { abs(it.percentage) }.forEach { riskFactor ->
+                    val colorIndex = processedRiskFactors.indexOfFirst { it.name == riskFactor.name }
+                    val abbreviation = riskFactor.abbreviation
+                    if (colorIndex >= 0) {
+                        LegendItem(
+                            color = Color(chartColors[colorIndex]),
+                            label = riskFactor.name,
+                            abbreviation = abbreviation,
+                            value = riskFactor.percentage
+                        )
+                    }
+                }
+
+                if (minorPositive.isNotEmpty()) {
+                    val colorIndex = processedRiskFactors.indexOfFirst { it.name == "Others (Positive)" }
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("L+")
+                            }
+                            append(": ")
+                            withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
+                                append("Lainnya (meningkatkan risiko)")
+                            }
+                        },
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+                    )
+                    minorPositive.forEach { riskFactor ->
+                        if (colorIndex >= 0) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 12.dp, bottom = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .background(Color(chartColors[colorIndex]))
+                                )
+                                Text(
+                                    text = riskFactor.name,
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                        .weight(1f),
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 12.sp,
+                                    color = colorResource(id = R.color.primary)
+                                )
+                                Text(
+                                    text = when {
+                                        abs(riskFactor.percentage) < 0.000001 -> "${String.format("%.1f", riskFactor.percentage)}%"
+                                        riskFactor.percentage > 0 -> "+${String.format("%.1f", riskFactor.percentage)}%"
+                                        else -> "${String.format("%.1f", riskFactor.percentage)}%"
+                                    },
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = if (riskFactor.percentage > 0) Color(0xFFC62828) else Color(0xFF2E7D32),
+                                    modifier = Modifier
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (minorNegative.isNotEmpty()) {
+                    val colorIndex = processedRiskFactors.indexOfFirst { it.name == "Others (Negative)" }
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("L-")
+                            }
+                            append(": ")
+                            withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
+                                append("Lainnya (menurunkan risiko)")
+                            }
+                        },
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+                    )
+                    minorNegative.forEach { riskFactor ->
+                        if (colorIndex >= 0) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 12.dp, bottom = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .background(Color(chartColors[colorIndex]))
+                                )
+                                Text(
+                                    text = riskFactor.name,
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                        .weight(1f),
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 12.sp,
+                                    color = colorResource(id = R.color.primary)
+                                )
+                                Text(
+                                    text = when {
+                                        abs(riskFactor.percentage) < 0.000001 -> "${String.format("%.1f", riskFactor.percentage)}%"
+                                        riskFactor.percentage > 0 -> "+${String.format("%.1f", riskFactor.percentage)}%"
+                                        else -> "${String.format("%.1f", riskFactor.percentage)}%"
+                                    },
+                                    fontFamily = poppinsFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = if (riskFactor.percentage > 0) Color(0xFFC62828) else Color(0xFF2E7D32),
+                                    modifier = Modifier
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -200,6 +412,7 @@ fun PieChart(
 fun LegendItem(
     color: Color,
     label: String,
+    abbreviation: String,
     value: Double
 ) {
     Row(
@@ -215,13 +428,22 @@ fun LegendItem(
         )
 
         Text(
-            text = label,
+            buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("")
+                    append(abbreviation)
+                }
+                append(": ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
+                    append(label)
+                }
+            },
             modifier = Modifier
                 .padding(start = 8.dp)
                 .weight(1f),
             fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
+            lineHeight = 12.sp,
             color = colorResource(id = R.color.primary)
         )
 

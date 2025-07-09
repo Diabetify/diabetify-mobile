@@ -236,30 +236,10 @@ fun SummarySection(riskFactors: List<HomeViewModel.RiskFactor>) {
                 1 -> {
                     PieChart(
                         riskFactors = riskFactors,
-                        centerText = "Faktor\nRisiko",
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Penjelasan:",
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = colorResource(id = R.color.primary)
-            )
-
-            Text(
-                text = "🟢 Hijau = Menurunkan risiko (faktor pelindung)\n🔴 Merah = Meningkatkan risiko (faktor berbahaya)",
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                lineHeight = 22.sp,
-                color = colorResource(id = R.color.primary)
-            )
         }
     }
 }

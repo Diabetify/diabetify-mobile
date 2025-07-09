@@ -171,7 +171,8 @@ fun AuthNavGraph(
                 route = Route.MainScreen.route
             ) {
                 MainNavGraph(
-                    navController = navController
+                    navController = navController,
+                    onRetryConnection = onRetryConnection
                 )
             }
         }

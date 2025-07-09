@@ -236,8 +236,6 @@ class HomeViewModel @Inject constructor(
     val physicalActivityToday: State<Int> = _physicalActivityToday
 
     private var isOnRiskFactorDetailScreen = false
-    private var hasUnprocessedPredictionUpdate = false
-    private var hasLoadedExplanationsOnce = false
     
     // Loading state tracking
     private var isUserDataLoaded = false
@@ -252,14 +250,6 @@ class HomeViewModel @Inject constructor(
         loadLatestPredictionData()
         loadActivityTodayData()
         loadProfileData()
-        
-        PredictionUpdateNotifier.addListener {
-            hasUnprocessedPredictionUpdate = true
-            if (isOnRiskFactorDetailScreen) {
-                loadExplanationData()
-                hasUnprocessedPredictionUpdate = false
-            }
-        }
     }
 
     // Use Case Calls
@@ -612,7 +602,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadExplanationData() {
+    fun loadExplanationData() {
         viewModelScope.launch {
             _explainPredictionState.value = explainPredictionState.value.copy(isLoading = true)
 
@@ -635,16 +625,6 @@ class HomeViewModel @Inject constructor(
                     Log.e("HomeViewModel", "Unexpected error loading explanation data")
                 }
             }
-        }
-    }
-
-    fun loadRiskFactorExplanations() {
-        isOnRiskFactorDetailScreen = true
-
-        if (!hasLoadedExplanationsOnce || hasUnprocessedPredictionUpdate) {
-            loadExplanationData()
-            hasUnprocessedPredictionUpdate = false
-            hasLoadedExplanationsOnce = true
         }
     }
 
@@ -692,10 +672,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onRiskFactorDetailScreenExit() {
-        isOnRiskFactorDetailScreen = false
-    }
-
     fun onNavigationHandled() {
         _navigationEvent.value = null
     }
@@ -706,16 +682,5 @@ class HomeViewModel @Inject constructor(
 
     fun onSuccessShown() {
         _successMessage.value = null
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        PredictionUpdateNotifier.removeListener {
-            hasUnprocessedPredictionUpdate = true
-            if (isOnRiskFactorDetailScreen) {
-                loadExplanationData()
-                hasUnprocessedPredictionUpdate = false
-            }
-        }
     }
 }

@@ -43,6 +43,7 @@ import com.itb.diabetify.presentation.settings.SettingsScreen
 import com.itb.diabetify.presentation.settings.SettingsViewModel
 import com.itb.diabetify.presentation.settings.edit_profile.EditProfileScreen
 import com.itb.diabetify.presentation.navbar.add_activity.AddActivityViewModel
+import com.itb.diabetify.presentation.no_internet.NoInternetScreen
 import com.itb.diabetify.presentation.register.RegisterViewModel
 import com.itb.diabetify.presentation.survey.SurveyScreen
 import com.itb.diabetify.presentation.survey.SurveyViewModel
@@ -54,6 +55,7 @@ import com.itb.diabetify.presentation.whatif.WhatIfViewModel
 @Composable
 fun MainNavGraph(
     navController: NavController,
+    onRetryConnection: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navigationViewModel: NavigationViewModel = hiltViewModel()
@@ -144,9 +146,7 @@ fun MainNavGraph(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Route.HomeScreen.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.MainNavigation.route)
-                )
+                val homeViewModel: HomeViewModel = hiltViewModel()
                 HomeScreen(
                     navController = mainNavController,
                     viewModel = homeViewModel,
@@ -173,7 +173,7 @@ fun MainNavGraph(
 
             composable(route = Route.RiskDetailScreen.route) {
                 val homeViewModel: HomeViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.MainNavigation.route)
+                    mainNavController.getBackStackEntry(Route.HomeScreen.route)
                 )
                 RiskDetailScreen(
                     navController = mainNavController,
@@ -183,7 +183,7 @@ fun MainNavGraph(
 
             composable(route = Route.RiskFactorDetailScreen.route) {
                 val homeViewModel: HomeViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.MainNavigation.route)
+                    mainNavController.getBackStackEntry(Route.HomeScreen.route)
                 )
                 RiskFactorDetailScreen(
                     navController = mainNavController,
@@ -192,9 +192,7 @@ fun MainNavGraph(
             }
 
             composable(route = Route.WhatIfScreen.route) {
-                val whatIfViewModel: WhatIfViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.MainNavigation.route)
-                )
+                val whatIfViewModel: WhatIfViewModel = hiltViewModel()
                 WhatIfScreen(
                     navController = mainNavController,
                     viewModel = whatIfViewModel
@@ -203,7 +201,7 @@ fun MainNavGraph(
 
             composable(route = Route.WhatIfResultScreen.route) {
                 val whatIfViewModel: WhatIfViewModel = hiltViewModel(
-                    navController.getBackStackEntry(Route.MainNavigation.route)
+                    mainNavController.getBackStackEntry(Route.WhatIfScreen.route)
                 )
                 WhatIfResultScreen(
                     navController = mainNavController,
@@ -270,6 +268,13 @@ fun MainNavGraph(
                 EditProfileScreen(
                     navController = mainNavController,
                     viewModel = settingsViewModel,
+                )
+            }
+
+            composable(route = Route.NoInternetScreen.route) {
+                NoInternetScreen(
+                    navController = mainNavController,
+                    onRetryClicked = onRetryConnection
                 )
             }
         }

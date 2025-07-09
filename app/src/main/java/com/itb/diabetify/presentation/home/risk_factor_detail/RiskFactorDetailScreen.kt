@@ -38,8 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.itb.diabetify.R
+import com.itb.diabetify.presentation.common.ErrorNotification
 import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.components.BarChart
 import com.itb.diabetify.presentation.home.components.BarChartEntry
@@ -53,98 +55,107 @@ fun RiskFactorDetailScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
+    val errorMessage = viewModel.errorMessage.value
     val isLoading = viewModel.latestPredictionState.value.isLoading || viewModel.explainPredictionState.value.isLoading
     val scrollState = rememberScrollState()
     val sortedRiskFactorDetails = viewModel.riskFactorDetails.value
         .sortedByDescending { abs(it.impactPercentage) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadRiskFactorExplanations()
-    }
-    
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.onRiskFactorDetailScreenExit()
-        }
+        viewModel.loadExplanationData()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp)
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            IconButton(
-                modifier = Modifier.align(Alignment.CenterStart),
-                onClick = { navController.popBackStack() }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = colorResource(id = R.color.primary)
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    onClick = { navController.popBackStack() }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = colorResource(id = R.color.primary)
+                    )
+                }
+
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "Perhitungan faktor risiko",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = colorResource(id = R.color.primary)
                 )
             }
 
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = "Perhitungan faktor risiko",
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = colorResource(id = R.color.primary)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
-        ) {
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp)
+            ) {
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(50.dp),
-                            color = colorResource(id = R.color.primary)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = if (viewModel.explainPredictionState.value.isLoading) {
-                                "Memuat penjelasan..."
-                            } else {
-                                "Memuat data..."
-                            },
-                            fontFamily = poppinsFontFamily,
-                            fontSize = 14.sp,
-                            color = colorResource(id = R.color.primary),
-                            textAlign = TextAlign.Center
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(50.dp),
+                                color = colorResource(id = R.color.primary)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = if (viewModel.explainPredictionState.value.isLoading) {
+                                    "Memuat penjelasan..."
+                                } else {
+                                    "Memuat data..."
+                                },
+                                fontFamily = poppinsFontFamily,
+                                fontSize = 14.sp,
+                                color = colorResource(id = R.color.primary),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    SummarySection(viewModel.riskFactors.value)
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    sortedRiskFactorDetails.forEach { factor ->
+                        RiskFactorCard(
+                            riskFactor = factor,
+                            riskFactors = viewModel.riskFactors.value
                         )
                     }
                 }
-            } else {
-                SummarySection(viewModel.riskFactors.value)
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                sortedRiskFactorDetails.forEach { factor ->
-                    RiskFactorCard(
-                        riskFactor = factor,
-                        riskFactors = viewModel.riskFactors.value
-                    )
-                }
             }
         }
+
+        // Error notification
+        ErrorNotification(
+            showError = errorMessage != null,
+            errorMessage = errorMessage,
+            onDismiss = { viewModel.onErrorShown() },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1000f)
+        )
     }
 }
 

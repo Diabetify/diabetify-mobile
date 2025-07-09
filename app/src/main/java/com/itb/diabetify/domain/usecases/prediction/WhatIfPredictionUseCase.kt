@@ -9,6 +9,7 @@ class WhatIfPredictionUseCase(
 ) {
     suspend operator fun invoke(
         smokingStatus: Int,
+        yearsOfSmoking: Int,
         avgSmokeCount: Int,
         weight: Int,
         isHypertension: Boolean,
@@ -16,6 +17,7 @@ class WhatIfPredictionUseCase(
         isCholesterol: Boolean,
     ): WhatIfPredictionResult {
         val smokingStatusError: String? = if (smokingStatus < 0 || smokingStatus > 2) "Status merokok tidak valid" else null
+        val yearsOfSmokingError: String? = if (yearsOfSmoking < 0 || yearsOfSmoking > 70) "Lama merokok tidak valid" else null
         val avgSmokeCountError: String? = if (avgSmokeCount < 0 || avgSmokeCount > 60) "Jumlah rokok tidak valid" else null
         val weightError: String? = if (weight < 30 || weight > 300) "Berat badan tidak valid" else null
         val physicalActivityFrequencyError = if (physicalActivityFrequency < 0 || physicalActivityFrequency > 7) "Frekuensi aktivitas fisik tidak valid" else null
@@ -23,6 +25,12 @@ class WhatIfPredictionUseCase(
         if (smokingStatusError != null) {
             return WhatIfPredictionResult(
                 smokingStatusError = smokingStatusError
+            )
+        }
+
+        if (yearsOfSmokingError != null) {
+            return WhatIfPredictionResult(
+                yearsOfSmokingError = yearsOfSmokingError
             )
         }
 
@@ -46,6 +54,7 @@ class WhatIfPredictionUseCase(
 
         val whatIfPredictionResult = WhatIfPredictionRequest(
             smokingStatus = smokingStatus,
+            yearsOfSmoking = yearsOfSmoking,
             avgSmokeCount = avgSmokeCount,
             weight = weight,
             isHypertension = isHypertension,

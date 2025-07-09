@@ -55,12 +55,13 @@ fun WhatIfScreen(
     val age by viewModel.age
     val macrosomicBaby by viewModel.macrosomicBaby
     val isBloodline by viewModel.isBloodline
-    val smokingStatus by viewModel.smokingStatusFieldState
-    val averageCigarettes by viewModel.averageCigarettesFieldState
-    val weight by viewModel.weightFieldState
-    val isHypertension by viewModel.isHypertensionFieldState
-    val physicalActivityFrequency by viewModel.physicalActivityFieldState
-    val isCholesterol by viewModel.isCholesterolFieldState
+    val smokingStatusFieldState by viewModel.smokingStatusFieldState
+    val yearsOfSmokingFieldState by viewModel.yearsOfSmokingFieldState
+    val averageCigarettesFieldState by viewModel.averageCigarettesFieldState
+    val weightFieldState by viewModel.weightFieldState
+    val isHypertensionFieldState by viewModel.isHypertensionFieldState
+    val physicalActivityFrequencyFieldState by viewModel.physicalActivityFieldState
+    val isCholesterolFieldState by viewModel.isCholesterolFieldState
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
     val isLoading = viewModel.whatIfPredictionState.value.isLoading
@@ -249,7 +250,7 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 DropdownField(
-                    selectedOption = when (smokingStatus.text) {
+                    selectedOption = when (smokingStatusFieldState.text) {
                         "0" -> "Tidak Pernah Merokok"
                         "1" -> "Berhenti Merokok"
                         "2" -> "Aktif Merokok"
@@ -272,14 +273,35 @@ fun WhatIfScreen(
                     placeHolderText = "Status merokok",
                     iconResId = R.drawable.ic_smoking,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = smokingStatus.error != null,
-                    errorMessage = smokingStatus.error ?: ""
+                    isError = smokingStatusFieldState.error != null,
+                    errorMessage = smokingStatusFieldState.error ?: ""
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Years of Smoking
+                Text(
+                    text = "Berapa lama merokok (tahun)",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = colorResource(id = R.color.primary),
+                )
+                InputField(
+                    value = yearsOfSmokingFieldState.text,
+                    onValueChange = { viewModel.setYearsOfSmoking(it) },
+                    placeholderText = "Berapa lama merokok (tahun)",
+                    iconResId = R.drawable.ic_calendar,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = yearsOfSmokingFieldState.error != null,
+                    errorMessage = yearsOfSmokingFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Average cigarettes
-                if (smokingStatus.text.toInt() > 0) {
+                if (smokingStatusFieldState.text.toInt() > 0) {
                     Text(
                         text = "Rata-rata rokok per hari (batang)",
                         fontFamily = poppinsFontFamily,
@@ -288,14 +310,14 @@ fun WhatIfScreen(
                         color = colorResource(id = R.color.primary),
                     )
                     InputField(
-                        value = averageCigarettes.text,
+                        value = averageCigarettesFieldState.text,
                         onValueChange = { viewModel.setAverageCigarettes(it) },
                         placeholderText = "Rata-rata rokok per hari (batang)",
                         iconResId = R.drawable.ic_smoking,
                         keyboardType = KeyboardType.Number,
                         modifier = Modifier.fillMaxWidth(),
-                        isError = averageCigarettes.error != null,
-                        errorMessage = averageCigarettes.error ?: ""
+                        isError = averageCigarettesFieldState.error != null,
+                        errorMessage = averageCigarettesFieldState.error ?: ""
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -310,14 +332,14 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 InputField(
-                    value = weight.text,
+                    value = weightFieldState.text,
                     onValueChange = { viewModel.setWeight(it) },
                     placeholderText = "Berat badan (kg)",
                     iconResId = R.drawable.ic_weight,
                     keyboardType = KeyboardType.Decimal,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = weight.error != null,
-                    errorMessage = weight.error ?: ""
+                    isError = weightFieldState.error != null,
+                    errorMessage = weightFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -331,7 +353,7 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 DropdownField(
-                    selectedOption = if (isHypertension.text == "true") "Ya" else "Tidak",
+                    selectedOption = if (isHypertensionFieldState.text == "true") "Ya" else "Tidak",
                     onOptionSelected = { selectedText ->
                         viewModel.setIsHypertension((selectedText == "Ya").toString())
                     },
@@ -339,8 +361,8 @@ fun WhatIfScreen(
                     placeHolderText = "Hipertensi",
                     iconResId = R.drawable.ic_hypertension,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = isHypertension.error != null,
-                    errorMessage = isHypertension.error ?: ""
+                    isError = isHypertensionFieldState.error != null,
+                    errorMessage = isHypertensionFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -354,14 +376,14 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 InputField(
-                    value = physicalActivityFrequency.text,
+                    value = physicalActivityFrequencyFieldState.text,
                     onValueChange = { viewModel.setPhysicalActivity(it) },
                     placeholderText = "Aktivitas fisik per minggu (hari)",
                     iconResId = R.drawable.ic_walk,
                     keyboardType = KeyboardType.Number,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = physicalActivityFrequency.error != null,
-                    errorMessage = physicalActivityFrequency.error ?: ""
+                    isError = physicalActivityFrequencyFieldState.error != null,
+                    errorMessage = physicalActivityFrequencyFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -375,7 +397,7 @@ fun WhatIfScreen(
                     color = colorResource(id = R.color.primary),
                 )
                 DropdownField(
-                    selectedOption = if (isCholesterol.text == "true") "Ya" else "Tidak",
+                    selectedOption = if (isCholesterolFieldState.text == "true") "Ya" else "Tidak",
                     onOptionSelected = { selectedText ->
                         viewModel.setIsCholesterol((selectedText == "Ya").toString())
                     },
@@ -383,8 +405,8 @@ fun WhatIfScreen(
                     placeHolderText = "Kolesterol",
                     iconResId = R.drawable.ic_cholesterol,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = isCholesterol.error != null,
-                    errorMessage = isCholesterol.error ?: ""
+                    isError = isCholesterolFieldState.error != null,
+                    errorMessage = isCholesterolFieldState.error ?: ""
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

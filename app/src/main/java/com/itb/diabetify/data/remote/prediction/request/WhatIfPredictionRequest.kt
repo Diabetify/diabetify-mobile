@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class WhatIfPredictionRequest (
     @SerializedName("smoking_status")
     val smokingStatus: Int,
+    @SerializedName("years_of_smoking")
+    val yearsOfSmoking: Int,
     @SerializedName("avg_smoke_count")
     val avgSmokeCount: Int,
     @SerializedName("weight")

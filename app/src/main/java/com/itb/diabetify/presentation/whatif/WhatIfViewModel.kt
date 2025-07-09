@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactor
 import com.itb.diabetify.util.DataState
@@ -23,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WhatIfViewModel @Inject constructor(
     private val predictionUseCases: PredictionUseCases,
-    private val profileUseCases: ProfileUseCases
+    private val profileUseCases: ProfileUseCases,
 ): ViewModel() {
     // Navigation and Error States
     private val _navigationEvent = mutableStateOf<String?>(null)
@@ -65,6 +66,9 @@ class WhatIfViewModel @Inject constructor(
     private val _age = mutableIntStateOf(0)
     val age: State<Int> = _age
 
+    private val _yearsOfSmoking = mutableIntStateOf(0)
+    val yearsOfSmoking: State<Int> = _yearsOfSmoking
+
     private val _macrosomicBaby = mutableIntStateOf(0)
     val macrosomicBaby: State<Int> = _macrosomicBaby
 
@@ -74,6 +78,9 @@ class WhatIfViewModel @Inject constructor(
     // Field States
     private val _smokingStatusFieldState = mutableStateOf(FieldState())
     val smokingStatusFieldState: State<FieldState> = _smokingStatusFieldState
+
+    private val _yearsOfSmokingFieldState = mutableStateOf(FieldState())
+    val yearsOfSmokingFieldState: State<FieldState> = _yearsOfSmokingFieldState
 
     private val _averageCigarettesFieldState = mutableStateOf(FieldState())
     val averageCigarettesFieldState: State<FieldState> = _averageCigarettesFieldState
@@ -100,6 +107,11 @@ class WhatIfViewModel @Inject constructor(
     fun setSmokingStatus(value: String) {
         _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = null)
         _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(text = value)
+    }
+
+    fun setYearsOfSmoking(value: String) {
+        _yearsOfSmokingFieldState.value = yearsOfSmokingFieldState.value.copy(error = null)
+        _yearsOfSmokingFieldState.value = yearsOfSmokingFieldState.value.copy(text = value)
     }
 
     fun setAverageCigarettes(value: String) {
@@ -133,6 +145,17 @@ class WhatIfViewModel @Inject constructor(
 
         if (smokingStatusFieldState.value.text.isBlank()) {
             _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = "Status merokok tidak boleh kosong")
+            isValid = false
+        }
+
+        if (yearsOfSmokingFieldState.value.text.isBlank()) {
+            _yearsOfSmokingFieldState.value = yearsOfSmokingFieldState.value.copy(error = "Lama merokok tidak boleh kosong")
+            isValid = false
+        } else if (yearsOfSmokingFieldState.value.text.toInt() < 0 || yearsOfSmokingFieldState.value.text.toInt() > 70) {
+            _yearsOfSmokingFieldState.value = yearsOfSmokingFieldState.value.copy(error = "Lama merokok harus antara 0-70 tahun")
+            isValid = false
+        } else if (yearsOfSmokingFieldState.value.text.toInt() < _yearsOfSmoking.intValue) {
+            _yearsOfSmokingFieldState.value = yearsOfSmokingFieldState.value.copy(error = "Lama merokok tidak boleh kurang dari lama merokok yang Anda miliki saat ini")
             isValid = false
         }
 
@@ -200,6 +223,20 @@ class WhatIfViewModel @Inject constructor(
                 _profileState.value = profileState.value.copy(isLoading = false)
 
                 profile?.let {
+                    if (it.ageOfSmoking == 0 && it.ageOfStopSmoking == 0) {
+                        _yearsOfSmoking.intValue = 0
+                    } else if (it.ageOfSmoking != 0 && it.ageOfStopSmoking != 0) {
+                        _yearsOfSmoking.intValue = it.ageOfStopSmoking - it.ageOfSmoking
+                    } else if (it.ageOfSmoking != 0) {
+                        _yearsOfSmoking.intValue = _age.intValue - it.ageOfSmoking
+                    } else {
+                        _yearsOfSmoking.intValue = 0
+                    }
+                    _yearsOfSmokingFieldState.value = FieldState(
+                        text = _yearsOfSmoking.intValue.toString(),
+                        error = null
+                    )
+
                     _macrosomicBaby.intValue = it.macrosomicBaby
                     _isBloodline.value = it.bloodline
 
@@ -226,7 +263,8 @@ class WhatIfViewModel @Inject constructor(
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
 
             val smokingStatus = smokingStatusFieldState.value.text.toInt()
-            val averageCigarettes = averageCigarettesFieldState.value.text.toInt()
+            val yearsOfSmoking = yearsOfSmokingFieldState.value.text.toIntOrNull() ?: 0
+            val averageCigarettes = averageCigarettesFieldState.value.text.toIntOrNull() ?: 0
             val weight = weightFieldState.value.text.toInt()
             val isHypertension = isHypertensionFieldState.value.text.toBoolean()
             val physicalActivity = physicalActivityFieldState.value.text.toInt()
@@ -234,6 +272,7 @@ class WhatIfViewModel @Inject constructor(
 
             val whatIfPredictionResult = predictionUseCases.whatIfPrediction(
                 smokingStatus = smokingStatus,
+                yearsOfSmoking = yearsOfSmoking,
                 avgSmokeCount = averageCigarettes,
                 weight = weight,
                 isHypertension = isHypertension,

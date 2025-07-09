@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.itb.diabetify.R
-import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.home.components.BarChartEntry
 import com.itb.diabetify.presentation.home.components.BarChart
 import com.itb.diabetify.presentation.home.components.HomeCard
@@ -45,7 +44,6 @@ import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.RiskCategory
 import com.itb.diabetify.presentation.home.components.getRiskCategoryColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryDescription
-import com.itb.diabetify.presentation.navgraph.Route
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
@@ -199,31 +197,6 @@ fun WhatIfResultScreen(
                             )
                         }
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Home Button
-                    PrimaryButton(
-                        text = "Beranda",
-                        onClick = {
-                            navController.navigate(Route.HomeScreen.route) {
-                                popUpTo(Route.WhatIfScreen.route) { inclusive = true }
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(50.dp)
-                    )
                 }
             }
 

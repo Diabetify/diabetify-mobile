@@ -239,7 +239,7 @@ fun PieChart(
                     Box(
                         modifier = Modifier
                             .size(20.dp)
-                            .background(androidx.compose.ui.graphics.Color(0xFFC62828)),
+                            .background(Color(0xFFC62828)),
                     )
 
                     Text(
@@ -287,7 +287,7 @@ fun PieChart(
                     }
                 }
 
-                if (minorPositive.isNotEmpty()) {
+                if (minorPositive.size > 1) {
                     val colorIndex = processedRiskFactors.indexOfFirst { it.name == "Others (Positive)" }
                     Text(
                         buildAnnotatedString {
@@ -310,12 +310,12 @@ fun PieChart(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 12.dp, bottom = 4.dp),
+                                    .padding(start = 24.dp, bottom = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(16.dp)
+                                        .size(12.dp)
                                         .background(Color(chartColors[colorIndex]))
                                 )
                                 Text(
@@ -343,9 +343,20 @@ fun PieChart(
                             }
                         }
                     }
+                } else if (minorPositive.size == 1) {
+                    val riskFactor = minorPositive.first()
+                    val colorIndex = processedRiskFactors.indexOfFirst { it.name == riskFactor.name }
+                    if (colorIndex >= 0) {
+                        LegendItem(
+                            color = Color(chartColors[colorIndex]),
+                            label = riskFactor.name,
+                            abbreviation = riskFactor.abbreviation,
+                            value = riskFactor.percentage
+                        )
+                    }
                 }
 
-                if (minorNegative.isNotEmpty()) {
+                if (minorNegative.size > 1) {
                     val colorIndex = processedRiskFactors.indexOfFirst { it.name == "Others (Negative)" }
                     Text(
                         buildAnnotatedString {
@@ -368,12 +379,12 @@ fun PieChart(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 12.dp, bottom = 4.dp),
+                                    .padding(start = 24.dp, bottom = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(16.dp)
+                                        .size(12.dp)
                                         .background(Color(chartColors[colorIndex]))
                                 )
                                 Text(
@@ -400,6 +411,17 @@ fun PieChart(
                                 )
                             }
                         }
+                    }
+                } else if (minorNegative.size == 1) {
+                    val riskFactor = minorNegative.first()
+                    val colorIndex = processedRiskFactors.indexOfFirst { it.name == riskFactor.name }
+                    if (colorIndex >= 0) {
+                        LegendItem(
+                            color = Color(chartColors[colorIndex]),
+                            label = riskFactor.name,
+                            abbreviation = riskFactor.abbreviation,
+                            value = riskFactor.percentage
+                        )
                     }
                 }
             }

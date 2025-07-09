@@ -14,6 +14,8 @@ data class GetPredictionResponse (
 data class PredictionData(
     @SerializedName("risk_score")
     val riskScore: Double,
+    @SerializedName("prediction_summary")
+    val predictionSummary: String,
     @SerializedName("age")
     val age: Int,
     @SerializedName("age_contribution")

@@ -111,6 +111,37 @@ fun RiskFactorDetailScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    val predictionSummary by viewModel.predictionSummary
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Ringkasan Prediksi",
+                                fontFamily = poppinsFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.primary)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = predictionSummary,
+                                fontFamily = poppinsFontFamily,
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                        }
+                    }
+
                     sortedRiskFactorDetails.forEach { factor ->
                         RiskFactorCard(
                             riskFactor = factor,

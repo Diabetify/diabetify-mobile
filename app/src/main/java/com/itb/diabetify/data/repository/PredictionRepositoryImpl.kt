@@ -54,6 +54,7 @@ class PredictionRepositoryImpl (
                 predictionManager.savePrediction(
                     Prediction(
                         riskScore = 0.0,
+                        predictionSummary = "",
                         age = 0,
                         ageContribution = 0.0,
                         ageExplanation = "",
@@ -109,6 +110,9 @@ class PredictionRepositoryImpl (
                 predictionManager.savePrediction(
                     Prediction(
                         riskScore = prediction.riskScore * 100,
+                        predictionSummary = prediction.predictionSummary.ifEmpty {
+                            "Prediksi ini didasarkan pada faktor-faktor risiko yang telah Anda berikan. Silakan periksa faktor-faktor tersebut untuk memahami lebih lanjut tentang risiko diabetes Anda."
+                        },
                         age = prediction.age,
                         ageContribution = ageContribution * 100,
                         ageExplanation = prediction.ageExplanation.ifEmpty {

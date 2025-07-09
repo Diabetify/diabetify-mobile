@@ -2,6 +2,7 @@ package com.itb.diabetify.domain.model
 
 data class Prediction (
     val riskScore: Double,
+    val predictionSummary: String,
     val age: Int,
     val ageContribution: Double,
     val ageExplanation: String,

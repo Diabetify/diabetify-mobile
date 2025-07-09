@@ -183,6 +183,9 @@ class HomeViewModel @Inject constructor(
     ))
     val riskFactorDetails: State<List<RiskFactorDetails>> = _riskFactorDetails
 
+    private val _predictionSummary = mutableStateOf("")
+    val predictionSummary: State<String> = _predictionSummary
+
     private val _isHypertension = mutableStateOf(false)
     val isHypertension: State<Boolean> = _isHypertension
 
@@ -453,6 +456,7 @@ class HomeViewModel @Inject constructor(
                         )
                     )
 
+                    _predictionSummary.value = latestPrediction.predictionSummary
                     _smokingStatus.value = latestPrediction.smokingStatus
                     _smokeAverage.intValue = latestPrediction.avgSmokeCount
                     _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency

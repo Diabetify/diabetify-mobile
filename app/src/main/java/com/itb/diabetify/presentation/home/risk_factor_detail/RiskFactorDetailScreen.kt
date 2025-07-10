@@ -137,6 +137,7 @@ fun RiskFactorDetailScreen(
                                 text = predictionSummary,
                                 fontFamily = poppinsFontFamily,
                                 fontSize = 14.sp,
+                                lineHeight = 22.sp,
                                 color = Color(0xFF6B7280)
                             )
                         }

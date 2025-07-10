@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,12 +51,12 @@ fun RiskFactorCard(
         )
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
+            // Header Section
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -64,7 +66,6 @@ fun RiskFactorCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Name and Impact Percentage
                 Text(
                     text = "${riskFactor.name}: ${riskFactor.fullName}",
                     fontFamily = poppinsFontFamily,
@@ -77,11 +78,14 @@ fun RiskFactorCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = color.copy(alpha = 0.15f)
-                    )
+                // Impact Badge
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = color.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     val formattedValue = if (riskFactor.impactPercentage >= 0)
                         "+${String.format("%.1f", riskFactor.impactPercentage)}%"
@@ -93,104 +97,132 @@ fun RiskFactorCard(
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        color = color,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        color = color
                     )
                 }
             }
 
-            // Explanation
-            val explanationParts = riskFactor.explanation.split(".")
-            val userImpact = explanationParts.getOrNull(0)?.trim().orEmpty()
-            val globalImpact = explanationParts.drop(1).joinToString(".").trim().removePrefix(".")
-
-            if (userImpact.isNotEmpty()) {
-                Text(
-                    text = userImpact + if (userImpact.isNotEmpty()) "." else "",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
-                    color = colorResource(id = R.color.primary),
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-            }
-            if (globalImpact.isNotEmpty()) {
-                Text(
-                    text = globalImpact,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                    fontSize = 13.sp,
-                    lineHeight = 20.sp,
-                    color = colorResource(id = R.color.primary).copy(alpha = 0.7f),
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-            }
-
-            // Current and Ideal Values
-            Row(
+            // Explanation Section
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .background(
+                        color = colorResource(id = R.color.primary).copy(alpha = 0.03f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(12.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                val explanationParts = riskFactor.explanation.split(Regex("(?<=[a-zA-Z])\\. "))
+                val userImpact = explanationParts.getOrNull(0)?.trim().orEmpty()
+                val globalImpact = explanationParts.drop(1).joinToString(". ").trim()
+
+                if (userImpact.isNotEmpty()) {
+                    Text(
+                        text = userImpact + if (!userImpact.endsWith(".")) "." else "",
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        color = colorResource(id = R.color.primary),
+                        modifier = Modifier.padding(bottom = if (globalImpact.isNotEmpty()) 8.dp else 0.dp)
+                    )
+                }
+
+                if (globalImpact.isNotEmpty()) {
+                    Text(
+                        text = globalImpact,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        color = colorResource(id = R.color.primary).copy(alpha = 0.7f)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HorizontalDivider(
+                color = colorResource(id = R.color.primary).copy(alpha = 0.1f),
+                thickness = 1.dp
+            )
+
+            // Description
+            if (riskFactor.description != null) {
+                Text(
+                    text = riskFactor.description,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp,
+                    color = colorResource(id = R.color.primary).copy(alpha = 0.7f),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Ideal Value
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            color = colorResource(id = R.color.primary).copy(alpha = 0.03f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(12.dp)
+                ) {
                     Text(
                         text = "Nilai Ideal",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontFamily = poppinsFontFamily,
-                        color = colorResource(id = R.color.primary)
+                        color = Color.Black,
+                        modifier = Modifier.padding(bottom = 1.dp)
                     )
 
                     Text(
                         text = riskFactor.idealValue,
                         fontSize = 14.sp,
                         fontFamily = poppinsFontFamily,
-                        lineHeight = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 18.sp,
                         color = colorResource(id = R.color.primary)
                     )
                 }
 
-                Column(modifier = Modifier.weight(1f)) {
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Current Value
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            color = colorResource(id = R.color.primary).copy(alpha = 0.03f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(12.dp)
+                ) {
                     Text(
                         text = "Nilai Anda",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontFamily = poppinsFontFamily,
-                        color = colorResource(id = R.color.primary)
+                        color = Color.Black,
+                        modifier = Modifier.padding(bottom = 1.dp)
                     )
 
                     Text(
                         text = riskFactor.currentValue,
                         fontSize = 14.sp,
                         fontFamily = poppinsFontFamily,
-                        lineHeight = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 18.sp,
                         color = colorResource(id = R.color.primary)
                     )
                 }
-            }
-
-            if (riskFactor.categories != null) {
-                Text(
-                    text = "Kategori: ",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
-                    color = colorResource(id = R.color.primary),
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                Text(
-                    text = "${riskFactor.categories}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
-                    color = colorResource(id = R.color.primary),
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
             }
         }
     }

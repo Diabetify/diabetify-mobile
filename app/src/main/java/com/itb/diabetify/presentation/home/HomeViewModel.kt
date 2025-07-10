@@ -91,30 +91,27 @@ class HomeViewModel @Inject constructor(
     data class RiskFactorDetails(
         val name: String,
         val fullName: String,
+        val description: String? = null,
         val impactPercentage: Double,
         val explanation: String,
         val idealValue: String,
         val currentValue: String,
-        val categories: String? = null
     )
 
     private val _riskFactorDetails = mutableStateOf(listOf(
         RiskFactorDetails(
             name = "IMT",
             fullName = "Indeks Massa Tubuh",
+            description = "Rasio berat badan terhadap tinggi badan",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "18.5 - 22.9 kg/m²",
             currentValue = "0.0 kg/m² (Kurus)",
-            categories = "• Kurus: < 18.5 kg/m²\n" +
-                    "• Normal: 18.5 - 22.9 kg/m²\n" +
-                    "• Beresiko Obesitas: 23 - 24.9 kg/m²\n" +
-                    "• Obesitas I: 25 - 29.9 kg/m²\n" +
-                    "• Obesitas II: ≥ 30 kg/m²"
         ),
         RiskFactorDetails(
             name = "H",
             fullName = "Hipertensi",
+            description = "Status tekanan darah tinggi",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "Tidak",
@@ -123,6 +120,7 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "RBM",
             fullName = "Riwayat Bayi Makrosomia",
+            description = "Riwayat melahirkan bayi dengan berat badan lahir di atas 4 kg",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "Tidak",
@@ -131,6 +129,7 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "AF",
             fullName = "Aktivitas Fisik",
+            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "7 hari per minggu",
@@ -139,6 +138,7 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "U",
             fullName = "Usia",
+            description = "Usia saat ini",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "< 45 tahun",
@@ -147,6 +147,7 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "SM",
             fullName = "Status Merokok",
+            description = "Kondisi kebiasaan merokok.",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "Tidak merokok",
@@ -155,18 +156,16 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "IB",
             fullName = "Indeks Brinkman",
+            description = "Kategori perokok berdasarkan kebiasaan merokok (jumlah rokok per hari x lama merokok dalam tahun)",
             impactPercentage = 0.0,
             explanation = "",
-            idealValue = "0 (tidak merokok)",
-            currentValue = "0",
-            categories = "• Tidak merokok: 0\n" +
-                    "• Perokok ringan: < 200\n" +
-                    "• Perokok sedang: 200 - 599\n" +
-                    "• Perokok berat: ≥ 600"
+            idealValue = "Tidak pernah merokok",
+            currentValue = "Tidak pernah merokok",
         ),
         RiskFactorDetails(
             name = "RK",
             fullName = "Riwayat Keluarga",
+            description = "Riwayat orang tua kandung meninggal akibat komplikasi diabetes",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "Tidak",
@@ -175,6 +174,7 @@ class HomeViewModel @Inject constructor(
         RiskFactorDetails(
             name = "K",
             fullName = "Kolesterol",
+            description = "Status kadar kolesterol tinggi",
             impactPercentage = 0.0,
             explanation = "",
             idealValue = "Tidak",
@@ -222,8 +222,6 @@ class HomeViewModel @Inject constructor(
     private val _physicalActivityToday = mutableIntStateOf(0)
     val physicalActivityToday: State<Int> = _physicalActivityToday
 
-    private var isOnRiskFactorDetailScreen = false
-    
     // Loading state tracking
     private var isUserDataLoaded = false
     private var isPredictionDataLoaded = false
@@ -355,6 +353,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "IMT",
                             fullName = "Indeks Massa Tubuh",
+                            description = "Rasio berat badan terhadap tinggi badan",
                             impactPercentage = latestPrediction.bmiContribution,
                             explanation = latestPrediction.bmiExplanation,
                             idealValue = "18.5 - 22.9 kg/m²",
@@ -365,15 +364,11 @@ class HomeViewModel @Inject constructor(
                                 latestPrediction.bmi < 30 -> String.format("%.1f kg/m² (Obesitas I)", latestPrediction.bmi)
                                 else -> String.format("%.1f kg/m² (Obesitas II)", latestPrediction.bmi)
                             },
-                            categories = "• Kurus: < 18.5 kg/m²\n" +
-                                    "• Normal: 18.5 - 22.9 kg/m²\n" +
-                                    "• Beresiko Obesitas: 23 - 24.9 kg/m²\n" +
-                                    "• Obesitas I: 25 - 29.9 kg/m²\n" +
-                                    "• Obesitas II: ≥ 30 kg/m²"
                         ),
                         RiskFactorDetails(
                             name = "H",
                             fullName = "Hipertensi",
+                            description = "Status tekanan darah tinggi",
                             impactPercentage = latestPrediction.isHypertensionContribution,
                             explanation = latestPrediction.isHypertensionExplanation,
                             idealValue = "Tidak",
@@ -382,6 +377,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "RBM",
                             fullName = "Riwayat Bayi Makrosomia",
+                            description = "Riwayat melahirkan bayi dengan berat badan lahir di atas 4 kg",
                             impactPercentage = latestPrediction.isMacrosomicBabyContribution,
                             explanation = latestPrediction.isMacrosomicBabyExplanation,
                             idealValue = "Tidak",
@@ -395,6 +391,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "AF",
                             fullName = "Aktivitas Fisik",
+                            description = "Jumlah total hari dalam seminggu saat pengguna melakukan aktivitas fisik dengan intensitas sedang",
                             impactPercentage = latestPrediction.physicalActivityFrequencyContribution,
                             explanation = latestPrediction.physicalActivityFrequencyExplanation,
                             idealValue = "7 hari per minggu",
@@ -403,6 +400,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "U",
                             fullName = "Usia",
+                            description = "Usia saat ini",
                             impactPercentage = latestPrediction.ageContribution,
                             explanation = latestPrediction.ageExplanation,
                             idealValue = "< 45 tahun",
@@ -411,6 +409,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "SM",
                             fullName = "Status Merokok",
+                            description = "Kondisi kebiasaan merokok.",
                             impactPercentage = latestPrediction.smokingStatusContribution,
                             explanation = latestPrediction.smokingStatusExplanation,
                             idealValue = "Tidak merokok",
@@ -424,23 +423,22 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "IB",
                             fullName = "Indeks Brinkman",
+                            description = "Kategori perokok berdasarkan kebiasaan merokok (jumlah rokok per hari x lama merokok dalam tahun)",
                             impactPercentage = latestPrediction.brinkmanScoreContribution,
                             explanation = latestPrediction.brinkmanScoreExplanation,
-                            idealValue = "0 (Tidak merokok)",
-                            currentValue = when {
-                                latestPrediction.brinkmanScore == 0 -> "0 (Tidak merokok)"
-                                latestPrediction.brinkmanScore < 200 -> "${latestPrediction.brinkmanScore} (Perokok ringan)"
-                                latestPrediction.brinkmanScore < 600 -> "${latestPrediction.brinkmanScore} (Perokok sedang)"
-                                else -> "${latestPrediction.brinkmanScore} (Perokok berat)"
+                            idealValue = "Tidak pernah merokok",
+                            currentValue = when (latestPrediction.brinkmanScore) {
+                                0 -> "Tidak pernah merokok"
+                                1 -> "Perokok ringan"
+                                2 -> "Perokok sedang"
+                                3 -> "Perokok berat"
+                                else -> "Tidak diketahui"
                             },
-                            categories = "• Tidak merokok: 0\n" +
-                                    "• Perokok ringan: < 200\n" +
-                                    "• Perokok sedang: 200 - 599\n" +
-                                    "• Perokok berat: ≥ 600"
                         ),
                         RiskFactorDetails(
                             name = "RK",
                             fullName = "Riwayat Keluarga",
+                            description = "Riwayat orang tua kandung meninggal akibat komplikasi diabetes",
                             impactPercentage = latestPrediction.isBloodlineContribution,
                             explanation = latestPrediction.isBloodlineExplanation,
                             idealValue = "Tidak",
@@ -449,6 +447,7 @@ class HomeViewModel @Inject constructor(
                         RiskFactorDetails(
                             name = "K",
                             fullName = "Kolesterol",
+                            description = "Status kadar kolesterol tinggi",
                             impactPercentage = latestPrediction.isCholesterolContribution,
                             explanation = latestPrediction.isCholesterolExplanation,
                             idealValue = "Tidak",

@@ -29,6 +29,7 @@ import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactorDetails
 import com.itb.diabetify.presentation.home.components.calculateRiskFactorColor
 import com.itb.diabetify.ui.theme.poppinsFontFamily
+import kotlin.math.abs
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -87,10 +88,7 @@ fun RiskFactorCard(
                         )
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
-                    val formattedValue = if (riskFactor.impactPercentage >= 0)
-                        "+${String.format("%.1f", riskFactor.impactPercentage)}%"
-                    else
-                        "${String.format("%.1f", riskFactor.impactPercentage)}%"
+                    val formattedValue =  "${String.format("%.1f", abs(riskFactor.impactPercentage))}%"
 
                     Text(
                         text = formattedValue,

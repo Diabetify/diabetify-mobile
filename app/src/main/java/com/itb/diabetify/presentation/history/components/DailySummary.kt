@@ -247,7 +247,7 @@ private fun RiskFactorItem(
         )
 
         Text(
-            text = "${if (contribution.isPositive) "+" else "-"}${contribution.percentage}%",
+            text = "${contribution.percentage}%",
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,

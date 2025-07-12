@@ -357,13 +357,7 @@ class HomeViewModel @Inject constructor(
                             impactPercentage = latestPrediction.bmiContribution,
                             explanation = latestPrediction.bmiExplanation,
                             idealValue = "18.5 - 22.9 kg/m²",
-                            currentValue = when {
-                                latestPrediction.bmi < 18.5 -> String.format("%.1f kg/m² (Kurus)", latestPrediction.bmi)
-                                latestPrediction.bmi < 23 -> String .format("%.1f kg/m² (Normal)", latestPrediction.bmi)
-                                latestPrediction.bmi < 25 -> String.format("%.1f kg/m² (Beresiko Obesitas)", latestPrediction.bmi)
-                                latestPrediction.bmi < 30 -> String.format("%.1f kg/m² (Obesitas I)", latestPrediction.bmi)
-                                else -> String.format("%.1f kg/m² (Obesitas II)", latestPrediction.bmi)
-                            },
+                            currentValue = String.format("%.1f kg/m²", latestPrediction.bmi)
                         ),
                         RiskFactorDetails(
                             name = "H",

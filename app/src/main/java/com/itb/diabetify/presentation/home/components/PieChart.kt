@@ -76,7 +76,7 @@ fun PieChart(
             val positiveOthersTotalPercentage = positiveMinorFactors.sumOf { it.percentage }
             val positiveOthersItem = HomeViewModel.RiskFactor(
                 name = "Others (Positive)",
-                abbreviation = "L+",
+                abbreviation = "L",
                 percentage = positiveOthersTotalPercentage
             )
             result.add(positiveOthersItem)
@@ -87,7 +87,7 @@ fun PieChart(
             val negativeOthersTotalPercentage = negativeMinorFactors.sumOf { it.percentage }
             val negativeOthersItem = HomeViewModel.RiskFactor(
                 name = "Others (Negative)",
-                abbreviation = "L-",
+                abbreviation = "L",
                 percentage = negativeOthersTotalPercentage
             )
             result.add(negativeOthersItem)
@@ -220,7 +220,7 @@ fun PieChart(
                     )
 
                     Text(
-                        text = "= Mengurangi Risiko (-)",
+                        text = "= Mengurangi Risiko",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
@@ -243,7 +243,7 @@ fun PieChart(
                     )
 
                     Text(
-                        text = "= Meningkatkan Risiko (+)",
+                        text = "= Meningkatkan Risiko",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
@@ -292,7 +292,7 @@ fun PieChart(
                     Text(
                         buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("L+")
+                                append("L")
                             }
                             append(": ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
@@ -329,11 +329,7 @@ fun PieChart(
                                     color = colorResource(id = R.color.primary)
                                 )
                                 Text(
-                                    text = when {
-                                        abs(riskFactor.percentage) < 0.000001 -> "${String.format("%.1f", riskFactor.percentage)}%"
-                                        riskFactor.percentage > 0 -> "+${String.format("%.1f", riskFactor.percentage)}%"
-                                        else -> "${String.format("%.1f", riskFactor.percentage)}%"
-                                    },
+                                    text = "${String.format("%.1f", abs(riskFactor.percentage))}%",
                                     fontFamily = poppinsFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
@@ -361,7 +357,7 @@ fun PieChart(
                     Text(
                         buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("L-")
+                                append("L")
                             }
                             append(": ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
@@ -398,11 +394,7 @@ fun PieChart(
                                     color = colorResource(id = R.color.primary)
                                 )
                                 Text(
-                                    text = when {
-                                        abs(riskFactor.percentage) < 0.000001 -> "${String.format("%.1f", riskFactor.percentage)}%"
-                                        riskFactor.percentage > 0 -> "+${String.format("%.1f", riskFactor.percentage)}%"
-                                        else -> "${String.format("%.1f", riskFactor.percentage)}%"
-                                    },
+                                    text = "${String.format("%.1f", abs(riskFactor.percentage))}%",
                                     fontFamily = poppinsFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
@@ -470,11 +462,7 @@ fun LegendItem(
         )
 
         Text(
-            text = when {
-                abs(value) < 0.000001 -> "${String.format("%.1f", value)}%"
-                value > 0 -> "+${String.format("%.1f", value)}%"
-                else -> "${String.format("%.1f", value)}%"
-            },
+            text = "${String.format("%.1f", abs(value))}%",
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,

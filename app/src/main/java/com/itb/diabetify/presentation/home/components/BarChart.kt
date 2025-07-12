@@ -215,7 +215,7 @@ fun BarChart(
                     )
 
                     Text(
-                        text = "= Mengurangi Risiko (-)",
+                        text = "= Mengurangi Risiko",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
@@ -238,7 +238,7 @@ fun BarChart(
                     )
 
                     Text(
-                        text = "= Meningkatkan Risiko (+)",
+                        text = "= Meningkatkan Risiko",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
@@ -321,11 +321,7 @@ fun LegendItems(
         )
 
         Text(
-            text = when {
-                abs(value) < 0.000001 -> "${String.format("%.1f", value)}%"
-                value > 0 -> "+${String.format("%.1f", value)}%"
-                else -> "${String.format("%.1f", value)}%"
-            },
+            text = "${String.format("%.1f", abs(value))}%",
             fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,

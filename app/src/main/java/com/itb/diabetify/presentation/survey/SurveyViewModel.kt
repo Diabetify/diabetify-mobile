@@ -11,6 +11,7 @@ import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.handleAsyncPrediction
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -461,25 +462,25 @@ class SurveyViewModel @Inject constructor(
         viewModelScope.launch {
             _predictionState.value = predictionState.value.copy(isLoading = true)
 
-            val predictionResult = predictionUseCases.predict()
-
-            _predictionState.value = predictionState.value.copy(isLoading = false)
-
-            when (predictionResult.result) {
-                is Resource.Success -> {
+            predictionUseCases.handleAsyncPrediction(
+                scope = viewModelScope,
+                pollingIntervalMs = 2000L,
+                onPending = {
+                    _predictionState.value = predictionState.value.copy(isLoading = true)
+                },
+                onProgress = { progress ->
+                    _predictionState.value = predictionState.value.copy(isLoading = true)
+                },
+                onCompleted = {
+                    _predictionState.value = predictionState.value.copy(isLoading = false)
+                    _navigationEvent.value = "SUCCESS_SCREEN"
+                },
+                onFailed = { error ->
+                    _predictionState.value = predictionState.value.copy(isLoading = false)
+                    Log.e("SurveyViewModel", "Prediction error: $error")
                     _navigationEvent.value = "SUCCESS_SCREEN"
                 }
-                is Resource.Error -> {
-                    Log.e("SurveyViewModel", "Prediction error: ${predictionResult.result.message}")
-                    _navigationEvent.value = "SUCCESS_SCREEN"
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    Log.e("SurveyViewModel", "Unexpected error in prediction")
-                    _navigationEvent.value = "SUCCESS_SCREEN"
-                }
-            }
+            )
         }
     }
 

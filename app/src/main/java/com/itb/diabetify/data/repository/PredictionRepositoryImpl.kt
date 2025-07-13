@@ -4,7 +4,10 @@ import com.itb.diabetify.data.remote.prediction.PredictionApiService
 import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionResponse
 import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreResponse
+import com.itb.diabetify.data.remote.prediction.response.PredictionJobResponse
 import com.itb.diabetify.data.remote.prediction.response.WhatIfPredictionResponse
+import com.itb.diabetify.domain.manager.PredictionJobManager
+import com.itb.diabetify.domain.manager.PredictionJobStatus
 import com.itb.diabetify.domain.manager.PredictionManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.model.Prediction
@@ -18,6 +21,7 @@ class PredictionRepositoryImpl (
     private val predictionApiService: PredictionApiService,
     private val tokenManager: TokenManager,
     private val predictionManager: PredictionManager,
+    private val predictionJobManager: PredictionJobManager,
 ) : PredictionRepository {
     override suspend fun getToken(): String? {
         return tokenManager.getToken()
@@ -25,14 +29,48 @@ class PredictionRepositoryImpl (
 
     override suspend fun predict(): Resource<Unit> {
         return try {
-            val response = predictionApiService.predict()
-            fetchLatestPrediction()
-            Resource.Success(Unit)
+            val jobResponse = predictionApiService.predict()
+            
+            val jobStatusFlow = predictionJobManager.pollJobStatus(jobResponse.data.jobId)
+            
+            var result: Resource<Unit> = Resource.Error("Unknown error")
+            
+            jobStatusFlow.collect { status ->
+                when (status) {
+                    is PredictionJobStatus.Completed -> {
+                        fetchLatestPrediction()
+                        result = Resource.Success(Unit)
+                        return@collect
+                    }
+                    is PredictionJobStatus.Failed -> {
+                        result = Resource.Error(status.error)
+                        return@collect
+                    }
+                    else -> {
+                        // Continue polling
+                    }
+                }
+            }
         } catch (e: IOException) {
             Resource.Error("${e.message}")
         } catch (e: HttpException) {
             Resource.Error("${e.message}")
         }
+    }
+
+    override suspend fun startPredictionJob(): Resource<PredictionJobResponse> {
+        return try {
+            val response = predictionApiService.predict()
+            Resource.Success(response)
+        } catch (e: IOException) {
+            Resource.Error("${e.message}")
+        } catch (e: HttpException) {
+            Resource.Error("${e.message}")
+        }
+    }
+
+    override suspend fun pollPredictionJob(jobId: String, pollingIntervalMs: Long): Flow<PredictionJobStatus> {
+        return predictionJobManager.pollJobStatus(jobId, pollingIntervalMs)
     }
 
     override suspend fun explainPrediction(): Resource<Unit> {

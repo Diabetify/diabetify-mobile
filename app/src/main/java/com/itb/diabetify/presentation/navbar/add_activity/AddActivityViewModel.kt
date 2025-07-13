@@ -14,6 +14,7 @@ import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
+import com.itb.diabetify.util.handleAsyncPrediction
 import com.itb.diabetify.util.PredictionUpdateNotifier
 import com.itb.diabetify.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -664,28 +665,10 @@ class AddActivityViewModel @Inject constructor(
 
     private fun triggerPredictionUpdate() {
         viewModelScope.launch {
-            _predictionState.value = predictionState.value.copy(isLoading = true)
-
-            val predictionResult = predictionUseCases.predict()
-
-            _predictionState.value = predictionState.value.copy(isLoading = false)
-
-            when (predictionResult.result) {
-                is Resource.Success -> {
-                    _successMessage.value = "Data berhasil diperbarui"
-                    PredictionUpdateNotifier.notifyPredictionUpdated()
-                }
-                is Resource.Error -> {
-                    _errorMessage.value = predictionResult.result.message ?: "Terjadi kesalahan saat memperbarui prediksi"
-                    predictionResult.result.message?.let { Log.e("AddActivityViewModel", it) }
-                }
-
-                else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Terjadi kesalahan saat memperbarui prediksi"
-                    Log.e("AddActivityViewModel", "Unknown error during prediction")
-                }
-            }
+            predictionUseCases.predictBackground(viewModelScope, pollingIntervalMs = 5000L)
+            
+            _successMessage.value = "Data berhasil disimpan dan prediksi akan diperbarui dalam beberapa saat."
+            PredictionUpdateNotifier.notifyPredictionUpdated()
         }
     }
 

@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.itb.diabetify.data.manager.ActivityManagerImpl
 import com.itb.diabetify.data.manager.ConnectivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
+import com.itb.diabetify.data.manager.PredictionJobManagerImpl
 import com.itb.diabetify.data.manager.PredictionManagerImpl
 import com.itb.diabetify.data.manager.ProfileManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
@@ -23,6 +24,7 @@ import com.itb.diabetify.data.repository.ProfileRepositoryImpl
 import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.ConnectivityManager
 import com.itb.diabetify.domain.manager.LocalUserManager
+import com.itb.diabetify.domain.manager.PredictionJobManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
 import com.itb.diabetify.domain.manager.ActivityManager
@@ -52,6 +54,8 @@ import com.itb.diabetify.domain.usecases.connectivity.ObserveConnectivityUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionByDateUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetPredictionScoreByDateUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictAsyncUseCase
+import com.itb.diabetify.domain.usecases.prediction.PredictBackgroundUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictUseCase
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.AddProfileUseCase
@@ -278,15 +282,25 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesPredictionJobManager(
+        predictionApiService: PredictionApiService
+    ): PredictionJobManager {
+        return PredictionJobManagerImpl(predictionApiService)
+    }
+
+    @Provides
+    @Singleton
     fun providesPredictionRepository(
         predictionApiService: PredictionApiService,
         tokenManager: TokenManager,
-        predictionManager: PredictionManager
+        predictionManager: PredictionManager,
+        predictionJobManager: PredictionJobManager
     ): PredictionRepository {
         return PredictionRepositoryImpl(
             predictionApiService = predictionApiService,
             tokenManager = tokenManager,
-            predictionManager = predictionManager
+            predictionManager = predictionManager,
+            predictionJobManager = predictionJobManager
         )
     }
 
@@ -301,6 +315,8 @@ object AppModule {
             getPredictionByDate = GetPredictionByDateUseCase(repository),
             getPredictionScoreByDate = GetPredictionScoreByDateUseCase(repository),
             predict = PredictUseCase(repository),
+            predictAsync = PredictAsyncUseCase(repository),
+            predictBackground = PredictBackgroundUseCase(repository),
             explainPrediction = ExplainPredictionUseCase(repository),
             whatIfPrediction = WhatIfPredictionUseCase(repository)
         )

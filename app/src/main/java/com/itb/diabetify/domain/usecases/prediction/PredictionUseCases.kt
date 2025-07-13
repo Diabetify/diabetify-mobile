@@ -6,6 +6,8 @@ data class PredictionUseCases(
     val getPredictionByDate: GetPredictionByDateUseCase,
     val getPredictionScoreByDate: GetPredictionScoreByDateUseCase,
     val predict: PredictUseCase,
+    val predictAsync: PredictAsyncUseCase,
+    val predictBackground: PredictBackgroundUseCase,
     val explainPrediction: ExplainPredictionUseCase,
     val whatIfPrediction: WhatIfPredictionUseCase
 )

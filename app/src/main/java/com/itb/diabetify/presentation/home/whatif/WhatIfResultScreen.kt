@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.whatif
+package com.itb.diabetify.presentation.home.whatif
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,16 +44,17 @@ import com.itb.diabetify.presentation.home.components.RiskIndicator
 import com.itb.diabetify.presentation.home.components.RiskCategory
 import com.itb.diabetify.presentation.home.components.getRiskCategoryColor
 import com.itb.diabetify.presentation.home.components.getRiskCategoryDescription
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun WhatIfResultScreen(
     navController: NavController,
-    viewModel: WhatIfViewModel
+    viewModel: HomeViewModel
 ) {
     // States
-    val predictionPercentage by viewModel.predictionScore
-    val riskFactors by viewModel.riskFactors
+    val predictionPercentage by viewModel.whatIfPredictionScore
+    val riskFactors by viewModel.whatIfRiskFactors
     val scrollState = rememberScrollState()
 
     Column(

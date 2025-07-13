@@ -1,4 +1,4 @@
-package com.itb.diabetify.presentation.whatif
+package com.itb.diabetify.presentation.home.whatif
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,23 +45,24 @@ import com.itb.diabetify.presentation.common.InputField
 import com.itb.diabetify.presentation.common.PrimaryButton
 import com.itb.diabetify.presentation.common.SuccessNotification
 import com.itb.diabetify.presentation.navgraph.Route
+import com.itb.diabetify.presentation.home.HomeViewModel
 import com.itb.diabetify.ui.theme.poppinsFontFamily
 
 @Composable
 fun WhatIfScreen(
     navController: NavController,
-    viewModel: WhatIfViewModel
+    viewModel: HomeViewModel
 ) {
-    val age by viewModel.age
-    val macrosomicBaby by viewModel.macrosomicBaby
-    val isBloodline by viewModel.isBloodline
-    val smokingStatusFieldState by viewModel.smokingStatusFieldState
-    val yearsOfSmokingFieldState by viewModel.yearsOfSmokingFieldState
-    val averageCigarettesFieldState by viewModel.averageCigarettesFieldState
-    val weightFieldState by viewModel.weightFieldState
-    val isHypertensionFieldState by viewModel.isHypertensionFieldState
-    val physicalActivityFrequencyFieldState by viewModel.physicalActivityFieldState
-    val isCholesterolFieldState by viewModel.isCholesterolFieldState
+    val age by viewModel.whatIfAge
+    val macrosomicBaby by viewModel.whatIfMacrosomicBaby
+    val isBloodline by viewModel.whatIfIsBloodline
+    val smokingStatusFieldState by viewModel.whatIfSmokingStatusFieldState
+    val yearsOfSmokingFieldState by viewModel.whatIfYearsOfSmokingFieldState
+    val averageCigarettesFieldState by viewModel.whatIfAverageCigarettesFieldState
+    val weightFieldState by viewModel.whatIfWeightFieldState
+    val isHypertensionFieldState by viewModel.whatIfIsHypertensionFieldState
+    val physicalActivityFrequencyFieldState by viewModel.whatIfPhysicalActivityFieldState
+    val isCholesterolFieldState by viewModel.whatIfIsCholesterolFieldState
     val errorMessage = viewModel.errorMessage.value
     val successMessage = viewModel.successMessage.value
     val isLoading = viewModel.whatIfPredictionState.value.isLoading
@@ -259,7 +260,7 @@ fun WhatIfScreen(
                             "Aktif Merokok" -> "2"
                             else -> "0"
                         }
-                        viewModel.setSmokingStatus(status)
+                        viewModel.setWhatIfSmokingStatus(status)
                     },
                     options = listOf(
                         "Tidak Pernah Merokok",
@@ -285,7 +286,7 @@ fun WhatIfScreen(
                 )
                 InputField(
                     value = yearsOfSmokingFieldState.text,
-                    onValueChange = { viewModel.setYearsOfSmoking(it) },
+                    onValueChange = { viewModel.setWhatIfYearsOfSmoking(it) },
                     placeholderText = "Berapa lama merokok (tahun)",
                     iconResId = R.drawable.ic_calendar,
                     keyboardType = KeyboardType.Number,
@@ -307,7 +308,7 @@ fun WhatIfScreen(
                     )
                     InputField(
                         value = averageCigarettesFieldState.text,
-                        onValueChange = { viewModel.setAverageCigarettes(it) },
+                        onValueChange = { viewModel.setWhatIfAverageCigarettes(it) },
                         placeholderText = "Rata-rata rokok per hari (batang)",
                         iconResId = R.drawable.ic_smoking,
                         keyboardType = KeyboardType.Number,
@@ -329,7 +330,7 @@ fun WhatIfScreen(
                 )
                 InputField(
                     value = weightFieldState.text,
-                    onValueChange = { viewModel.setWeight(it) },
+                    onValueChange = { viewModel.setWhatIfWeight(it) },
                     placeholderText = "Berat badan (kg)",
                     iconResId = R.drawable.ic_weight,
                     keyboardType = KeyboardType.Decimal,
@@ -351,7 +352,7 @@ fun WhatIfScreen(
                 DropdownField(
                     selectedOption = if (isHypertensionFieldState.text == "true") "Ya" else "Tidak",
                     onOptionSelected = { selectedText ->
-                        viewModel.setIsHypertension((selectedText == "Ya").toString())
+                        viewModel.setWhatIfIsHypertension((selectedText == "Ya").toString())
                     },
                     options = listOf("Tidak", "Ya"),
                     placeHolderText = "Hipertensi",
@@ -373,7 +374,7 @@ fun WhatIfScreen(
                 )
                 InputField(
                     value = physicalActivityFrequencyFieldState.text,
-                    onValueChange = { viewModel.setPhysicalActivity(it) },
+                    onValueChange = { viewModel.setWhatIfPhysicalActivity(it) },
                     placeholderText = "Aktivitas fisik per minggu (hari)",
                     iconResId = R.drawable.ic_walk,
                     keyboardType = KeyboardType.Number,
@@ -395,7 +396,7 @@ fun WhatIfScreen(
                 DropdownField(
                     selectedOption = if (isCholesterolFieldState.text == "true") "Ya" else "Tidak",
                     onOptionSelected = { selectedText ->
-                        viewModel.setIsCholesterol((selectedText == "Ya").toString())
+                        viewModel.setWhatIfIsCholesterol((selectedText == "Ya").toString())
                     },
                     options = listOf("Tidak", "Ya"),
                     placeHolderText = "Kolesterol",
@@ -414,7 +415,7 @@ fun WhatIfScreen(
                 ) {
                     CustomizableButton(
                         text = "Reset",
-                        onClick = { viewModel.resetFields() },
+                        onClick = { viewModel.resetWhatIfFields() },
                         backgroundColor = Color.Gray,
                         modifier = Modifier
                             .weight(1f)
@@ -424,7 +425,7 @@ fun WhatIfScreen(
                     PrimaryButton(
                         text = "Hitung",
                         onClick = {
-                            val isValid = viewModel.validateFields()
+                            val isValid = viewModel.validateWhatIfFields()
                             if (isValid) {
                                 viewModel.calculateWhatIfPrediction()
                             }

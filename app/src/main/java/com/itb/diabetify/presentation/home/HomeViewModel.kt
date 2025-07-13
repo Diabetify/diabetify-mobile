@@ -13,9 +13,11 @@ import com.itb.diabetify.domain.usecases.activity.ActivityUseCases
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.UserUseCases
+import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
+import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.util.DataState
-import com.itb.diabetify.util.PredictionUpdateNotifier
 import com.itb.diabetify.util.Resource
+import com.itb.diabetify.util.handleAsyncWhatIfPrediction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -221,6 +223,65 @@ class HomeViewModel @Inject constructor(
 
     private val _physicalActivityToday = mutableIntStateOf(0)
     val physicalActivityToday: State<Int> = _physicalActivityToday
+
+    // WhatIf States
+    private val _isNavigating = mutableStateOf(false)
+    private val _isCalculating = mutableStateOf(false)
+    private var lastCalculationTime = 0L
+    private var currentJobId: String? = null
+
+    private val _whatIfPredictionState = mutableStateOf(DataState())
+    val whatIfPredictionState: State<DataState> = _whatIfPredictionState
+
+    private val _whatIfPredictionScore = mutableDoubleStateOf(0.0)
+    val whatIfPredictionScore: State<Double> = _whatIfPredictionScore
+
+    private val _whatIfRiskFactors = mutableStateOf(listOf(
+        RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
+        RiskFactor("Hipertensi", "H", 0.0),
+        RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0.0),
+        RiskFactor("Aktivitas Fisik", "AF", 0.0),
+        RiskFactor("Usia", "U", 0.0),
+        RiskFactor("Status Merokok", "SM", 0.0),
+        RiskFactor("Indeks Brinkman", "IB", 0.0),
+        RiskFactor("Riwayat Keluarga", "RK", 0.0),
+        RiskFactor("Kolesterol", "K", 0.0),
+    ))
+    val whatIfRiskFactors: State<List<RiskFactor>> = _whatIfRiskFactors
+
+    private val _whatIfAge = mutableIntStateOf(0)
+    val whatIfAge: State<Int> = _whatIfAge
+
+    private val _whatIfYearsOfSmoking = mutableIntStateOf(0)
+    val whatIfYearsOfSmoking: State<Int> = _whatIfYearsOfSmoking
+
+    private val _whatIfMacrosomicBaby = mutableIntStateOf(0)
+    val whatIfMacrosomicBaby: State<Int> = _whatIfMacrosomicBaby
+
+    private val _whatIfIsBloodline = mutableStateOf(false)
+    val whatIfIsBloodline: State<Boolean> = _whatIfIsBloodline
+
+    // WhatIf Field States
+    private val _whatIfSmokingStatusFieldState = mutableStateOf(FieldState())
+    val whatIfSmokingStatusFieldState: State<FieldState> = _whatIfSmokingStatusFieldState
+
+    private val _whatIfYearsOfSmokingFieldState = mutableStateOf(FieldState())
+    val whatIfYearsOfSmokingFieldState: State<FieldState> = _whatIfYearsOfSmokingFieldState
+
+    private val _whatIfAverageCigarettesFieldState = mutableStateOf(FieldState())
+    val whatIfAverageCigarettesFieldState: State<FieldState> = _whatIfAverageCigarettesFieldState
+
+    private val _whatIfWeightFieldState = mutableStateOf(FieldState())
+    val whatIfWeightFieldState: State<FieldState> = _whatIfWeightFieldState
+
+    private val _whatIfIsHypertensionFieldState = mutableStateOf(FieldState())
+    val whatIfIsHypertensionFieldState: State<FieldState> = _whatIfIsHypertensionFieldState
+
+    private val _whatIfPhysicalActivityFieldState = mutableStateOf(FieldState())
+    val whatIfPhysicalActivityFieldState: State<FieldState> = _whatIfPhysicalActivityFieldState
+
+    private val _whatIfIsCholesterolFieldState = mutableStateOf(FieldState())
+    val whatIfIsCholesterolFieldState: State<FieldState> = _whatIfIsCholesterolFieldState
 
     // Loading state tracking
     private var isUserDataLoaded = false
@@ -453,6 +514,21 @@ class HomeViewModel @Inject constructor(
                     _smokingStatus.value = latestPrediction.smokingStatus
                     _smokeAverage.intValue = latestPrediction.avgSmokeCount
                     _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency
+
+                    _whatIfAge.intValue = latestPrediction.age
+                    Log.d("HomeViewModel", "WhatIf Age: ${_whatIfAge.intValue}")
+                    _whatIfSmokingStatusFieldState.value = FieldState(
+                        text = latestPrediction.smokingStatus,
+                        error = null
+                    )
+                    _whatIfAverageCigarettesFieldState.value = FieldState(
+                        text = latestPrediction.avgSmokeCount.toString(),
+                        error = null
+                    )
+                    _whatIfPhysicalActivityFieldState.value = FieldState(
+                        text = latestPrediction.physicalActivityFrequency.toString(),
+                        error = null
+                    )
                 }
             }.launchIn(viewModelScope)
         }
@@ -514,6 +590,36 @@ class HomeViewModel @Inject constructor(
                     _macrosomicBaby.intValue = userProfile.macrosomicBaby
                     _isBloodline.value = userProfile.bloodline
                     _isCholesterol.value = userProfile.cholesterol
+
+                    if (userProfile.ageOfSmoking == 0 && userProfile.ageOfStopSmoking == 0) {
+                        _whatIfYearsOfSmoking.intValue = 0
+                    } else if (userProfile.ageOfSmoking != 0 && userProfile.ageOfStopSmoking != 0) {
+                        _whatIfYearsOfSmoking.intValue = userProfile.ageOfStopSmoking - userProfile.ageOfSmoking
+                    } else if (userProfile.ageOfSmoking != 0) {
+                        _whatIfYearsOfSmoking.intValue = _whatIfAge.intValue - userProfile.ageOfSmoking
+                    } else {
+                        _whatIfYearsOfSmoking.intValue = 0
+                    }
+                    _whatIfYearsOfSmokingFieldState.value = FieldState(
+                        text = _whatIfYearsOfSmoking.intValue.toString(),
+                        error = null
+                    )
+
+                    _whatIfMacrosomicBaby.intValue = userProfile.macrosomicBaby
+                    _whatIfIsBloodline.value = userProfile.bloodline
+
+                    _whatIfWeightFieldState.value = FieldState(
+                        text = userProfile.weight.toString(),
+                        error = null
+                    )
+                    _whatIfIsHypertensionFieldState.value = FieldState(
+                        text = userProfile.hypertension.toString(),
+                        error = null
+                    )
+                    _whatIfIsCholesterolFieldState.value = FieldState(
+                        text = userProfile.cholesterol.toString(),
+                        error = null
+                    )
                 }
             }.launchIn(viewModelScope)
         }
@@ -638,15 +744,296 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onNavigationHandled() {
-        _navigationEvent.value = null
-    }
-
     fun onErrorShown() {
         _errorMessage.value = null
     }
 
     fun onSuccessShown() {
         _successMessage.value = null
+    }
+
+    // WhatIf Methods
+    // Setters for WhatIf Field States
+    fun setWhatIfSmokingStatus(value: String) {
+        _whatIfSmokingStatusFieldState.value = whatIfSmokingStatusFieldState.value.copy(error = null)
+        _whatIfSmokingStatusFieldState.value = whatIfSmokingStatusFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfYearsOfSmoking(value: String) {
+        _whatIfYearsOfSmokingFieldState.value = whatIfYearsOfSmokingFieldState.value.copy(error = null)
+        _whatIfYearsOfSmokingFieldState.value = whatIfYearsOfSmokingFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfAverageCigarettes(value: String) {
+        _whatIfAverageCigarettesFieldState.value = whatIfAverageCigarettesFieldState.value.copy(error = null)
+        _whatIfAverageCigarettesFieldState.value = whatIfAverageCigarettesFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfWeight(value: String) {
+        _whatIfWeightFieldState.value = whatIfWeightFieldState.value.copy(error = null)
+        _whatIfWeightFieldState.value = whatIfWeightFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfIsHypertension(value: String) {
+        _whatIfIsHypertensionFieldState.value = whatIfIsHypertensionFieldState.value.copy(error = null)
+        _whatIfIsHypertensionFieldState.value = whatIfIsHypertensionFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfPhysicalActivity(value: String) {
+        _whatIfPhysicalActivityFieldState.value = whatIfPhysicalActivityFieldState.value.copy(error = null)
+        _whatIfPhysicalActivityFieldState.value = whatIfPhysicalActivityFieldState.value.copy(text = value)
+    }
+
+    fun setWhatIfIsCholesterol(value: String) {
+        _whatIfIsCholesterolFieldState.value = whatIfIsCholesterolFieldState.value.copy(error = null)
+        _whatIfIsCholesterolFieldState.value = whatIfIsCholesterolFieldState.value.copy(text = value)
+    }
+
+    // WhatIf Validation Functions
+    fun validateWhatIfFields(): Boolean {
+        var isValid = true
+
+        if (whatIfSmokingStatusFieldState.value.text.isBlank()) {
+            _whatIfSmokingStatusFieldState.value = whatIfSmokingStatusFieldState.value.copy(error = "Status merokok tidak boleh kosong")
+            isValid = false
+        }
+
+        if (whatIfYearsOfSmokingFieldState.value.text.isBlank()) {
+            _whatIfYearsOfSmokingFieldState.value = whatIfYearsOfSmokingFieldState.value.copy(error = "Lama merokok tidak boleh kosong")
+            isValid = false
+        } else if (whatIfYearsOfSmokingFieldState.value.text.toInt() < 0 || whatIfYearsOfSmokingFieldState.value.text.toInt() > 70) {
+            _whatIfYearsOfSmokingFieldState.value = whatIfYearsOfSmokingFieldState.value.copy(error = "Lama merokok harus antara 0-70 tahun")
+            isValid = false
+        } else if (whatIfYearsOfSmokingFieldState.value.text.toInt() < _whatIfYearsOfSmoking.intValue) {
+            _whatIfYearsOfSmokingFieldState.value = whatIfYearsOfSmokingFieldState.value.copy(error = "Lama merokok tidak boleh kurang dari lama merokok yang Anda miliki saat ini")
+            isValid = false
+        }
+
+        if (whatIfAverageCigarettesFieldState.value.text.toInt() < 0 || whatIfAverageCigarettesFieldState.value.text.toInt() > 60) {
+            _whatIfAverageCigarettesFieldState.value = whatIfAverageCigarettesFieldState.value.copy(error = "Jumlah rokok harus antara 0-60 batang")
+            isValid = false
+        }
+
+        if (whatIfWeightFieldState.value.text.toInt() < 30 || whatIfWeightFieldState.value.text.toInt() > 300) {
+            _whatIfWeightFieldState.value = whatIfWeightFieldState.value.copy(error = "Berat badan harus antara 30-300 kg")
+            isValid = false
+        }
+
+        if (whatIfIsHypertensionFieldState.value.text.isBlank()) {
+            _whatIfIsHypertensionFieldState.value = whatIfIsHypertensionFieldState.value.copy(error = "Hipertensi tidak boleh kosong")
+            isValid = false
+        }
+
+        if (whatIfPhysicalActivityFieldState.value.text.toInt() < 0 || whatIfPhysicalActivityFieldState.value.text.toInt() > 7) {
+            _whatIfPhysicalActivityFieldState.value = whatIfPhysicalActivityFieldState.value.copy(error = "Aktivitas fisik harus antara 0-7 hari")
+            isValid = false
+        }
+
+        if (whatIfIsCholesterolFieldState.value.text.isBlank()) {
+            _whatIfIsCholesterolFieldState.value = whatIfIsCholesterolFieldState.value.copy(error = "Kolesterol tidak boleh kosong")
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    private fun clearWhatIfResults() {
+        _whatIfPredictionScore.doubleValue = 0.0
+        _whatIfRiskFactors.value = listOf(
+            RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
+            RiskFactor("Hipertensi", "H", 0.0),
+            RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0.0),
+            RiskFactor("Aktivitas Fisik", "AF", 0.0),
+            RiskFactor("Usia", "U", 0.0),
+            RiskFactor("Status Merokok", "SM", 0.0),
+            RiskFactor("Indeks Brinkman", "IB", 0.0),
+            RiskFactor("Riwayat Keluarga", "RK", 0.0),
+            RiskFactor("Kolesterol", "K", 0.0),
+        )
+        _isNavigating.value = false
+        currentJobId = null
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun calculateWhatIfPrediction() {
+        val currentTime = System.currentTimeMillis()
+        
+        if (_isCalculating.value) {
+            return
+        }
+        
+        if (currentTime - lastCalculationTime < 5000) {
+            return
+        }
+        
+        lastCalculationTime = currentTime
+
+        viewModelScope.launch {
+            _isCalculating.value = true
+            
+            clearWhatIfResults()
+            
+            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
+
+            val smokingStatus = whatIfSmokingStatusFieldState.value.text.toInt()
+            val yearsOfSmoking = whatIfYearsOfSmokingFieldState.value.text.toIntOrNull() ?: 0
+            val averageCigarettes = whatIfAverageCigarettesFieldState.value.text.toIntOrNull() ?: 0
+            val weight = whatIfWeightFieldState.value.text.toInt()
+            val isHypertension = whatIfIsHypertensionFieldState.value.text.toBoolean()
+            val physicalActivity = whatIfPhysicalActivityFieldState.value.text.toInt()
+            val isCholesterol = whatIfIsCholesterolFieldState.value.text.toBoolean()
+
+            val whatIfPredictionResult = predictionUseCases.whatIfPrediction(
+                smokingStatus = smokingStatus,
+                yearsOfSmoking = yearsOfSmoking,
+                avgSmokeCount = averageCigarettes,
+                weight = weight,
+                isHypertension = isHypertension,
+                physicalActivityFrequency = physicalActivity,
+                isCholesterol = isCholesterol
+            )
+
+            if (whatIfPredictionResult.smokingStatusError != null) {
+                _whatIfSmokingStatusFieldState.value = whatIfSmokingStatusFieldState.value.copy(error = whatIfPredictionResult.smokingStatusError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
+                return@launch
+            }
+
+            if (whatIfPredictionResult.avgSmokeCountError != null) {
+                _whatIfAverageCigarettesFieldState.value = whatIfAverageCigarettesFieldState.value.copy(error = whatIfPredictionResult.avgSmokeCountError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
+                return@launch
+            }
+
+            if (whatIfPredictionResult.weightError != null) {
+                _whatIfWeightFieldState.value = whatIfWeightFieldState.value.copy(error = whatIfPredictionResult.weightError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
+                return@launch
+            }
+
+            if (whatIfPredictionResult.physicalActivityFrequencyError != null) {
+                _whatIfPhysicalActivityFieldState.value = whatIfPhysicalActivityFieldState.value.copy(error = whatIfPredictionResult.physicalActivityFrequencyError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
+                return@launch
+            }
+
+            val whatIfRequest = WhatIfPredictionRequest(
+                smokingStatus = smokingStatus,
+                yearsOfSmoking = yearsOfSmoking,
+                avgSmokeCount = averageCigarettes,
+                weight = weight,
+                isHypertension = isHypertension,
+                physicalActivityFrequency = physicalActivity,
+                isCholesterol = isCholesterol
+            )
+
+            predictionUseCases.handleAsyncWhatIfPrediction(
+                scope = viewModelScope,
+                whatIfRequest = whatIfRequest,
+                onPending = {
+                },
+                onProgress = { progress ->
+                },
+                onCompleted = { jobId ->
+                    if (currentJobId == null) {
+                        currentJobId = jobId
+                        handleWhatIfJobCompleted(jobId)
+                    }
+                },
+                onFailed = { error ->
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
+                    _errorMessage.value = error
+                }
+            )
+        }
+    }
+
+    private suspend fun handleWhatIfJobCompleted(jobId: String) {
+        try {
+            val resultResponse = predictionUseCases.getWhatIfJobResult(jobId)
+            
+            when (resultResponse) {
+                is Resource.Success -> {
+                    val data = resultResponse.data?.data
+                    data?.let { resultData ->
+                        _whatIfPredictionScore.doubleValue = resultData.riskPercentage
+
+                        val updatedRiskFactors = _whatIfRiskFactors.value.map { riskFactor ->
+                            val featureKey = when (riskFactor.abbreviation) {
+                                "IMT" -> "BMI"
+                                "H" -> "is_hypertension"
+                                "RBM" -> "is_macrosomic_baby"
+                                "AF" -> "moderate_physical_activity_frequency"
+                                "U" -> "age"
+                                "SM" -> "smoking_status"
+                                "IB" -> "brinkman_index"
+                                "RK" -> "is_bloodline"
+                                "K" -> "is_cholesterol"
+                                else -> null
+                            }
+
+                            featureKey?.let { key ->
+                                resultData.featureExplanations[key]?.let { explanation ->
+                                    val adjustedContribution = if (explanation.impact == 0) {
+                                        -explanation.contribution
+                                    } else {
+                                        explanation.contribution
+                                    }
+                                    riskFactor.copy(
+                                        name = riskFactor.name,
+                                        abbreviation = riskFactor.abbreviation,
+                                        percentage = adjustedContribution * 100
+                                    )
+                                }
+                            } ?: riskFactor
+                        }
+
+                        _whatIfRiskFactors.value = updatedRiskFactors
+                    }
+
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
+
+                    if (!_isNavigating.value) {
+                        _isNavigating.value = true
+                        _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
+                    }
+                }
+                is Resource.Error -> {
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
+                    _errorMessage.value = resultResponse.message ?: "Terjadi kesalahan saat mengambil hasil prediksi"
+                }
+                else -> {
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
+                    _errorMessage.value = "Terjadi kesalahan yang tidak diketahui"
+                }
+            }
+        } catch (e: Exception) {
+            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+            _isCalculating.value = false
+            _errorMessage.value = "Terjadi kesalahan saat memproses hasil: ${e.message}"
+        }
+    }
+
+    // Helper Functions
+    fun resetWhatIfFields() {
+        collectLatestPredictionData()
+        collectProfileData()
+
+        _successMessage.value = "Data berhasil di-reset"
+    }
+
+    fun onNavigationHandled() {
+        _navigationEvent.value = null
+        _isNavigating.value = false
+        _isCalculating.value = false
+        currentJobId = null
     }
 }

@@ -2,6 +2,7 @@ package com.itb.diabetify.domain.usecases.prediction
 
 import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.domain.model.prediction.WhatIfPredictionResult
+import com.itb.diabetify.domain.model.prediction.AsyncWhatIfResult
 import com.itb.diabetify.domain.repository.PredictionRepository
 
 class WhatIfPredictionUseCase(
@@ -15,6 +16,7 @@ class WhatIfPredictionUseCase(
         isHypertension: Boolean,
         physicalActivityFrequency: Int,
         isCholesterol: Boolean,
+        pollingIntervalMs: Long = 2000L
     ): WhatIfPredictionResult {
         val smokingStatusError: String? = if (smokingStatus < 0 || smokingStatus > 2) "Status merokok tidak valid" else null
         val yearsOfSmokingError: String? = if (yearsOfSmoking < 0 || yearsOfSmoking > 70) "Lama merokok tidak valid" else null
@@ -52,7 +54,7 @@ class WhatIfPredictionUseCase(
             )
         }
 
-        val whatIfPredictionResult = WhatIfPredictionRequest(
+        val whatIfPredictionRequest = WhatIfPredictionRequest(
             smokingStatus = smokingStatus,
             yearsOfSmoking = yearsOfSmoking,
             avgSmokeCount = avgSmokeCount,
@@ -62,8 +64,24 @@ class WhatIfPredictionUseCase(
             isCholesterol = isCholesterol
         )
 
+        val jobResult = repository.startWhatIfJob(whatIfPredictionRequest)
+        
         return WhatIfPredictionResult(
-            result = repository.whatIfPrediction(whatIfPredictionResult)
+            asyncResult = when {
+                jobResult.data != null -> {
+                    val jobId = jobResult.data.data.jobId
+                    AsyncWhatIfResult(
+                        jobId = jobId,
+                        jobStatusFlow = repository.pollWhatIfJob(jobId, pollingIntervalMs)
+                    )
+                }
+                jobResult.message != null -> {
+                    AsyncWhatIfResult(error = jobResult.message)
+                }
+                else -> {
+                    AsyncWhatIfResult(error = "Terjadi kesalahan yang tidak diketahui")
+                }
+            }
         )
     }
 }

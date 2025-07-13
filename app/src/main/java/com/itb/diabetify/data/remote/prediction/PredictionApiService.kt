@@ -6,7 +6,9 @@ import com.itb.diabetify.data.remote.prediction.response.GetPredictionScoreRespo
 import com.itb.diabetify.data.remote.prediction.response.PredictionJobResponse
 import com.itb.diabetify.data.remote.prediction.response.PredictionJobStatusResponse
 import com.itb.diabetify.data.remote.prediction.response.PredictionResponse
-import com.itb.diabetify.data.remote.prediction.response.WhatIfPredictionResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfJobResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfJobStatusResponse
+import com.itb.diabetify.data.remote.prediction.response.WhatIfJobResultResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -45,5 +47,15 @@ interface PredictionApiService {
     @POST("prediction/what-if")
     suspend fun whatIfPrediction(
         @Body whatIfRequest: WhatIfPredictionRequest
-    ): WhatIfPredictionResponse
+    ): WhatIfJobResponse
+
+    @GET("prediction/job/{jobId}/status")
+    suspend fun getWhatIfJobStatus(
+        @Path("jobId") jobId: String
+    ): WhatIfJobStatusResponse
+
+    @GET("prediction/job/{jobId}/result")
+    suspend fun getWhatIfJobResult(
+        @Path("jobId") jobId: String
+    ): WhatIfJobResultResponse
 }

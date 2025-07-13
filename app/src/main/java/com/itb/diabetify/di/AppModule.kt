@@ -7,6 +7,7 @@ import com.itb.diabetify.data.manager.ActivityManagerImpl
 import com.itb.diabetify.data.manager.ConnectivityManagerImpl
 import com.itb.diabetify.data.manager.LocalUserManagerImpl
 import com.itb.diabetify.data.manager.PredictionJobManagerImpl
+import com.itb.diabetify.data.manager.WhatIfJobManagerImpl
 import com.itb.diabetify.data.manager.PredictionManagerImpl
 import com.itb.diabetify.data.manager.ProfileManagerImpl
 import com.itb.diabetify.data.manager.TokenManagerImpl
@@ -25,6 +26,7 @@ import com.itb.diabetify.data.repository.UserRepositoryImpl
 import com.itb.diabetify.domain.manager.ConnectivityManager
 import com.itb.diabetify.domain.manager.LocalUserManager
 import com.itb.diabetify.domain.manager.PredictionJobManager
+import com.itb.diabetify.domain.manager.WhatIfJobManager
 import com.itb.diabetify.domain.manager.TokenManager
 import com.itb.diabetify.domain.manager.UserManager
 import com.itb.diabetify.domain.manager.ActivityManager
@@ -75,6 +77,8 @@ import com.itb.diabetify.domain.usecases.activity.GetActivityRepositoryUseCase
 import com.itb.diabetify.domain.usecases.prediction.ExplainPredictionUseCase
 import com.itb.diabetify.domain.usecases.prediction.GetLatestPredictionRepositoryUseCase
 import com.itb.diabetify.domain.usecases.prediction.WhatIfPredictionUseCase
+import com.itb.diabetify.domain.usecases.prediction.WhatIfPredictionAsyncUseCase
+import com.itb.diabetify.domain.usecases.prediction.GetWhatIfJobResultUseCase
 import com.itb.diabetify.domain.usecases.profile.GetProfileRepositoryUseCase
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
 import com.itb.diabetify.domain.usecases.user.GetUserRepositoryUseCase
@@ -290,17 +294,27 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesWhatIfJobManager(
+        predictionApiService: PredictionApiService
+    ): WhatIfJobManager {
+        return WhatIfJobManagerImpl(predictionApiService)
+    }
+
+    @Provides
+    @Singleton
     fun providesPredictionRepository(
         predictionApiService: PredictionApiService,
         tokenManager: TokenManager,
         predictionManager: PredictionManager,
-        predictionJobManager: PredictionJobManager
+        predictionJobManager: PredictionJobManager,
+        whatIfJobManager: WhatIfJobManager
     ): PredictionRepository {
         return PredictionRepositoryImpl(
             predictionApiService = predictionApiService,
             tokenManager = tokenManager,
             predictionManager = predictionManager,
-            predictionJobManager = predictionJobManager
+            predictionJobManager = predictionJobManager,
+            whatIfJobManager = whatIfJobManager
         )
     }
 
@@ -318,7 +332,9 @@ object AppModule {
             predictAsync = PredictAsyncUseCase(repository),
             predictBackground = PredictBackgroundUseCase(repository),
             explainPrediction = ExplainPredictionUseCase(repository),
-            whatIfPrediction = WhatIfPredictionUseCase(repository)
+            whatIfPrediction = WhatIfPredictionUseCase(repository),
+            whatIfPredictionAsync = WhatIfPredictionAsyncUseCase(repository),
+            getWhatIfJobResult = GetWhatIfJobResultUseCase(repository)
         )
     }
 

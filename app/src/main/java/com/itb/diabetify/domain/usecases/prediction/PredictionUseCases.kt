@@ -9,5 +9,7 @@ data class PredictionUseCases(
     val predictAsync: PredictAsyncUseCase,
     val predictBackground: PredictBackgroundUseCase,
     val explainPrediction: ExplainPredictionUseCase,
-    val whatIfPrediction: WhatIfPredictionUseCase
+    val whatIfPrediction: WhatIfPredictionUseCase,
+    val whatIfPredictionAsync: WhatIfPredictionAsyncUseCase,
+    val getWhatIfJobResult: GetWhatIfJobResultUseCase
 )

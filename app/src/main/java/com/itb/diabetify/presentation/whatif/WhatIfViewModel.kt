@@ -10,10 +10,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itb.diabetify.domain.usecases.prediction.PredictionUseCases
 import com.itb.diabetify.domain.usecases.profile.ProfileUseCases
+import com.itb.diabetify.data.remote.prediction.request.WhatIfPredictionRequest
 import com.itb.diabetify.presentation.common.FieldState
 import com.itb.diabetify.presentation.home.HomeViewModel.RiskFactor
 import com.itb.diabetify.util.DataState
 import com.itb.diabetify.util.Resource
+import com.itb.diabetify.util.handleAsyncWhatIfPrediction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -279,30 +281,68 @@ class WhatIfViewModel @Inject constructor(
                 isCholesterol = isCholesterol
             )
 
-            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
-
             if (whatIfPredictionResult.smokingStatusError != null) {
                 _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = whatIfPredictionResult.smokingStatusError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                return@launch
             }
 
             if (whatIfPredictionResult.avgSmokeCountError != null) {
                 _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(error = whatIfPredictionResult.avgSmokeCountError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                return@launch
             }
 
             if (whatIfPredictionResult.weightError != null) {
                 _weightFieldState.value = weightFieldState.value.copy(error = whatIfPredictionResult.weightError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                return@launch
             }
 
             if (whatIfPredictionResult.physicalActivityFrequencyError != null) {
                 _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(error = whatIfPredictionResult.physicalActivityFrequencyError)
+                _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                return@launch
             }
 
-            when (whatIfPredictionResult.result) {
-                is Resource.Success -> {
-                    val responseData = whatIfPredictionResult.result.data?.data
+            val whatIfRequest = WhatIfPredictionRequest(
+                smokingStatus = smokingStatus,
+                yearsOfSmoking = yearsOfSmoking,
+                avgSmokeCount = averageCigarettes,
+                weight = weight,
+                isHypertension = isHypertension,
+                physicalActivityFrequency = physicalActivity,
+                isCholesterol = isCholesterol
+            )
 
-                    responseData?.let { data ->
-                        _predictionScore.doubleValue = data.riskPercentage
+            predictionUseCases.handleAsyncWhatIfPrediction(
+                scope = viewModelScope,
+                whatIfRequest = whatIfRequest,
+                onPending = {
+                },
+                onProgress = { progress ->
+                },
+                onCompleted = { jobId ->
+                    handleWhatIfJobCompleted(jobId)
+                },
+                onFailed = { error ->
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _errorMessage.value = error
+                    Log.e("WhatIfViewModel", error)
+                }
+            )
+        }
+    }
+
+    private suspend fun handleWhatIfJobCompleted(jobId: String) {
+        try {
+            val resultResponse = predictionUseCases.getWhatIfJobResult(jobId)
+            
+            when (resultResponse) {
+                is Resource.Success -> {
+                    val data = resultResponse.data?.data
+                    data?.let { resultData ->
+                        _predictionScore.doubleValue = resultData.riskPercentage
 
                         val updatedRiskFactors = _riskFactors.value.map { riskFactor ->
                             val featureKey = when (riskFactor.abbreviation) {
@@ -319,7 +359,7 @@ class WhatIfViewModel @Inject constructor(
                             }
 
                             featureKey?.let { key ->
-                                data.featureExplanations[key]?.let { explanation ->
+                                resultData.featureExplanations[key]?.let { explanation ->
                                     val adjustedContribution = if (explanation.impact == 0) {
                                         -explanation.contribution
                                     } else {
@@ -337,19 +377,24 @@ class WhatIfViewModel @Inject constructor(
                         _riskFactors.value = updatedRiskFactors
                     }
 
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
                     _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
                 }
                 is Resource.Error -> {
-                    _errorMessage.value = whatIfPredictionResult.result.message ?: "Terjadi kesalahan saat melakukan prediksi"
-                    whatIfPredictionResult.result.message?.let { Log.e("WhatIfViewModel", it) }
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _errorMessage.value = resultResponse.message ?: "Terjadi kesalahan saat mengambil hasil prediksi"
+                    Log.e("WhatIfViewModel", resultResponse.message ?: "Unknown error")
                 }
-
                 else -> {
-                    // Handle unexpected error
-                    _errorMessage.value = "Terjadi kesalahan saat melakukan prediksi"
+                    _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _errorMessage.value = "Terjadi kesalahan yang tidak diketahui"
                     Log.e("WhatIfViewModel", "Unknown error occurred")
                 }
             }
+        } catch (e: Exception) {
+            _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+            _errorMessage.value = "Terjadi kesalahan saat memproses hasil: ${e.message}"
+            Log.e("WhatIfViewModel", "Error processing what-if result", e)
         }
     }
 

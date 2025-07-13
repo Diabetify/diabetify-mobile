@@ -70,13 +70,9 @@ fun WhatIfScreen(
     // Navigation Event
     val navigationEvent = viewModel.navigationEvent.value
     LaunchedEffect(navigationEvent) {
-        navigationEvent?.let {
-            when (it) {
-                "WHAT_IF_RESULT_SCREEN" -> {
-                    navController.navigate(Route.WhatIfResultScreen.route)
-                    viewModel.onNavigationHandled()
-                }
-            }
+        if (navigationEvent == "WHAT_IF_RESULT_SCREEN") {
+            navController.navigate(Route.WhatIfResultScreen.route)
+            viewModel.onNavigationHandled()
         }
     }
 

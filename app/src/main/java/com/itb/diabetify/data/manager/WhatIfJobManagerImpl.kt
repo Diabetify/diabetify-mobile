@@ -15,57 +15,57 @@ class WhatIfJobManagerImpl @Inject constructor(
     private val predictionApiService: PredictionApiService
 ) : WhatIfJobManager {
     
-    private val _jobStatus = MutableStateFlow<WhatIfJobStatus>(WhatIfJobStatus.Pending)
-    private var currentJobId: String? = null
-    private var isCancelled = false
+    private val activeJobs = mutableMapOf<String, MutableStateFlow<WhatIfJobStatus>>()
 
     override suspend fun pollJobStatus(jobId: String, pollingIntervalMs: Long): StateFlow<WhatIfJobStatus> {
-        currentJobId = jobId
-        isCancelled = false
-        _jobStatus.value = WhatIfJobStatus.Pending
+        val jobFlow = MutableStateFlow<WhatIfJobStatus>(WhatIfJobStatus.Pending)
+        activeJobs[jobId] = jobFlow
         
         try {
-            while (!isCancelled) {
+            while (true) {
                 val response = predictionApiService.getWhatIfJobStatus(jobId)
                 
                 when (response.data.status.lowercase()) {
                     "pending", "submitted" -> {
-                        _jobStatus.value = WhatIfJobStatus.Pending
+                        jobFlow.value = WhatIfJobStatus.Pending
                     }
                     "processing" -> {
-                        _jobStatus.value = WhatIfJobStatus.InProgress(50)
+                        jobFlow.value = WhatIfJobStatus.InProgress(50)
                     }
                     "completed" -> {
-                        _jobStatus.value = WhatIfJobStatus.Completed
+                        jobFlow.value = WhatIfJobStatus.Completed
+                        activeJobs.remove(jobId)
                         break
                     }
                     "failed" -> {
-                        _jobStatus.value = WhatIfJobStatus.Failed("What-if prediction job failed")
+                        jobFlow.value = WhatIfJobStatus.Failed("What-if prediction job failed")
+                        activeJobs.remove(jobId)
                         break
                     }
                     "cancelled" -> {
-                        _jobStatus.value = WhatIfJobStatus.Failed("What-if prediction job was cancelled")
+                        jobFlow.value = WhatIfJobStatus.Failed("What-if prediction job was cancelled")
+                        activeJobs.remove(jobId)
                         break
                     }
                     else -> {
-                        _jobStatus.value = WhatIfJobStatus.InProgress(50)
+                        jobFlow.value = WhatIfJobStatus.InProgress(50)
                     }
                 }
                 
                 delay(pollingIntervalMs)
             }
         } catch (e: Exception) {
-            if (!isCancelled) {
-                _jobStatus.value = WhatIfJobStatus.Failed(e.message ?: "Unknown error occurred")
-            }
+            jobFlow.value = WhatIfJobStatus.Failed(e.message ?: "Unknown error occurred")
+            activeJobs.remove(jobId)
         }
         
-        return _jobStatus.asStateFlow()
+        return jobFlow.asStateFlow()
     }
 
     override suspend fun cancelJob(jobId: String) {
-        if (currentJobId == jobId) {
-            isCancelled = true
+        activeJobs[jobId]?.let { jobFlow ->
+            jobFlow.value = WhatIfJobStatus.Failed("Job cancelled")
+            activeJobs.remove(jobId)
         }
     }
 }

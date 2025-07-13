@@ -31,6 +31,14 @@ class WhatIfViewModel @Inject constructor(
     private val _navigationEvent = mutableStateOf<String?>(null)
     val navigationEvent: State<String?> = _navigationEvent
 
+    private val _isNavigating = mutableStateOf(false)
+    
+    private val _isCalculating = mutableStateOf(false)
+    
+    private var lastCalculationTime = 0L
+    
+    private var currentJobId: String? = null
+
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
@@ -258,9 +266,43 @@ class WhatIfViewModel @Inject constructor(
         }
     }
 
+    private fun clearWhatIfResults() {
+        _predictionScore.doubleValue = 0.0
+        _riskFactors.value = listOf(
+            RiskFactor("Indeks Massa Tubuh", "IMT", 0.0),
+            RiskFactor("Hipertensi", "H", 0.0),
+            RiskFactor("Riwayat Bayi Makrosomia", "RBM", 0.0),
+            RiskFactor("Aktivitas Fisik", "AF", 0.0),
+            RiskFactor("Usia", "U", 0.0),
+            RiskFactor("Status Merokok", "SM", 0.0),
+            RiskFactor("Indeks Brinkman", "IB", 0.0),
+            RiskFactor("Riwayat Keluarga", "RK", 0.0),
+            RiskFactor("Kolesterol", "K", 0.0),
+        )
+        _navigationEvent.value = null
+        _isNavigating.value = false
+        currentJobId = null
+    }
+
     @SuppressLint("DefaultLocale")
     fun calculateWhatIfPrediction() {
+        val currentTime = System.currentTimeMillis()
+        
+        if (_isCalculating.value) {
+            return
+        }
+        
+        if (currentTime - lastCalculationTime < 5000) {
+            return
+        }
+        
+        lastCalculationTime = currentTime
+
         viewModelScope.launch {
+            _isCalculating.value = true
+            
+            clearWhatIfResults()
+            
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = true)
 
             val smokingStatus = smokingStatusFieldState.value.text.toInt()
@@ -284,24 +326,28 @@ class WhatIfViewModel @Inject constructor(
             if (whatIfPredictionResult.smokingStatusError != null) {
                 _smokingStatusFieldState.value = smokingStatusFieldState.value.copy(error = whatIfPredictionResult.smokingStatusError)
                 _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
                 return@launch
             }
 
             if (whatIfPredictionResult.avgSmokeCountError != null) {
                 _averageCigarettesFieldState.value = averageCigarettesFieldState.value.copy(error = whatIfPredictionResult.avgSmokeCountError)
                 _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
                 return@launch
             }
 
             if (whatIfPredictionResult.weightError != null) {
                 _weightFieldState.value = weightFieldState.value.copy(error = whatIfPredictionResult.weightError)
                 _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
                 return@launch
             }
 
             if (whatIfPredictionResult.physicalActivityFrequencyError != null) {
                 _physicalActivityFieldState.value = physicalActivityFieldState.value.copy(error = whatIfPredictionResult.physicalActivityFrequencyError)
                 _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                _isCalculating.value = false
                 return@launch
             }
 
@@ -323,12 +369,15 @@ class WhatIfViewModel @Inject constructor(
                 onProgress = { progress ->
                 },
                 onCompleted = { jobId ->
-                    handleWhatIfJobCompleted(jobId)
+                    if (currentJobId == null) {
+                        currentJobId = jobId
+                        handleWhatIfJobCompleted(jobId)
+                    }
                 },
                 onFailed = { error ->
                     _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
                     _errorMessage.value = error
-                    Log.e("WhatIfViewModel", error)
                 }
             )
         }
@@ -378,23 +427,28 @@ class WhatIfViewModel @Inject constructor(
                     }
 
                     _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
-                    _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
+                    _isCalculating.value = false
+
+                    if (!_isNavigating.value) {
+                        _isNavigating.value = true
+                        _navigationEvent.value = "WHAT_IF_RESULT_SCREEN"
+                    }
                 }
                 is Resource.Error -> {
                     _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
                     _errorMessage.value = resultResponse.message ?: "Terjadi kesalahan saat mengambil hasil prediksi"
-                    Log.e("WhatIfViewModel", resultResponse.message ?: "Unknown error")
                 }
                 else -> {
                     _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+                    _isCalculating.value = false
                     _errorMessage.value = "Terjadi kesalahan yang tidak diketahui"
-                    Log.e("WhatIfViewModel", "Unknown error occurred")
                 }
             }
         } catch (e: Exception) {
             _whatIfPredictionState.value = whatIfPredictionState.value.copy(isLoading = false)
+            _isCalculating.value = false
             _errorMessage.value = "Terjadi kesalahan saat memproses hasil: ${e.message}"
-            Log.e("WhatIfViewModel", "Error processing what-if result", e)
         }
     }
 
@@ -408,6 +462,9 @@ class WhatIfViewModel @Inject constructor(
 
     fun onNavigationHandled() {
         _navigationEvent.value = null
+        _isNavigating.value = false
+        _isCalculating.value = false
+        currentJobId = null
     }
 
     fun onErrorShown() {

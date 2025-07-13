@@ -6,5 +6,6 @@ import kotlinx.coroutines.flow.Flow
 data class AsyncWhatIfResult(
     val jobId: String? = null,
     val jobStatusFlow: Flow<WhatIfJobStatus>? = null,
-    val error: String? = null
+    val error: String? = null,
+    val onComplete: (() -> Unit)? = null
 )

@@ -50,7 +50,7 @@ data class WhatIfUserDataUsed(
     @SerializedName("age")
     val age: Int,
     @SerializedName("bmi")
-    val bmi: Int,
+    val bmi: Double,
     @SerializedName("brinkman_score")
     val brinkmanScore: Int,
     @SerializedName("is_bloodline")

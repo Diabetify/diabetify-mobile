@@ -516,7 +516,6 @@ class HomeViewModel @Inject constructor(
                     _physicalActivityAverage.intValue = latestPrediction.physicalActivityFrequency
 
                     _whatIfAge.intValue = latestPrediction.age
-                    Log.d("HomeViewModel", "WhatIf Age: ${_whatIfAge.intValue}")
                     _whatIfSmokingStatusFieldState.value = FieldState(
                         text = latestPrediction.smokingStatus,
                         error = null

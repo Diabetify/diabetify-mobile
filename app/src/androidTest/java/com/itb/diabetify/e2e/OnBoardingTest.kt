@@ -1,13 +1,13 @@
 package com.itb.diabetify.e2e
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.itb.diabetify.OnboardingNavigationUtils
 import com.itb.diabetify.presentation.onboarding.OnBoardingEvent
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.pages
@@ -19,7 +19,7 @@ import io.mockk.mockk
 import io.mockk.verify
 
 @RunWith(AndroidJUnit4::class)
-class OnBoardingScreenTest {
+class OnBoardingTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -34,13 +34,13 @@ class OnBoardingScreenTest {
             }
         }
 
-        OnboardingNavigationUtils.verifyOnboardingScreen(composeTestRule)
+        verifyOnboardingScreen(composeTestRule)
 
         composeTestRule.onNodeWithText("Mulai").performClick()
 
 
         for (i in 0 until pages.size - 1) {
-            OnboardingNavigationUtils.verifyOnboardingPage(
+            verifyOnboardingPage(
                 composeTestRule,
                 pages[i].title,
                 pages[i].description
@@ -66,12 +66,12 @@ class OnBoardingScreenTest {
             }
         }
 
-        OnboardingNavigationUtils.verifyOnboardingScreen(composeTestRule)
+        verifyOnboardingScreen(composeTestRule)
 
         composeTestRule.onNodeWithText("Mulai").performClick()
 
         for (i in 0 until pages.size - 1) {
-            OnboardingNavigationUtils.verifyOnboardingPage(
+            verifyOnboardingPage(
                 composeTestRule,
                 pages[i].title,
                 pages[i].description
@@ -79,11 +79,21 @@ class OnBoardingScreenTest {
 
             composeTestRule.onNodeWithText(">").performClick()
             composeTestRule.waitForIdle()
-            OnboardingNavigationUtils.verifyOnboardingPage(
+            verifyOnboardingPage(
                 composeTestRule,
                 pages[i + 1].title,
                 pages[i + 1].description
             )
         }
+    }
+
+    private fun verifyOnboardingScreen(composeTestRule: ComposeTestRule) {
+        composeTestRule.onNodeWithText("Kenali Risiko", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Mulai").assertIsDisplayed()
+    }
+
+    private fun verifyOnboardingPage(composeTestRule: ComposeTestRule, title: String, description: String) {
+        composeTestRule.onNodeWithText(title).assertIsDisplayed()
+        composeTestRule.onNodeWithText(description).assertIsDisplayed()
     }
 }

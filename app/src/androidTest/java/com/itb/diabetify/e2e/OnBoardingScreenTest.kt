@@ -7,6 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.itb.diabetify.OnboardingNavigationUtils
 import com.itb.diabetify.presentation.onboarding.OnBoardingEvent
 import com.itb.diabetify.presentation.onboarding.OnBoardingScreen
 import com.itb.diabetify.presentation.onboarding.pages
@@ -26,22 +27,25 @@ class OnBoardingScreenTest {
     private val mockEvent: (OnBoardingEvent) -> Unit = mockk(relaxed = true)
 
     @Test
-    fun onboardingFlow_E2E_Test() {
+    fun onboardingFlow_E2E_SwipeNavigation_Test() {
         composeTestRule.setContent {
             DiabetifyTheme {
                 OnBoardingScreen(event = mockEvent)
             }
         }
 
-        composeTestRule.onNodeWithText("Kenali Risiko,\nKendalikan Diabetes").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Mulai").assertIsDisplayed()
+        OnboardingNavigationUtils.verifyOnboardingScreen(composeTestRule)
 
         composeTestRule.onNodeWithText("Mulai").performClick()
 
-        composeTestRule.onNodeWithText(pages[0].title).assertIsDisplayed()
-        composeTestRule.onNodeWithText(pages[0].description).assertIsDisplayed()
 
         for (i in 0 until pages.size - 1) {
+            OnboardingNavigationUtils.verifyOnboardingPage(
+                composeTestRule,
+                pages[i].title,
+                pages[i].description
+            )
+
             composeTestRule.onNodeWithText(pages[i].title).performTouchInput {
                 swipeLeft()
             }
@@ -52,5 +56,34 @@ class OnBoardingScreenTest {
         composeTestRule.onNodeWithText(">").performClick()
 
         verify { mockEvent(OnBoardingEvent.SaveAppEntry) }
+    }
+
+    @Test 
+    fun onboardingFlow_E2E_ButtonNavigation_Test() {
+        composeTestRule.setContent {
+            DiabetifyTheme {
+                OnBoardingScreen(event = mockEvent)
+            }
+        }
+
+        OnboardingNavigationUtils.verifyOnboardingScreen(composeTestRule)
+
+        composeTestRule.onNodeWithText("Mulai").performClick()
+
+        for (i in 0 until pages.size - 1) {
+            OnboardingNavigationUtils.verifyOnboardingPage(
+                composeTestRule,
+                pages[i].title,
+                pages[i].description
+            )
+
+            composeTestRule.onNodeWithText(">").performClick()
+            composeTestRule.waitForIdle()
+            OnboardingNavigationUtils.verifyOnboardingPage(
+                composeTestRule,
+                pages[i + 1].title,
+                pages[i + 1].description
+            )
+        }
     }
 }

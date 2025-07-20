@@ -35,6 +35,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -154,7 +155,7 @@ fun OtpScreen(
             BasicTextField(
                 value = TextFieldValue(
                     text = otpFieldState.text,
-                    selection = TextRange(otpFieldState.text.length)
+                    selection = TextRange(otpFieldState.text.length),
                 ),
                 onValueChange = { newValue ->
                     viewModel.setOtp(newValue.text)
@@ -170,7 +171,8 @@ fun OtpScreen(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                    .focusRequester(focusRequester)
+                    .testTag("OtpTextField"),
                 textStyle = TextStyle(
                     fontSize = 1.sp,
                     color = Color.Transparent

@@ -1,4 +1,4 @@
-package com.itb.diabetify.e2e
+package com.itb.diabetify.e2e.presentation.onboarding
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -27,7 +27,7 @@ class OnBoardingTest {
     private val mockEvent: (OnBoardingEvent) -> Unit = mockk(relaxed = true)
 
     @Test
-    fun onboardingFlow_E2E_SwipeNavigation_Test() {
+    fun onboardingFlow_SwipeNavigation_Complete() {
         composeTestRule.setContent {
             DiabetifyTheme {
                 OnBoardingScreen(event = mockEvent)
@@ -59,7 +59,7 @@ class OnBoardingTest {
     }
 
     @Test 
-    fun onboardingFlow_E2E_ButtonNavigation_Test() {
+    fun onboardingFlow_ButtonNavigation_Complete() {
         composeTestRule.setContent {
             DiabetifyTheme {
                 OnBoardingScreen(event = mockEvent)

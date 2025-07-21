@@ -133,12 +133,6 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun providesFakeAuthRepository(): FakeAuthRepository {
-        return FakeAuthRepository()
-    }
-
-    @Provides
-    @Singleton
     fun providesAuthUseCases(
         repository: FakeAuthRepository
     ): AuthUseCases {

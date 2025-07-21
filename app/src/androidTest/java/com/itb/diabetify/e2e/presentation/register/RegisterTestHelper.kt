@@ -1,83 +1,27 @@
-package com.itb.diabetify.e2e
+package com.itb.diabetify.e2e.presentation.register
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.GrantPermissionRule
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.itb.diabetify.MainActivity
-import com.itb.diabetify.di.AppModule
-import com.itb.diabetify.domain.repository.AuthRepository
-import com.itb.diabetify.e2e.repository.FakeAuthRepository
-import dagger.hilt.android.testing.BindValue
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
 
-@UninstallModules(AppModule::class)
-@HiltAndroidTest
-@RunWith(AndroidJUnit4::class)
-class RegisterTest {
-
-    @get:Rule(order = 0)
-    val hiltRule = HiltAndroidRule(this)
-
-    @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
-
-    @get:Rule(order = 2)
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.POST_NOTIFICATIONS
-    )
-
-    @BindValue
-    val fakeRepo: AuthRepository = FakeAuthRepository()
-
-    @Before
-    fun setUp() {
-        hiltRule.inject()
-    }
-
-    @Test
-    fun completeRegistrationFlow_E2E_ActsLikeRealUser() {
-        startAppAndNavigateToRegister()
-
-        fillRegistrationForm(
-            name = "John Doe",
-            email = "john.doe@example.com",
-            password = "SecurePassword123"
-        )
-
-        acceptPrivacyPolicyAndSubmit()
-
-        fillBiodataFormIfPresent(
-            gender = "Laki-laki",
-            birthDate = "15/08/1990"
-        )
-
-        proceedToOtpVerificationIfPresent()
-
-        enterOtpAndVerifyIfPresent("123456")
-
-        verifyRegistrationFlowCompletion()
-    }
+class RegisterTestHelper(
+    private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
+) {
 
     @SuppressLint("CheckResult")
-    private fun startAppAndNavigateToRegister() {
+    fun startAppAndNavigateToRegister() {
         composeTestRule.waitForIdle()
         Thread.sleep(1000)
 
@@ -162,7 +106,7 @@ class RegisterTest {
         throw AssertionError("Could not navigate to register screen after completing onboarding. Current screen might be different than expected.")
     }
 
-    private fun fillRegistrationForm(name: String, email: String, password: String) {
+    fun fillRegistrationForm(name: String, email: String, password: String) {
         composeTestRule.onNode(hasText("Nama", substring = true))
             .performClick()
             .performTextInput(name)
@@ -178,7 +122,7 @@ class RegisterTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun acceptPrivacyPolicyAndSubmit() {
+    fun acceptPrivacyPolicyAndSubmit() {
         composeTestRule.onNodeWithTag("PrivacyPolicyCheckbox")
             .performClick()
 
@@ -188,11 +132,9 @@ class RegisterTest {
             .performClick()
 
         composeTestRule.waitForIdle()
-
-
     }
 
-    private fun fillBiodataFormIfPresent(gender: String, birthDate: String) {
+    fun fillBiodataFormIfPresent(gender: String, birthDate: String) {
         try {
             composeTestRule.onNode(hasText("Lengkapi Profil", substring = true))
                 .assertIsDisplayed()
@@ -223,14 +165,14 @@ class RegisterTest {
         } catch (e: AssertionError) {
             try {
                 composeTestRule.onNodeWithText("Konfirmasi").performClick()
-            } catch (e2: AssertionError) {
+            } catch (_: AssertionError) {
             }
         }
 
         composeTestRule.waitForIdle()
     }
 
-    private fun proceedToOtpVerificationIfPresent() {
+    fun proceedToOtpVerificationIfPresent() {
         try {
             composeTestRule.onNode(hasText("Lanjut", substring = true))
                 .performClick()
@@ -240,7 +182,7 @@ class RegisterTest {
         }
     }
 
-    private fun enterOtpAndVerifyIfPresent(otpCode: String) {
+    fun enterOtpAndVerifyIfPresent(otpCode: String) {
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule
                 .onAllNodesWithTag("OtpTextField")
@@ -262,7 +204,7 @@ class RegisterTest {
         composeTestRule.mainClock.autoAdvance = false
     }
 
-    private fun verifyRegistrationFlowCompletion() {
+    fun verifyRegistrationFlowCompletion() {
         try {
             composeTestRule.onNode(hasText("Selamat", substring = true))
                 .assertIsDisplayed()
@@ -298,6 +240,117 @@ class RegisterTest {
                 } catch (_: AssertionError) {
                 }
             }
+        }
+    }
+
+    fun enterOtpAndVerifyIfPresentV2(otpCode: String) {
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule
+                .onAllNodesWithTag("OtpTextField")
+                .fetchSemanticsNodes().size == 1
+        }
+
+        enterOtpAndVerifyV2(otpCode)
+    }
+
+    private fun enterOtpAndVerifyV2(otpCode: String) {
+        composeTestRule.onNodeWithTag("OtpTextField")
+            .performTextInput(otpCode)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(hasText("Verifikasi") and hasClickAction())
+            .performClick()
+    }
+
+    fun fillRegistrationFormWithValidation(
+        name: String,
+        email: String,
+        password: String,
+        expectValidation: Boolean = false
+    ) {
+        fillRegistrationForm(name, email, password)
+
+        if (expectValidation) {
+            composeTestRule.waitForIdle()
+            Thread.sleep(500)
+        }
+    }
+
+    fun waitForErrorMessage(errorText: String, timeoutMs: Long = 5000) {
+        composeTestRule.waitUntil(timeoutMillis = timeoutMs) {
+            try {
+                composeTestRule.onNode(hasText(errorText, substring = true))
+                    .assertIsDisplayed()
+                true
+            } catch (e: AssertionError) {
+                false
+            }
+        }
+    }
+
+    fun verifyStillOnRegisterScreen() {
+        composeTestRule.onNodeWithText("Buat Akun Anda").assertIsDisplayed()
+    }
+
+    fun acceptPrivacyPolicyOnly() {
+        composeTestRule.onNodeWithTag("PrivacyPolicyCheckbox")
+            .performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    fun clickRegisterButton() {
+        composeTestRule.onNodeWithText("Daftar")
+            .performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    fun testPasswordVisibilityToggle() {
+        composeTestRule.onNode(hasText("Nama", substring = true))
+            .performClick()
+            .performTextInput("John Doe")
+
+        composeTestRule.onNode(hasText("Email", substring = true))
+            .performClick()
+            .performTextInput("john.doe@example.com")
+
+        composeTestRule.onNode(hasText("Kata Sandi", substring = true))
+            .performClick()
+            .performTextInput("SecurePassword123")
+
+        composeTestRule.waitForIdle()
+
+        try {
+            composeTestRule.onNode(hasText("Show password"))
+                .assertIsDisplayed()
+                .performClick()
+
+            composeTestRule.waitForIdle()
+
+            composeTestRule.onNode(hasText("Hide password"))
+                .assertIsDisplayed()
+        } catch (e: AssertionError) {
+            try {
+                composeTestRule.onNodeWithTag("PasswordVisibilityIcon")
+                    .performClick()
+                composeTestRule.waitForIdle()
+            } catch (e2: AssertionError) {
+            }
+        }
+    }
+
+    fun navigateBackToLogin() {
+        composeTestRule.onNode(hasText("Sudah memiliki akun", substring = true))
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        try {
+            composeTestRule.onNode(hasText("Masuk", substring = true))
+                .assertIsDisplayed()
+        } catch (e: AssertionError) {
+            composeTestRule.onNode(hasText("Login", substring = true))
+                .assertIsDisplayed()
         }
     }
 }

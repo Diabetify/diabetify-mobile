@@ -5,16 +5,19 @@
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="OnBoardingTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="RegisterTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="registerFlow_E2E_Test()">
+      <SelectionState runConfigName="registerWithDuplicateEmail_ShowsErrorMessage()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="completeRegistrationFlow_E2E_ActsLikeRealUser()">
+      <SelectionState runConfigName="registerWithNetworkError_ShowsErrorMessage()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="otpVerificationWithInvalidCode_ShowsErrorMessage()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="Tests in 'com.itb.diabetify.e2e'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

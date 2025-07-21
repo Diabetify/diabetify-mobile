@@ -5,19 +5,19 @@
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="RegisterTest">
+      <SelectionState runConfigName="LoginTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="registerWithDuplicateEmail_ShowsErrorMessage()">
+      <SelectionState runConfigName="loginFormFieldValidation_RealTime()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="registerWithNetworkError_ShowsErrorMessage()">
+      <SelectionState runConfigName="loginButtonDisabled_WhenFieldsEmpty()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="otpVerificationWithInvalidCode_ShowsErrorMessage()">
+      <SelectionState runConfigName="loginWithWrongPassword_ShowsErrorMessage()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.itb.diabetify.e2e'">
+      <SelectionState runConfigName="loginWithSpecialCharactersInEmail_WorksCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

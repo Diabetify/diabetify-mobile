@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -158,7 +159,8 @@ fun InputField(
     enabled: Boolean? = true,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    errorMessage: String = ""
+    errorMessage: String = "",
+    testTag: String = ""
 ) {
     Box(
         modifier = modifier
@@ -177,7 +179,8 @@ fun InputField(
                     width = 1.dp,
                     color = if (isError) Color.Red else Color.Transparent,
                     shape = RoundedCornerShape(16.dp)
-                ),
+                )
+                .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier),
             textStyle = TextStyle(
                 fontFamily = poppinsFontFamily,
                 fontSize = 12.sp

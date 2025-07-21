@@ -119,6 +119,7 @@ fun LoginScreen(
                     keyboardType = KeyboardType.Email,
                     isError = emailState.error != null,
                     errorMessage = emailState.error ?: "",
+                    testTag = "EmailTextField"
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -149,6 +150,7 @@ fun LoginScreen(
                     },
                     isError = passwordState.error != null,
                     errorMessage = passwordState.error ?: "",
+                    testTag = "PasswordTextField"
                 )
 
                 // Forgot password

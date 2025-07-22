@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -179,7 +180,8 @@ fun ChangePasswordScreen(
                     }
                 },
                 isError = passwordFieldState.error != null,
-                errorMessage = passwordFieldState.error ?: ""
+                errorMessage = passwordFieldState.error ?: "",
+                testTag = "ChangePasswordNewPasswordTextField"
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -203,7 +205,8 @@ fun ChangePasswordScreen(
                     }
                 ),
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("ChangePasswordOtpTextField"),
                 textStyle = TextStyle(
                     fontSize = 1.sp,
                     color = Color.Transparent
@@ -307,7 +310,7 @@ fun ChangePasswordScreen(
 
         // Change password button
         PrimaryButton(
-            text = "Ubah Kata Sandi",
+            text = "Ubah Sandi",
             onClick = {
                 val isValid = viewModel.validateChangePasswordFields()
                 if (isValid) {

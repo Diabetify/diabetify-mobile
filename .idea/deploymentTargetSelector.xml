@@ -5,19 +5,19 @@
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="LoginTest">
+      <SelectionState runConfigName="ForgotPasswordTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="loginFormFieldValidation_RealTime()">
+      <SelectionState runConfigName="forgotPasswordWithIncompleteOtp_ShowsValidationError()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="loginButtonDisabled_WhenFieldsEmpty()">
+      <SelectionState runConfigName="changePasswordWithNetworkError_ShowsErrorMessage()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="loginWithWrongPassword_ShowsErrorMessage()">
+      <SelectionState runConfigName="forgotPasswordFlow_Complete()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="loginWithSpecialCharactersInEmail_WorksCorrectly()">
+      <SelectionState runConfigName="Tests in 'com.itb.diabetify.e2e'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

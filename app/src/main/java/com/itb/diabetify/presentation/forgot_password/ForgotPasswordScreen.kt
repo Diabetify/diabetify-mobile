@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -113,7 +114,8 @@ fun ForgotPasswordScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Email,
                     isError = emailFieldState.error != null,
-                    errorMessage = emailFieldState.error ?: ""
+                    errorMessage = emailFieldState.error ?: "",
+                    testTag = "ForgotPasswordEmailTextField"
                 )
             }
         }

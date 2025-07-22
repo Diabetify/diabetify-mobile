@@ -15,10 +15,12 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
     var shouldFailSendVerification = false
     var shouldFailVerifyOtp = false
     var shouldFailLogin = false
+    var shouldFailChangePassword = false
     var createAccountErrorType = "duplicate_email"
     var sendVerificationErrorType = "email_not_found"
     var verifyOtpErrorType = "invalid_otp"
     var loginErrorType = "wrong_password"
+    var changePasswordErrorType = "network_error"
 
     override suspend fun createAccount(
         createAccountRequest: CreateAccountRequest
@@ -81,6 +83,14 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
     }
 
     override suspend fun changePassword(changePasswordRequest: ChangePasswordRequest): Resource<Unit> {
+        if (shouldFailChangePassword) {
+            return when (changePasswordErrorType) {
+                "invalid_otp" -> Resource.Error("Kode OTP salah atau sudah kadaluarsa")
+                "weak_password" -> Resource.Error("Kata sandi harus lebih dari 8 karakter")
+                "network_error" -> Resource.Error("Network error occurred")
+                else -> Resource.Error("Unknown error")
+            }
+        }
         return Resource.Success(Unit)
     }
 
@@ -93,9 +103,11 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
         shouldFailSendVerification = false
         shouldFailVerifyOtp = false
         shouldFailLogin = false
+        shouldFailChangePassword = false
         createAccountErrorType = "duplicate_email"
         sendVerificationErrorType = "email_not_found"
         verifyOtpErrorType = "invalid_otp"
         loginErrorType = "wrong_password"
+        changePasswordErrorType = "network_error"
     }
 }

@@ -5,19 +5,19 @@
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ForgotPasswordTest">
+      <SelectionState runConfigName="SurveyTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="forgotPasswordWithIncompleteOtp_ShowsValidationError()">
+      <SelectionState runConfigName="surveyProgressIndicator_WorksCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="changePasswordWithNetworkError_ShowsErrorMessage()">
+      <SelectionState runConfigName="surveyForMaleUser_SkipsPregnancyQuestion()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="forgotPasswordFlow_Complete()">
+      <SelectionState runConfigName="surveyForFemaleUser_ShowsPregnancyQuestion()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.itb.diabetify.e2e'">
+      <SelectionState runConfigName="surveyWithMaximumValues_WorksCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

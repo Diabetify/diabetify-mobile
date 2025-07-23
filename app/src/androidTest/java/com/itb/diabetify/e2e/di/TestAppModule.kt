@@ -81,6 +81,8 @@ import com.itb.diabetify.domain.usecases.user.GetUserRepositoryUseCase
 import com.itb.diabetify.domain.usecases.user.GetUserUseCase
 import com.itb.diabetify.domain.usecases.user.UserUseCases
 import com.itb.diabetify.e2e.repository.FakeAuthRepository
+import com.itb.diabetify.e2e.repository.FakeProfileRepository
+import com.itb.diabetify.e2e.repository.FakeUserRepository
 import com.itb.diabetify.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -174,22 +176,8 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun providesUserRepository(
-        userApiService: UserApiService,
-        tokenManager: TokenManager,
-        userManager: UserManager
-    ): UserRepository {
-        return UserRepositoryImpl(
-            userApiService = userApiService,
-            tokenManager = tokenManager,
-            userManager = userManager
-        )
-    }
-
-    @Provides
-    @Singleton
     fun providesUserUseCases(
-        repository: UserRepository
+        repository: FakeUserRepository
     ): UserUseCases {
         return UserUseCases(
             getUser = GetUserUseCase(repository),
@@ -315,39 +303,8 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun providesProfileApiService(okHttpClient: OkHttpClient): ProfileApiService {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ProfileApiService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun providesProfileManager(): ProfileManager {
-        return ProfileManagerImpl()
-    }
-
-    @Provides
-    @Singleton
-    fun providesProfileRepository(
-        profileApiService: ProfileApiService,
-        tokenManager: TokenManager,
-        profileManager: ProfileManager
-    ): ProfileRepository {
-        return ProfileRepositoryImpl(
-            profileApiService = profileApiService,
-            tokenManager = tokenManager,
-            profileManager = profileManager
-        )
-    }
-
-    @Provides
-    @Singleton
     fun provideProfileUseCases(
-        repository: ProfileRepository
+        repository: FakeProfileRepository
     ): ProfileUseCases {
         return ProfileUseCases(
             addProfile = AddProfileUseCase(repository),

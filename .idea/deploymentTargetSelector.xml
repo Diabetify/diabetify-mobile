@@ -5,19 +5,19 @@
       <SelectionState runConfigName="App">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SurveyTest">
+      <SelectionState runConfigName="homeFlow_Complete()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="surveyProgressIndicator_WorksCorrectly()">
+      <SelectionState runConfigName="homeScreen_DisplaysAllMainContent()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="surveyForMaleUser_SkipsPregnancyQuestion()">
+      <SelectionState runConfigName="homeScreen_DisplaysHealthAndLifestyleData()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="surveyForFemaleUser_ShowsPregnancyQuestion()">
+      <SelectionState runConfigName="homeScreen_NavigateToRiskDetail_WorksCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="surveyWithMaximumValues_WorksCorrectly()">
+      <SelectionState runConfigName="homeScreen_NavigateToRiskFactorDetail_WorksCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
